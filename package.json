@@ -3,19 +3,24 @@
   "version": "0.0.0",
   "license": "NONE",
   "scripts": {
-    "client": "nx run client:serve"
+    "client:dev": "nx run client:serve",
+    "server:dev": "nx run server:serve",
+    "start": "nx run-many --target=serve --projects=client,server --parallel"
   },
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^10.0.1",
+    "@nestjs/testing": "^10.0.2",
     "@nx/eslint": "20.4.5",
     "@nx/eslint-plugin": "20.4.5",
     "@nx/js": "20.4.5",
     "@nx/nest": "^20.4.5",
+    "@nx/node": "20.4.5",
     "@nx/react": "^20.4.5",
     "@nx/vite": "20.4.5",
     "@nx/web": "20.4.5",
+    "@nx/webpack": "20.4.5",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.3.12",
     "@swc/core": "~1.5.7",
@@ -41,18 +46,29 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.0",
     "vite": "^5.0.0",
-    "vitest": "^1.3.1"
+    "vitest": "^1.3.1",
+    "webpack-cli": "^5.1.4"
   },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.751.0",
+    "@aws-sdk/client-s3": "^3.750.0",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@nestjs/common": "^10.0.2",
+    "@nestjs/core": "^10.0.2",
+    "@nestjs/platform-express": "^10.0.2",
+    "axios": "^1.6.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "jotai": "^2.12.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-router-dom": "6.11.2"
+    "react-router-dom": "6.11.2",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
   }
 }
