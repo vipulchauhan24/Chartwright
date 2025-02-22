@@ -1,14 +1,30 @@
 import { Field, Input, Label } from '@headlessui/react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
-function CWTextInput() {
+interface ICWTextInput {
+  id: string;
+  label: string;
+  defaultValue: string;
+  onChange: (e: any) => void;
+}
+
+function CWTextInput(props: ICWTextInput) {
+  const { id, label, defaultValue, onChange } = props;
   return (
-    <Field>
-      <div className="flex items-center justify-start gap-1">
-        <Label className="text-md font-medium text-primary-text">Name</Label>
-        <InformationCircleIcon className="w-5 h-5" />
+    <Field className="flex items-center justify-between">
+      <Label
+        htmlFor={id}
+        className="text-base font-normal text-primary-text select-none"
+      >
+        {label}
+      </Label>
+      <div className="relative">
+        <Input
+          id={id}
+          value={defaultValue}
+          onChange={onChange}
+          className="text-primary-text border border-primary-border py-2 pl-3 pr-8 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+        />
       </div>
-      <Input className="mt-3 block w-full rounded-lg border border-primary-border py-1.5 px-3 text-sm/6 text-primary-text focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25" />
     </Field>
   );
 }

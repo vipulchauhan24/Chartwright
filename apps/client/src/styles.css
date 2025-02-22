@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
-*:where(.divide-white\/5 > :not(:last-child)) {
-  /* border: none; */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 100vw;
+  height: 100vh;
 }
