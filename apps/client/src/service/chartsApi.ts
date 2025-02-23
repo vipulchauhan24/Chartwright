@@ -14,6 +14,8 @@ export const fetchAllChartData = atom(null, async (get, set) => {
   } catch (error) {
     console.error('Error fetching data:', error);
     set(allCharts, []);
+  } finally {
+    set(loadingChartConfig, false);
   }
 });
 
@@ -25,7 +27,7 @@ export const fetchAllChartConfigById = atom(
         `http://localhost:3000/api/chart-config/${chart_id}`
       );
 
-      set(chartGlobalConfig, JSON.parse(response.data['base_config']['S']));
+      // set(chartGlobalConfig, JSON.parse(response.data['base_config']['S']));
     } catch (error) {
       console.error('Error fetching data:', error);
       set(chartGlobalConfig, null);

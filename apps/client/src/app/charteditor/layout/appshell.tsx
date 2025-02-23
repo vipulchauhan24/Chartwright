@@ -1,10 +1,10 @@
-import AppSidebar from './appsidebar';
+import AppHeader from './appheader';
 
 function AppShell({ children }: { children: React.ReactElement }) {
   return (
-    <div className="flex items-start w-full h-full">
-      <AppSidebar />
-      {children}
+    <div className="w-full h-full">
+      <AppHeader />
+      <main className="h-[calc(100%_-_4.5rem)]">{children}</main>
     </div>
   );
 }

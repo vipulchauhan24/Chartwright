@@ -1,6 +1,9 @@
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { chartGlobalConfig } from '../../../../store/charts';
+import {
+  chartDataConfigStore,
+  chartGlobalConfig,
+} from '../../../../store/charts';
 import { DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
 import { alignments, legendPositions } from '../../utils/constants';
 import CWAccordian from '../../../components/accordian';
@@ -13,176 +16,47 @@ interface IChartGlobalOptions {
   inputsProps: Array<IInputRenderer>;
 }
 
-const gconfig = {
-  globalOptions: {
-    legend: ['visible', 'position', 'alignment', 'color', 'font'],
-    title: ['visible', 'text', 'alignment', 'color', 'font'],
-    subtitle: ['visible', 'text', 'alignment', 'color', 'font'],
-    grid: ['visible', 'xaxis', 'yaxis'],
-    // xAxis: ['visible', 'gridOffset'],
-    // yAxis: ['visible', 'gridOffset'],
-    others: ['background'],
-  },
-  chartOptions: {
-    dataset: {
-      type: 'AOS',
-      properties: [
-        'label',
-        'data',
-        'pointRadius',
-        'pointStyle',
-        'backgroundColor',
-        'pointBackgroundColor',
-        'pointHoverBackgroundColor',
-        'borderColor',
-        'pointBorderColor',
-        'pointHoverBorderColor',
-        'borderWidth',
-        'hoverBorderWidth',
-        'pointBorderWidth',
-        'indexAxis',
-        'fill',
-      ],
-    },
-  },
-};
-
-const chartDataConfig = {
-  type: 'line',
-  series: [
-    {
-      name: 'Series 1',
-      data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
-    },
-    {
-      name: 'Series 2',
-      data: [23, 42, 35, 27, 43, 52, 61, 75, 90],
-    },
-  ],
-  options: {
-    stroke: {
-      curve: 'smooth',
-    },
-    xaxis: {
-      categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-      ],
-    },
-    legend: {
-      show: true,
-      position: 'top',
-      horizontalAlign: 'center',
-      fontSize: '14px',
-    },
-    title: {
-      show: true,
-      text: 'Chart title',
-      align: 'left',
-      // margin: 10,
-      // offsetX: 0,
-      // offsetY: 0,
-      // floating: false,
-      style: {
-        fontSize: '14px',
-        // fontWeight: 'bold',
-        // fontFamily: undefined,
-        // color: '#263238',
-      },
-    },
-    subtitle: {
-      show: true,
-      text: 'Chart subtitle',
-      align: 'left',
-      // margin: 10,
-      // offsetX: 0,
-      // offsetY: 0,
-      // floating: false,
-      style: {
-        fontSize: '12px',
-        // fontWeight: 'normal',
-        // fontFamily: undefined,
-        // color: '#9699a2',
-      },
-    },
-    grid: {
-      show: true,
-      // borderColor: '#90A4AE',
-      // strokeDashArray: 0,
-      // position: 'back',
-      xaxis: {
-        lines: {
-          show: false,
-        },
-      },
-      yaxis: {
-        lines: {
-          show: false,
-        },
-      },
-      // row: {
-      //   colors: undefined,
-      //   opacity: 0.5,
-      // },
-      // column: {
-      //   colors: undefined,
-      //   opacity: 0.5,
-      // },
-      // padding: {
-      //   top: 0,
-      //   right: 0,
-      //   bottom: 0,
-      //   left: 0,
-      // },
-    },
-  },
-};
-
 function GlobalOptionsEditor() {
-  // const [config] = useAtom(chartGlobalConfig);
-  const [config] = useState(gconfig);
+  const [config] = useAtom(chartGlobalConfig);
+  const [chartDataConfig] = useAtom(chartDataConfigStore);
   const [globalOptions, setGlobalOptions] = useState<
     Array<IChartGlobalOptions>
   >([]);
 
-  const onLegendPropsUpdate = useCallback((event: any, key: DATA_SET_KEY) => {
-    if (event) {
-      event.stopPropagation();
-    }
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    let configChanged = true;
-    switch (key) {
-      case DATA_SET_KEY.display:
-        config.legend.show = !config.legend.show;
-        break;
-      case DATA_SET_KEY.position:
-        config.legend.position = event.target.value;
-        break;
-      case DATA_SET_KEY.alignment:
-        config.legend.horizontalAlign = event.target.value;
-        break;
-      // case DATA_SET_KEY.color:
-      //   config.options.plugins.legend.labels.color = event.target.value;
-      //   break;
-      case DATA_SET_KEY.fontSize:
-        config.options.legend.fontSize = event.target.value;
-        break;
-      default:
-        configChanged = false;
-        break;
-    }
+  const onLegendPropsUpdate = useCallback(
+    (event: any, key: DATA_SET_KEY) => {
+      if (event) {
+        event.stopPropagation();
+      }
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+      switch (key) {
+        case DATA_SET_KEY.display:
+          config.legend.show = !config.legend.show;
+          break;
+        case DATA_SET_KEY.position:
+          config.legend.position = event.target.value;
+          break;
+        case DATA_SET_KEY.alignment:
+          config.legend.horizontalAlign = event.target.value;
+          break;
+        // case DATA_SET_KEY.color:
+        //   config.options.plugins.legend.labels.color = event.target.value;
+        //   break;
+        case DATA_SET_KEY.fontSize:
+          config.options.legend.fontSize = event.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
 
-    //   if (configChanged) {
-    //     setChartConfigurations(config);
-    //   }
-  }, []);
+      //   if (configChanged) {
+      //     setChartConfigurations(config);
+      //   }
+    },
+    [chartDataConfig]
+  );
 
   const legendOptions = useMemo(() => {
     if (!config || !chartDataConfig) {
@@ -246,42 +120,45 @@ function GlobalOptionsEditor() {
         },
       ],
     };
-  }, [config, onLegendPropsUpdate]);
+  }, [chartDataConfig, config, onLegendPropsUpdate]);
 
-  const onTitlePropsUpdate = useCallback((event: any, key: DATA_SET_KEY) => {
-    if (event) {
-      event.stopPropagation();
-    }
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    let configChanged = true;
-    switch (key) {
-      case DATA_SET_KEY.display:
-        config.options.title.show = !config.options.title.show;
-        break;
-      case DATA_SET_KEY.position:
-        config.options.title.position = event.target.value;
-        break;
-      case DATA_SET_KEY.alignment:
-        config.options.title.align = event.target.value;
-        break;
-      // case DATA_SET_KEY.color:
-      //   config.options.plugins.title.color = event.target.value;
-      //   break;
-      case DATA_SET_KEY.fontSize:
-        config.options.title.style.fontSize = event.target.value;
-        break;
-      case DATA_SET_KEY.data:
-        config.options.title.text = event.target.value;
-        break;
-      default:
-        configChanged = false;
-        break;
-    }
+  const onTitlePropsUpdate = useCallback(
+    (event: any, key: DATA_SET_KEY) => {
+      if (event) {
+        event.stopPropagation();
+      }
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+      switch (key) {
+        case DATA_SET_KEY.display:
+          config.options.title.show = !config.options.title.show;
+          break;
+        case DATA_SET_KEY.position:
+          config.options.title.position = event.target.value;
+          break;
+        case DATA_SET_KEY.alignment:
+          config.options.title.align = event.target.value;
+          break;
+        // case DATA_SET_KEY.color:
+        //   config.options.plugins.title.color = event.target.value;
+        //   break;
+        case DATA_SET_KEY.fontSize:
+          config.options.title.style.fontSize = event.target.value;
+          break;
+        case DATA_SET_KEY.data:
+          config.options.title.text = event.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
 
-    // if (configChanged) {
-    //   setChartConfigurations(config);
-    // }
-  }, []);
+      // if (configChanged) {
+      //   setChartConfigurations(config);
+      // }
+    },
+    [chartDataConfig]
+  );
 
   const titleOptions = useMemo(() => {
     if (!config || !chartDataConfig) {
@@ -342,39 +219,42 @@ function GlobalOptionsEditor() {
         },
       ],
     };
-  }, [config, onTitlePropsUpdate]);
+  }, [chartDataConfig, config, onTitlePropsUpdate]);
 
-  const onSubtitlePropsUpdate = useCallback((event: any, key: DATA_SET_KEY) => {
-    if (event) {
-      event.stopPropagation();
-    }
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    let configChanged = true;
-    switch (key) {
-      case DATA_SET_KEY.display:
-        config.options.subtitle.show = !config.options.subtitle.show;
-        break;
-      case DATA_SET_KEY.alignment:
-        config.options.subtitle.align = event.target.value;
-        break;
-      // case DATA_SET_KEY.color:
-      //   config.options.plugins.subtitle.color = event.target.value;
-      //   break;
-      case DATA_SET_KEY.fontSize:
-        config.options.subtitle.style.fontSize = event.target.value;
-        break;
-      case DATA_SET_KEY.data:
-        config.options.subtitle.text = event.target.value;
-        break;
-      default:
-        configChanged = false;
-        break;
-    }
+  const onSubtitlePropsUpdate = useCallback(
+    (event: any, key: DATA_SET_KEY) => {
+      if (event) {
+        event.stopPropagation();
+      }
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+      switch (key) {
+        case DATA_SET_KEY.display:
+          config.options.subtitle.show = !config.options.subtitle.show;
+          break;
+        case DATA_SET_KEY.alignment:
+          config.options.subtitle.align = event.target.value;
+          break;
+        // case DATA_SET_KEY.color:
+        //   config.options.plugins.subtitle.color = event.target.value;
+        //   break;
+        case DATA_SET_KEY.fontSize:
+          config.options.subtitle.style.fontSize = event.target.value;
+          break;
+        case DATA_SET_KEY.data:
+          config.options.subtitle.text = event.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
 
-    // if (configChanged) {
-    //   setChartConfigurations(config);
-    // }
-  }, []);
+      // if (configChanged) {
+      //   setChartConfigurations(config);
+      // }
+    },
+    [chartDataConfig]
+  );
 
   const subtitleOptions = useMemo(() => {
     if (!config || !chartDataConfig) {
@@ -435,7 +315,7 @@ function GlobalOptionsEditor() {
         },
       ],
     };
-  }, [config, onSubtitlePropsUpdate]);
+  }, [chartDataConfig, config, onSubtitlePropsUpdate]);
 
   const gridOptions = useMemo(() => {
     if (!config || !chartDataConfig) {
@@ -474,7 +354,7 @@ function GlobalOptionsEditor() {
         },
       ],
     };
-  }, [config, onSubtitlePropsUpdate]);
+  }, [chartDataConfig, config, onSubtitlePropsUpdate]);
 
   const generateChartGlobalOptions = useCallback(() => {
     if (!config) {
@@ -537,17 +417,16 @@ function GlobalOptionsEditor() {
     <div className="px-4">
       {globalOptions.map((options: IChartGlobalOptions) => {
         return (
-          <div className="mt-2">
+          <div className="mt-2" key={options.id}>
             <CWAccordian
-              key={options.id}
               id={options.id}
               panelHeading={options.panelHeading}
               defaultOpen={options.open}
               panelComponent={options.inputsProps.map(
                 (props: IInputRenderer) => {
                   return (
-                    <div className="mt-2">
-                      <InputRenderer {...props} key={props.id} />
+                    <div className="mt-2" key={props.id}>
+                      <InputRenderer {...props} />
                     </div>
                   );
                 }

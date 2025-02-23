@@ -35,7 +35,7 @@ function CWSelect(props: ICWSelect) {
               <option
                 key={item.id}
                 value={item.value}
-                selected={defaultValue === item.value}
+                defaultValue={defaultValue}
               >
                 {item.label}
               </option>

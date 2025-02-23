@@ -10,7 +10,7 @@ interface ICWTextInput {
 function CWTextInput(props: ICWTextInput) {
   const { id, label, defaultValue, onChange } = props;
   return (
-    <Field className="flex items-center justify-between">
+    <Field className="flex items-center justify-between gap-2">
       <Label
         htmlFor={id}
         className="text-base font-normal text-primary-text select-none"
@@ -22,7 +22,7 @@ function CWTextInput(props: ICWTextInput) {
           id={id}
           value={defaultValue}
           onChange={onChange}
-          className="text-primary-text border border-primary-border py-2 pl-3 pr-8 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text border border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         />
       </div>
     </Field>

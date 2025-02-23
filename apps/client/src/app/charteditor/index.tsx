@@ -6,6 +6,11 @@ import {
 } from '../../service/chartsApi';
 import { allCharts, loadingChartConfig } from '../../store/charts';
 import { useEffect } from 'react';
+import ChartRenderer from './containers/chartRenderer';
+import GlobalOptionsEditor from './containers/globalOptionsEditor';
+import CWLink from '../components/link';
+import Spinner from '../components/spinner';
+import ChartDataEditor from './containers/chartDataEditor';
 
 function ChartEditor() {
   const [, fetchData] = useAtom(fetchAllChartData);
@@ -26,14 +31,29 @@ function ChartEditor() {
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
+        <Spinner />
       </div>
     );
   }
 
   return (
     <AppShell>
-      <p>hello</p>
+      <div className="flex items-start justify-between h-full">
+        <aside className="w-1/5 min-w-80 h-full border-r border-primary-border flex flex-col items-center">
+          <div className="w-full h-full overflow-y-auto">
+            <GlobalOptionsEditor />
+          </div>
+          <div className="p-4">
+            <CWLink href="#" label="Need Help?" />
+          </div>
+        </aside>
+        <div>
+          <ChartRenderer />
+        </div>
+        <aside className="w-1/5 min-w-80 h-full border-l border-primary-border overflow-y-auto">
+          <ChartDataEditor />
+        </aside>
+      </div>
     </AppShell>
   );
 }

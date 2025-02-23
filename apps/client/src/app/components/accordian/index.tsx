@@ -15,7 +15,7 @@ interface ICWAccordian {
 function CWAccordian(props: ICWAccordian) {
   const { id, panelHeading, defaultOpen, panelComponent } = props;
   return (
-    <div id={id} className="mx-auto w-full max-w-lg rounded-xl bg-white/5">
+    <div id={id} className="mx-auto w-full rounded-xl bg-white/5">
       <Disclosure
         as="div"
         className="border border-primary-border rounded-xl"

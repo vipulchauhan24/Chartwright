@@ -23,7 +23,7 @@ function CWNumberInput(props: ICWNumberInput) {
           id={id}
           value={defaultValue}
           onChange={onChange}
-          className="text-primary-text border border-primary-border py-2 pl-3 pr-8 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text border border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         />
         <Button className="absolute top-2/4 -translate-y-2/4 right-9 bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm">
           <MinusIcon className="size-4" aria-hidden={true} />
