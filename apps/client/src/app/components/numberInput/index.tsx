@@ -1,5 +1,6 @@
-import { Button, Field, Input, Label } from '@headlessui/react';
+import { Field, Input, Label } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
+import IconButton from '../iconButton';
 
 interface ICWNumberInput {
   id: string;
@@ -54,18 +55,16 @@ function CWNumberInput(props: ICWNumberInput) {
           onChange={validateNumberInputChange}
           className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         />
-        <Button
+        <IconButton
+          icon={<MinusIcon className="size-4" aria-hidden={true} />}
           onClick={decrease}
-          className="bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
-        >
-          <MinusIcon className="size-4" aria-hidden={true} />
-        </Button>
-        <Button
+          tooltip="Decrease font size by one pixel."
+        />
+        <IconButton
+          icon={<PlusIcon className="size-4" aria-hidden={true} />}
           onClick={increase}
-          className="bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
-        >
-          <PlusIcon className="size-4" aria-hidden={true} />
-        </Button>
+          tooltip="Increase font size by one pixel."
+        />
       </div>
     </Field>
   );

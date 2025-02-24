@@ -36,7 +36,7 @@ function CWTextInput(props: ICWTextInput) {
           value={defaultValue}
           placeholder={placeholder}
           onChange={onChange}
-          className="text-primary-text border border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text border w-full border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         />
       </div>
     </Field>

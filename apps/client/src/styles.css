@@ -6,6 +6,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-width: thin; /* Width of scrollbar */
+  scrollbar-color: #b0bec5 transparent; /* Thumb color and track color */
 }
 
 html,

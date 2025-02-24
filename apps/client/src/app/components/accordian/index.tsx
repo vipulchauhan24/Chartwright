@@ -8,12 +8,14 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 interface ICWAccordian {
   id: string;
   panelHeading: string;
-  panelComponent: any;
+  panelComponent: React.ReactNode;
   defaultOpen?: boolean;
+  panelHeadingButton?: React.ReactNode;
 }
 
 function CWAccordian(props: ICWAccordian) {
-  const { id, panelHeading, defaultOpen, panelComponent } = props;
+  const { id, panelHeading, defaultOpen, panelComponent, panelHeadingButton } =
+    props;
   return (
     <div id={id} className="mx-auto w-full rounded-xl bg-white/5">
       <Disclosure
@@ -21,13 +23,16 @@ function CWAccordian(props: ICWAccordian) {
         className="border border-primary-border rounded-xl"
         defaultOpen={defaultOpen}
       >
-        <DisclosureButton className="group flex w-full items-center justify-between py-4 px-2">
-          <span className="text-lg font-semibold text-white group-data-[hover]:text-white/80">
-            {panelHeading}
-          </span>
+        <DisclosureButton className="group flex w-full items-center justify-between p-4">
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-semibold text-white group-data-[hover]:text-white/80">
+              {panelHeading}
+            </span>
+            {panelHeadingButton}
+          </div>
           <ChevronDownIcon className="size-5 fill-white/60 group-data-[hover]:fill-white/50 group-data-[open]:rotate-180" />
         </DisclosureButton>
-        <DisclosurePanel className="mt-2 text-sm/5 text-white/50 pb-4 px-2">
+        <DisclosurePanel className="mt-2 pb-4 px-4">
           {panelComponent}
         </DisclosurePanel>
       </Disclosure>
