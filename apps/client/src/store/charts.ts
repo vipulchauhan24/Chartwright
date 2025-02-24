@@ -2,10 +2,10 @@ import { atom } from 'jotai';
 
 const gconfig = {
   globalOptions: {
-    legend: ['visible', 'position', 'alignment', 'color', 'font'],
-    title: ['visible', 'text', 'alignment', 'color', 'font'],
-    subtitle: ['visible', 'text', 'alignment', 'color', 'font'],
-    grid: ['visible', 'xaxis', 'yaxis'],
+    legend: ['enabled', 'position', 'alignment', 'color', 'font'],
+    title: ['text', 'alignment', 'color', 'font'],
+    subtitle: ['text', 'alignment', 'color', 'font'],
+    grid: ['enabled', 'xaxis', 'yaxis'],
     // xAxis: ['visible', 'gridOffset'],
     // yAxis: ['visible', 'gridOffset'],
     others: ['background'],
@@ -14,7 +14,6 @@ const gconfig = {
 };
 
 const chartDataConfigl = {
-  type: 'line',
   series: [
     {
       name: 'Series 1',
@@ -26,7 +25,18 @@ const chartDataConfigl = {
     },
   ],
   options: {
+    series: [
+      {
+        name: 'Series 1',
+        data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
+      },
+      {
+        name: 'Series 2',
+        data: [23, 42, 35, 27, 43, 52, 61, 75, 90],
+      },
+    ],
     chart: {
+      type: 'line',
       toolbar: {
         show: false,
       },
@@ -55,7 +65,6 @@ const chartDataConfigl = {
       fontSize: '14px',
     },
     title: {
-      show: true,
       text: 'Chart title',
       align: 'left',
       // margin: 10,
@@ -70,7 +79,6 @@ const chartDataConfigl = {
       },
     },
     subtitle: {
-      show: true,
       text: 'Chart subtitle',
       align: 'left',
       // margin: 10,

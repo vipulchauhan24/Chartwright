@@ -16,7 +16,7 @@ interface ICWSelect {
 }
 
 function CWSelect(props: ICWSelect) {
-  const { id, label, options, defaultValue } = props;
+  const { id, label, options, defaultValue, onChange } = props;
   return (
     <Field className="flex items-center justify-between">
       <Label
@@ -28,6 +28,7 @@ function CWSelect(props: ICWSelect) {
       <div className="relative">
         <Select
           id={id}
+          onChange={onChange}
           className="text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         >
           {options?.map((item: ISelectOptions) => {

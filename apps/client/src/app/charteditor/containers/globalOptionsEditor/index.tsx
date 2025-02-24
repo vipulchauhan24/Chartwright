@@ -18,27 +18,27 @@ interface IChartGlobalOptions {
 
 function GlobalOptionsEditor() {
   const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig] = useAtom(chartDataConfigStore);
+  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
   const [globalOptions, setGlobalOptions] = useState<
     Array<IChartGlobalOptions>
   >([]);
 
   const onLegendPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {
-      if (event) {
+      if (event && key !== DATA_SET_KEY.display) {
         event.stopPropagation();
       }
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
         case DATA_SET_KEY.display:
-          config.legend.show = !config.legend.show;
+          config.options.legend.show = !config.options.legend.show;
           break;
         case DATA_SET_KEY.position:
-          config.legend.position = event.target.value;
+          config.options.legend.position = event.target.value;
           break;
         case DATA_SET_KEY.alignment:
-          config.legend.horizontalAlign = event.target.value;
+          config.options.legend.horizontalAlign = event.target.value;
           break;
         // case DATA_SET_KEY.color:
         //   config.options.plugins.legend.labels.color = event.target.value;
@@ -51,11 +51,11 @@ function GlobalOptionsEditor() {
           break;
       }
 
-      //   if (configChanged) {
-      //     setChartConfigurations(config);
-      //   }
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
     },
-    [chartDataConfig]
+    [chartDataConfig, setChartDataConfig]
   );
 
   const legendOptions = useMemo(() => {
@@ -69,13 +69,13 @@ function GlobalOptionsEditor() {
       open: true,
       inputsProps: [
         {
-          id: 'legend-visible',
-          label: 'Visible',
+          id: 'legend-enabled',
+          label: 'Enabled',
           value: chartDataConfig.options.legend.show,
           datasetKey: DATA_SET_KEY.display,
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.legend.includes('visible'),
+          enabled: config.globalOptions.legend.includes('enabled'),
         },
         {
           id: 'legend-position',
@@ -130,9 +130,6 @@ function GlobalOptionsEditor() {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.display:
-          config.options.title.show = !config.options.title.show;
-          break;
         case DATA_SET_KEY.position:
           config.options.title.position = event.target.value;
           break;
@@ -153,11 +150,11 @@ function GlobalOptionsEditor() {
           break;
       }
 
-      // if (configChanged) {
-      //   setChartConfigurations(config);
-      // }
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
     },
-    [chartDataConfig]
+    [chartDataConfig, setChartDataConfig]
   );
 
   const titleOptions = useMemo(() => {
@@ -169,22 +166,15 @@ function GlobalOptionsEditor() {
       panelHeading: 'Title',
       inputsProps: [
         {
-          id: 'title-visible',
-          label: 'Visible',
-          datasetKey: DATA_SET_KEY.display,
-          value: chartDataConfig.options.title.show,
-          onChange: onTitlePropsUpdate,
-          type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.title.includes('visible'),
-        },
-        {
           id: 'title-text',
           label: 'Text',
           datasetKey: DATA_SET_KEY.data,
           value: chartDataConfig.options.title.text,
           onChange: onTitlePropsUpdate,
           type: INPUT_TYPE.TEXT,
+          placeholder: 'Enter text here...',
           enabled: config.globalOptions.title.includes(INPUT_TYPE.TEXT),
+          hint: 'Clear text input on right to disable chart title.',
         },
         {
           id: 'title-alignment',
@@ -229,9 +219,6 @@ function GlobalOptionsEditor() {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.display:
-          config.options.subtitle.show = !config.options.subtitle.show;
-          break;
         case DATA_SET_KEY.alignment:
           config.options.subtitle.align = event.target.value;
           break;
@@ -249,11 +236,11 @@ function GlobalOptionsEditor() {
           break;
       }
 
-      // if (configChanged) {
-      //   setChartConfigurations(config);
-      // }
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
     },
-    [chartDataConfig]
+    [chartDataConfig, setChartDataConfig]
   );
 
   const subtitleOptions = useMemo(() => {
@@ -265,22 +252,15 @@ function GlobalOptionsEditor() {
       panelHeading: 'Subtitle',
       inputsProps: [
         {
-          id: 'subtitle-visible',
-          label: 'Visible',
-          datasetKey: DATA_SET_KEY.display,
-          value: chartDataConfig.options.subtitle.show,
-          onChange: onSubtitlePropsUpdate,
-          type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.subtitle.includes('visible'),
-        },
-        {
           id: 'subtitle-text',
           label: 'Text',
           datasetKey: DATA_SET_KEY.data,
           value: chartDataConfig.options.subtitle.text,
           onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.TEXT,
+          placeholder: 'Enter text here...',
           enabled: config.globalOptions.subtitle.includes(INPUT_TYPE.TEXT),
+          hint: 'Clear text input on right to disable chart subtitle.',
         },
         {
           id: 'subtitle-alignment',
@@ -317,6 +297,34 @@ function GlobalOptionsEditor() {
     };
   }, [chartDataConfig, config, onSubtitlePropsUpdate]);
 
+  const onGridPropsUpdate = useCallback(
+    (_event: any, key: DATA_SET_KEY) => {
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+      switch (key) {
+        case DATA_SET_KEY.display:
+          config.options.grid.show = !config.options.grid.show;
+          break;
+        case DATA_SET_KEY.gridXAxis:
+          config.options.grid.xaxis.lines.show =
+            !config.options.grid.xaxis.lines.show;
+          break;
+        case DATA_SET_KEY.gridYAxis:
+          config.options.grid.yaxis.lines.show =
+            !config.options.grid.yaxis.lines.show;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
+
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
+    },
+    [chartDataConfig, setChartDataConfig]
+  );
+
   const gridOptions = useMemo(() => {
     if (!config || !chartDataConfig) {
       return {};
@@ -326,20 +334,20 @@ function GlobalOptionsEditor() {
       panelHeading: 'Grid Lines',
       inputsProps: [
         {
-          id: 'grid-visible',
-          label: 'Visible',
+          id: 'grid-enabled',
+          label: 'Enabled',
           datasetKey: DATA_SET_KEY.display,
-          value: chartDataConfig.options.grid,
-          onChange: onSubtitlePropsUpdate,
+          value: chartDataConfig.options.grid.show,
+          onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.grid.includes('visible'),
+          enabled: config.globalOptions.grid.includes('enabled'),
         },
         {
           id: 'grid-xaxis',
           label: 'Show X-axis',
           datasetKey: DATA_SET_KEY.gridXAxis,
           value: chartDataConfig.options.grid.xaxis.lines.show,
-          onChange: onSubtitlePropsUpdate,
+          onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
           enabled: config.globalOptions.grid.includes('xaxis'),
         },
@@ -348,13 +356,13 @@ function GlobalOptionsEditor() {
           label: 'Show Y-axis',
           datasetKey: DATA_SET_KEY.gridYAxis,
           value: chartDataConfig.options.grid.yaxis.lines.show,
-          onChange: onSubtitlePropsUpdate,
+          onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
           enabled: config.globalOptions.grid.includes('yaxis'),
         },
       ],
     };
-  }, [chartDataConfig, config, onSubtitlePropsUpdate]);
+  }, [chartDataConfig, config, onGridPropsUpdate]);
 
   const generateChartGlobalOptions = useCallback(() => {
     if (!config) {

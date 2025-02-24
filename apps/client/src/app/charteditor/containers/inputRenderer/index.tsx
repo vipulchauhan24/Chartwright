@@ -23,12 +23,22 @@ export interface IInputRenderer {
   tooltip?: string;
   index?: number;
   enabled?: boolean;
-  subLabel?: string;
+  hint?: string;
 }
 
 function InputRenderer(props: IInputRenderer) {
-  const { id, type, label, value, onChange, datasetKey, options, enabled } =
-    props;
+  const {
+    id,
+    type,
+    label,
+    value,
+    onChange,
+    datasetKey,
+    options,
+    enabled,
+    hint,
+    placeholder,
+  } = props;
 
   if (!enabled) return null;
 
@@ -69,6 +79,8 @@ function InputRenderer(props: IInputRenderer) {
           label={label}
           defaultValue={String(value)}
           onChange={(e) => onChange(e, datasetKey, type)}
+          hint={hint}
+          placeholder={placeholder}
         />
       );
 

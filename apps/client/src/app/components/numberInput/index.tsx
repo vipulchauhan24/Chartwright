@@ -10,6 +10,35 @@ interface ICWNumberInput {
 
 function CWNumberInput(props: ICWNumberInput) {
   const { id, label, defaultValue, onChange } = props;
+
+  const isNumberASCII = (str: string) => {
+    if (!str) return false; // Check for empty string
+    for (let i = 0; i < str.length; i++) {
+      const ascii = str.charCodeAt(i);
+      if (ascii < 48 || ascii > 57) {
+        // ASCII range for '0' to '9'
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const validateNumberInputChange = (e: any) => {
+    if (isNumberASCII(e.target.value)) {
+      onChange(e);
+    }
+  };
+
+  const increase = (e: any) => {
+    e.target.value = defaultValue + 1;
+    onChange(e);
+  };
+
+  const decrease = (e: any) => {
+    e.target.value = defaultValue - 1;
+    onChange(e);
+  };
+
   return (
     <Field className="flex items-center justify-between">
       <Label
@@ -18,17 +47,23 @@ function CWNumberInput(props: ICWNumberInput) {
       >
         {label}
       </Label>
-      <div className="relative">
+      <div className="border border-primary-border rounded-lg flex items-center gap-1 pr-2">
         <Input
           id={id}
           value={defaultValue}
-          onChange={onChange}
-          className="text-primary-text border border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          onChange={validateNumberInputChange}
+          className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         />
-        <Button className="absolute top-2/4 -translate-y-2/4 right-9 bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm">
+        <Button
+          onClick={decrease}
+          className="bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
+        >
           <MinusIcon className="size-4" aria-hidden={true} />
         </Button>
-        <Button className="absolute top-2/4 -translate-y-2/4 right-2 bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm">
+        <Button
+          onClick={increase}
+          className="bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
+        >
           <PlusIcon className="size-4" aria-hidden={true} />
         </Button>
       </div>

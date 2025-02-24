@@ -47,9 +47,7 @@ function ChartEditor() {
             <CWLink href="#" label="Need Help?" />
           </div>
         </aside>
-        <div>
-          <ChartRenderer />
-        </div>
+        <ChartRenderer />
         <aside className="w-1/5 min-w-80 h-full border-l border-primary-border overflow-y-auto">
           <ChartDataEditor />
         </aside>
