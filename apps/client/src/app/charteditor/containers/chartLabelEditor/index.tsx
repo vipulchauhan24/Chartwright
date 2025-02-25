@@ -12,16 +12,16 @@ function ChartLabelEditor() {
   const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
   const [labelsEditable, setLabelsEditable] = useState<boolean>(false);
   const [chartLabelsData, setChartLabelData] = useState<Array<string>>(
-    chartDataConfig.options.xaxis.categories
+    chartDataConfig.options.labels
   );
 
   useEffect(() => {
-    setChartLabelData(chartDataConfig.options.xaxis.categories);
-  }, [chartDataConfig.options.xaxis.categories]);
+    setChartLabelData(chartDataConfig.options.labels);
+  }, [chartDataConfig.options.labels]);
 
   const deleteLabel = (index: number) => {
     const config = JSON.parse(JSON.stringify(chartDataConfig));
-    config.options.xaxis.categories.splice(index, 1);
+    config.options.labels.splice(index, 1);
     setChartDataConfig(config);
   };
 
@@ -47,14 +47,14 @@ function ChartLabelEditor() {
     const filteredChartLabelsData = chartLabelsData.filter(
       (label) => label !== ''
     );
-    config.options.xaxis.categories = filteredChartLabelsData;
+    config.options.labels = filteredChartLabelsData;
     setChartDataConfig(config);
     toggleLabelsEditable();
   };
   return (
     <CWAccordian
       id="chart-label-editor-acc"
-      panelHeading="Edit Chart Labels"
+      panelHeading="Chart Labels"
       defaultOpen={true}
       panelHeadingButton={
         !labelsEditable ? (
@@ -72,7 +72,7 @@ function ChartLabelEditor() {
       panelComponent={
         !labelsEditable ? (
           <div className="flex flex-wrap gap-2">
-            {chartDataConfig.options.xaxis.categories.map(
+            {chartDataConfig.options.labels.map(
               (label: string, index: number) => {
                 return (
                   <CWChip

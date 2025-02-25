@@ -1,0 +1,56 @@
+{
+  "options": {
+    "series": [10, 41, 35, 51, 49, 62],
+    "chart": {
+      "type": "pie",
+      "toolbar": {
+        "show": false
+      }
+    },
+    "colors": [
+      "#FF4560",
+      "#775DD0",
+      "#008FFB",
+      "#00E396",
+      "#FEB019",
+      "#FF4560"
+    ],
+    "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    "legend": {
+      "show": true,
+      "position": "top",
+      "horizontalAlign": "center",
+      "fontSize": "14px"
+    },
+    "title": {
+      "text": "Chart title",
+      "align": "left",
+      "style": {
+        "fontSize": "14px"
+      }
+    },
+    "subtitle": {
+      "text": "Chart subtitle",
+      "align": "left",
+      "style": {
+        "fontSize": "12px"
+      }
+    },
+    "grid": {
+      "show": true,
+      "xaxis": {
+        "lines": {
+          "show": true
+        }
+      },
+      "yaxis": {
+        "lines": {
+          "show": false
+        }
+      }
+    },
+    "tooltip": {
+      "enabled": true
+    }
+  }
+}

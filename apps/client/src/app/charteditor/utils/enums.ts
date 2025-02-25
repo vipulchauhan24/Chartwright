@@ -20,3 +20,17 @@ export enum INPUT_TYPE {
   COLOR = 'color',
   NUMBER = 'number',
 }
+
+export enum CHART_TYPE {
+  BAR = 'bar',
+  LINE = 'line',
+  PIE = 'pie',
+}
+
+export enum CHART_FEATURE {
+  LEGEND = 'legend',
+  TITLE = 'title',
+  SUBTITLE = 'subtitle',
+  GRID = 'grid',
+  OTHER = 'others',
+}

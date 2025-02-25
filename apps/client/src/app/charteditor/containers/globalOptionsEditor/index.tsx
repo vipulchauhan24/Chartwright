@@ -4,7 +4,7 @@ import {
   chartDataConfigStore,
   chartGlobalConfig,
 } from '../../../../store/charts';
-import { DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
+import { CHART_FEATURE, DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
 import { alignments, legendPositions } from '../../utils/constants';
 import CWAccordian from '../../../components/accordian';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
@@ -59,7 +59,7 @@ function GlobalOptionsEditor() {
   );
 
   const legendOptions = useMemo(() => {
-    if (!config || !chartDataConfig) {
+    if (!config || !config.globalOptions.legend || !chartDataConfig) {
       return {};
     }
 
@@ -158,7 +158,7 @@ function GlobalOptionsEditor() {
   );
 
   const titleOptions = useMemo(() => {
-    if (!config || !chartDataConfig) {
+    if (!config || !config.globalOptions.title || !chartDataConfig) {
       return {};
     }
     return {
@@ -244,7 +244,7 @@ function GlobalOptionsEditor() {
   );
 
   const subtitleOptions = useMemo(() => {
-    if (!config || !chartDataConfig) {
+    if (!config || !config.globalOptions.subtitle || !chartDataConfig) {
       return {};
     }
     return {
@@ -326,7 +326,7 @@ function GlobalOptionsEditor() {
   );
 
   const gridOptions = useMemo(() => {
-    if (!config || !chartDataConfig) {
+    if (!config || !config.globalOptions.grid || !chartDataConfig) {
       return {};
     }
     return {
@@ -371,43 +371,18 @@ function GlobalOptionsEditor() {
     const globalOpts: Array<IChartGlobalOptions> = [];
     Object.keys(config.globalOptions).forEach((opts) => {
       switch (opts) {
-        case 'legend':
+        case CHART_FEATURE.LEGEND:
           globalOpts.push(legendOptions as IChartGlobalOptions);
           break;
-        case 'title':
+        case CHART_FEATURE.TITLE:
           globalOpts.push(titleOptions as IChartGlobalOptions);
           break;
-        case 'subtitle':
+        case CHART_FEATURE.SUBTITLE:
           globalOpts.push(subtitleOptions as IChartGlobalOptions);
           break;
-        case 'grid':
+        case CHART_FEATURE.GRID:
           globalOpts.push(gridOptions as IChartGlobalOptions);
           break;
-        // case 'yAxis':
-        //   globalOpts.push(yAxisOptions as IChartGlobalOptions);
-        //   break;
-        // case 'others':
-        //   globalOpts.push({
-        //     id: 'others-options',
-        //     sectionTitle: 'Other options',
-        //     inputsProps: [
-        //       {
-        //         id: 'canvas-background',
-        //         label: 'Chart Background',
-        //         type: INPUT_TYPE.COLOR,
-        //         tooltip: 'Only Hex code supported. (#rrggbb)',
-        //         value:
-        //           chartConfigurations.options.plugins
-        //             .customCanvasBackgroundColor.color,
-        //         onChange: onChartBackgroundUpdate,
-        //         enabled:
-        //           chartGlobalConfigurations.globalOptions.others.includes(
-        //             'background'
-        //           ),
-        //       },
-        //     ],
-        //   });
-        //   break;
         default:
           break;
       }

@@ -1,0 +1,9 @@
+{
+  "globalOptions": {
+    "legend": ["enabled", "position", "alignment", "color", "font"],
+    "title": ["text", "alignment", "color", "font"],
+    "subtitle": ["text", "alignment", "color", "font"],
+    "others": ["background"]
+  },
+  "chartOptions": ["label", "data", "color"]
+}

@@ -1,17 +1,14 @@
 import { Field, Input, Label } from '@headlessui/react';
-import Tippy from '@tippyjs/react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface ICWColorInput {
   id: string;
   label: string;
   defaultValue: string;
   onChange: (e: any) => void;
-  hint?: string;
 }
 
 function CWColorInput(props: ICWColorInput) {
-  const { id, label, defaultValue, onChange, hint } = props;
+  const { id, label, defaultValue, onChange } = props;
 
   return (
     <Field>
@@ -23,11 +20,6 @@ function CWColorInput(props: ICWColorInput) {
           >
             {label}
           </Label>
-          {hint && (
-            <Tippy content={hint}>
-              <InformationCircleIcon className="w-5 h-5" />
-            </Tippy>
-          )}
         </div>
         <Input
           id={id}

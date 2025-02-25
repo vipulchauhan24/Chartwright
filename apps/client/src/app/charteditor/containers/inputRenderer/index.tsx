@@ -95,7 +95,6 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           label={label}
           defaultValue={String(value)}
-          hint={hint}
           onChange={(e) => onChange(e, datasetKey)}
         />
       );
