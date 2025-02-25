@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react';
 
 interface ICWTextInput {
   id: string;
-  label: string;
+  label?: string;
   defaultValue: string;
   onChange: (e: any) => void;
   hint?: string;
@@ -17,19 +17,21 @@ function CWTextInput(props: ICWTextInput) {
   return (
     <Field className="flex items-center justify-between gap-2">
       <div className="flex items-center justify-between gap-1">
-        <Label
-          htmlFor={id}
-          className="text-base font-normal text-primary-text select-none"
-        >
-          {label}
-        </Label>
+        {label && (
+          <Label
+            htmlFor={id}
+            className="text-base font-normal text-primary-text select-none"
+          >
+            {label}
+          </Label>
+        )}
         {hint && (
           <Tippy content={hint}>
             <InformationCircleIcon className="w-5 h-5" />
           </Tippy>
         )}
       </div>
-      <div className="relative">
+      <div className="relative w-full">
         <Input
           id={id}
           type="text"

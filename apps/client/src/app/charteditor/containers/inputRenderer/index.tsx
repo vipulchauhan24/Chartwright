@@ -1,27 +1,24 @@
 import CWCheckbox from '../../../components/checkbox';
+import CWColorInput from '../../../components/colorInput';
 import CWNumberInput from '../../../components/numberInput';
 import CWSelect from '../../../components/select';
+import CWTextArea from '../../../components/textArea';
 import CWTextInput from '../../../components/textInput';
-import { DATA_SET_KEY, INPUT_TYPE, InputType } from '../../utils/enums';
+import { DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
 
 export interface IInputRenderer {
   id: string;
   type: string;
   label: string;
   value: string | number | boolean | string[] | number[];
-  onChange: (event: any, key?: DATA_SET_KEY, type?: InputType) => void;
-  datasetKey?: DATA_SET_KEY;
+  onChange: (event: any, key: DATA_SET_KEY) => void;
+  datasetKey: DATA_SET_KEY;
   placeholder?: string;
   options?: Array<{
     id: string;
     label: string;
     value: string;
   }>;
-  min?: number;
-  max?: number;
-  step?: number;
-  tooltip?: string;
-  index?: number;
   enabled?: boolean;
   hint?: string;
 }
@@ -49,7 +46,7 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           label={label}
           checked={Boolean(value)}
-          onChange={(e) => onChange(e, datasetKey, type)}
+          onChange={(e) => onChange(e, datasetKey)}
         />
       );
     case INPUT_TYPE.SELECT:
@@ -58,7 +55,7 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           label={label}
           defaultValue={String(value)}
-          onChange={(e) => onChange(e, datasetKey, type)}
+          onChange={(e) => onChange(e, datasetKey)}
           options={options}
         />
       );
@@ -68,7 +65,7 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           label={label}
           defaultValue={parseInt(String(value), 10)}
-          onChange={(e) => onChange(e, datasetKey, type)}
+          onChange={(e) => onChange(e, datasetKey)}
         />
       );
 
@@ -78,12 +75,30 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           label={label}
           defaultValue={String(value)}
-          onChange={(e) => onChange(e, datasetKey, type)}
+          onChange={(e) => onChange(e, datasetKey)}
           hint={hint}
           placeholder={placeholder}
         />
       );
-
+    case INPUT_TYPE.TEXT_AREA:
+      return (
+        <CWTextArea
+          id={id}
+          label={label}
+          defaultValue={String(value)}
+          onChange={(e) => onChange(e, datasetKey)}
+        />
+      );
+    case INPUT_TYPE.COLOR:
+      return (
+        <CWColorInput
+          id={id}
+          label={label}
+          defaultValue={String(value)}
+          hint={hint}
+          onChange={(e) => onChange(e, datasetKey)}
+        />
+      );
     default:
       return null;
   }

@@ -1,158 +1,152 @@
 import { useAtom } from 'jotai';
 import CWAccordian from '../../../components/accordian';
-import { chartDataConfigStore } from '../../../../store/charts';
-import CWChip from '../../../components/chip';
-import CWTextInput from '../../../components/textInput';
-import { Field, Input, Label } from '@headlessui/react';
-import CWTextArea from '../../../components/textArea';
-import { useEffect, useState } from 'react';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
-import CWButton from '../../../components/button';
+import {
+  chartDataConfigStore,
+  chartGlobalConfig,
+} from '../../../../store/charts';
+import ChartLabelEditor from '../chartLabelEditor';
+import { DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
+import InputRenderer, { IInputRenderer } from '../inputRenderer';
+import { useCallback, useMemo } from 'react';
 import Tippy from '@tippyjs/react';
+import { TrashIcon } from '@heroicons/react/24/outline';
+
+interface IChartDataOptions {
+  id: string;
+  panelHeading: string;
+  open?: boolean;
+  inputsProps: Array<IInputRenderer>;
+}
 
 function ChartDataEditor() {
+  const [config] = useAtom(chartGlobalConfig);
   const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
-  const [labelsEditable, setLabelsEditable] = useState<boolean>(false);
-  const [chartLabelsData, setChartLabelData] = useState<Array<string>>(
-    chartDataConfig.options.xaxis.categories
+
+  const deleteChartSeries = (index: number) => {
+    const config = JSON.parse(JSON.stringify(chartDataConfig));
+    config.options.series.splice(index, 1);
+    setChartDataConfig(config);
+  };
+
+  const onChartDataOptionsUpdate = useCallback(
+    (event: any, datasetKey: DATA_SET_KEY, indx: number) => {
+      if (event) {
+        event.stopPropagation();
+      }
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+
+      switch (datasetKey) {
+        case DATA_SET_KEY.label:
+          config.options.series[indx].name = event.target.value;
+          break;
+        case DATA_SET_KEY.data:
+          config.options.series[indx].data = event.target.value.split(',');
+          break;
+        case DATA_SET_KEY.color:
+          config.options.colors[indx] = event.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
+    },
+    [chartDataConfig, setChartDataConfig]
   );
 
-  useEffect(() => {
-    setChartLabelData(chartDataConfig.options.xaxis.categories);
-  }, [chartDataConfig.options.xaxis.categories]);
-
-  const deleteLabel = (index: number) => {
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    config.options.xaxis.categories.splice(index, 1);
-    setChartDataConfig(config);
-  };
-
-  const toggleLabelsEditable = (event?: any) => {
-    if (event) {
-      event.stopPropagation();
+  const chartDataOptions = useMemo(() => {
+    if (!config && !chartDataConfig) {
+      return [];
     }
-    setLabelsEditable((prev) => !prev);
-  };
-
-  const onLabelsEdit = (e: any) => {
-    let labels = e.target.value;
-    labels = labels.split(',');
-    setChartLabelData(labels);
-  };
-
-  const onLabelsEditCancel = () => {
-    toggleLabelsEditable();
-  };
-
-  const onLabelsEditSave = () => {
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    const filteredChartLabelsData = chartLabelsData.filter(
-      (label) => label !== ''
+    const options: Array<IChartDataOptions> = [];
+    chartDataConfig.options.series.forEach(
+      (series: { name: string; data: Array<string> }, indx: number) => {
+        const opts = {
+          id: `chart-data-editor-acc-${indx}`,
+          panelHeading: `Edit ${series.name}`,
+          open: indx === 0,
+          inputsProps: [
+            {
+              id: `edit-chart-series-name-${indx}`,
+              label: 'Name',
+              value: series.name,
+              datasetKey: DATA_SET_KEY.label,
+              onChange: (event: any, datasetKey: DATA_SET_KEY) => {
+                onChartDataOptionsUpdate(event, datasetKey, indx);
+              },
+              type: INPUT_TYPE.TEXT,
+              enabled: config.chartOptions.includes(DATA_SET_KEY.label),
+            },
+            {
+              id: `edit-chart-data-${indx}`,
+              label: 'Data',
+              value: series.data.join(','),
+              datasetKey: DATA_SET_KEY.data,
+              onChange: (event: any, datasetKey: DATA_SET_KEY) => {
+                onChartDataOptionsUpdate(event, datasetKey, indx);
+              },
+              type: INPUT_TYPE.TEXT_AREA,
+              enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+            },
+            {
+              id: `edit-chart-color-${indx}`,
+              label: 'Background Color',
+              value: chartDataConfig.options.colors[indx],
+              datasetKey: DATA_SET_KEY.color,
+              onChange: (event: any, datasetKey: DATA_SET_KEY) => {
+                onChartDataOptionsUpdate(event, datasetKey, indx);
+              },
+              type: INPUT_TYPE.COLOR,
+              enabled: config.chartOptions.includes(DATA_SET_KEY.color),
+              hint: 'Only 6-digit hex code supported',
+            },
+          ],
+        };
+        options.push(opts);
+      }
     );
-    config.options.xaxis.categories = filteredChartLabelsData;
-    setChartDataConfig(config);
-    toggleLabelsEditable();
-  };
+    return options;
+  }, [chartDataConfig, config, onChartDataOptionsUpdate]);
 
   return (
     <div className="mt-2 px-4">
-      <CWAccordian
-        id="chart-label-editor-acc"
-        panelHeading="Edit Chart Labels"
-        defaultOpen={true}
-        panelHeadingButton={
-          !labelsEditable ? (
-            <Tippy content="Click add / edit / remove chart labels.">
-              <span
-                onClick={toggleLabelsEditable}
-                role="button"
-                className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
-              >
-                <PencilSquareIcon className="size-4" aria-hidden={true} />
-              </span>
-            </Tippy>
-          ) : null
-        }
-        panelComponent={
-          !labelsEditable ? (
-            <div className="flex flex-wrap gap-2">
-              {chartDataConfig.options.xaxis.categories.map(
-                (label: string, index: number) => {
+      <ChartLabelEditor />
+      {chartDataOptions.map((options: IChartDataOptions, indx: number) => {
+        return (
+          <div className="mt-2" key={options.id}>
+            <CWAccordian
+              id={options.id}
+              panelHeading={options.panelHeading}
+              defaultOpen={options.open}
+              panelHeadingButton={
+                <Tippy content="Delete this series">
+                  <span
+                    role="button"
+                    onClick={() => {
+                      deleteChartSeries(indx);
+                    }}
+                    className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
+                  >
+                    <TrashIcon className="size-4" aria-hidden={true} />
+                  </span>
+                </Tippy>
+              }
+              panelComponent={options.inputsProps.map(
+                (props: IInputRenderer) => {
                   return (
-                    <CWChip
-                      key={label + '-' + index}
-                      label={label}
-                      onDelete={() => {
-                        deleteLabel(index);
-                      }}
-                    />
+                    <div className="mt-2" key={props.id}>
+                      <InputRenderer {...props} />
+                    </div>
                   );
                 }
               )}
-            </div>
-          ) : (
-            <div>
-              <CWTextArea
-                defaultValue={chartLabelsData.join(',')}
-                id="chart-label-editor-acc-text-area"
-                onChange={onLabelsEdit}
-              />
-              <CWButton
-                label="Cancel"
-                onClick={onLabelsEditCancel}
-                additionalCssClasses="mt-2"
-              />
-              <CWButton
-                label="Save"
-                onClick={onLabelsEditSave}
-                additionalCssClasses="mt-2 ml-2"
-              />
-            </div>
-          )
-        }
-      />
-      <div className="mt-2">
-        <CWAccordian
-          id="chart-data-editor-acc"
-          panelHeading={'Edit ' + chartDataConfig.series[0].name}
-          panelComponent={
-            <div>
-              <CWTextInput
-                id="edit-chart-data-series-name-0"
-                label="Name"
-                defaultValue={chartDataConfig.series[0].name}
-                onChange={() => {
-                  console.log('jer');
-                }}
-              />
-              <div className="mt-2">
-                <CWTextArea
-                  id="edit-chart-data"
-                  defaultValue={chartDataConfig.series[0].data}
-                  label="Data"
-                  onChange={() => {
-                    console.log('jer');
-                  }}
-                />
-              </div>
-              <Field className="flex items-center justify-between gap-2 mt-2">
-                <Label className="text-base font-normal text-primary-text select-none">
-                  Color
-                </Label>
-                <Input
-                  id={'color'}
-                  type="color"
-                  value={chartDataConfig.options.colors[0]}
-                  onChange={() => {
-                    console.log('jer');
-                  }}
-                  className="text-primary-text border border-primary-border px-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
-                />
-              </Field>
-            </div>
-          }
-        />
-      </div>
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

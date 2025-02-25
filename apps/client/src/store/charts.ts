@@ -10,20 +10,10 @@ const gconfig = {
     // yAxis: ['visible', 'gridOffset'],
     others: ['background'],
   },
-  chartOptions: ['label', 'data'],
+  chartOptions: ['label', 'data', 'color'],
 };
 
 const chartDataConfigl = {
-  series: [
-    {
-      name: 'Series 1',
-      data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
-    },
-    {
-      name: 'Series 2',
-      data: [23, 42, 35, 27, 43, 52, 61, 75, 90],
-    },
-  ],
   options: {
     series: [
       {
