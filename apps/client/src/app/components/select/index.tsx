@@ -1,5 +1,5 @@
 import { Field, Label, Select } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface ISelectOptions {
   id: string;
@@ -29,7 +29,7 @@ function CWSelect(props: ICWSelect) {
         <Select
           id={id}
           onChange={onChange}
-          className="text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text cursor-pointer w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         >
           {options?.map((item: ISelectOptions) => {
             return (

@@ -1,6 +1,6 @@
 import { Field, Input, Label } from '@headlessui/react';
-import { MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
 import IconButton from '../iconButton';
+import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface ICWNumberInput {
   id: string;

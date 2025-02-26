@@ -1,0 +1,62 @@
+{
+  "options": {
+    "series": [
+      {
+        "name": "Series 1",
+        "data": [
+          [10, 20, 15],
+          [15, 10, 30],
+          [20, 30, 25],
+          [25, 40, 35]
+        ]
+      }
+    ],
+    "chart": {
+      "type": "bubble",
+      "toolbar": {
+        "show": false
+      }
+    },
+    "dataLabels": {
+      "enabled": false
+    },
+    "colors": ["#77B6EA", "#545454"],
+    "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+    "legend": {
+      "show": true,
+      "position": "top",
+      "horizontalAlign": "center",
+      "fontSize": "14px"
+    },
+    "title": {
+      "text": "Chart title",
+      "align": "left",
+      "style": {
+        "fontSize": "14px"
+      }
+    },
+    "subtitle": {
+      "text": "Chart subtitle",
+      "align": "left",
+      "style": {
+        "fontSize": "12px"
+      }
+    },
+    "grid": {
+      "show": true,
+      "xaxis": {
+        "lines": {
+          "show": true
+        }
+      },
+      "yaxis": {
+        "lines": {
+          "show": false
+        }
+      }
+    },
+    "tooltip": {
+      "enabled": true
+    }
+  }
+}

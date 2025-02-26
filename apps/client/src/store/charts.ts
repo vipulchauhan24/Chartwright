@@ -11,8 +11,11 @@ import { atom } from 'jotai';
 // import areaChartFeatureConfig from './jsons/featuresConfig/areaChart.json';
 // import simpleAreaChartDataConfig from './jsons/chartDataConfig/simpleAreaChart.json';
 
-import barChartFeatureConfig from './jsons/featuresConfig/barChart.json';
-import simpleBarChartDataConfig from './jsons/chartDataConfig/simpleBarChart.json';
+// import barChartFeatureConfig from './jsons/featuresConfig/barChart.json';
+// import simpleBarChartDataConfig from './jsons/chartDataConfig/simpleBarChart.json';
+
+import bubbleChartFeatureConfig from './jsons/featuresConfig/bubbleChart.json';
+import simpleBubbleChartDataConfig from './jsons/chartDataConfig/simpleBubbleChart.json';
 
 // const gconfig = lineChartFeatureConfig;
 // const chartDataConfigl = simpleLineChartDataConfig;
@@ -26,8 +29,11 @@ import simpleBarChartDataConfig from './jsons/chartDataConfig/simpleBarChart.jso
 // const gconfig = areaChartFeatureConfig;
 // const chartDataConfigl = simpleAreaChartDataConfig;
 
-const gconfig = barChartFeatureConfig;
-const chartDataConfigl = simpleBarChartDataConfig;
+// const gconfig = barChartFeatureConfig;
+// const chartDataConfigl = simpleBarChartDataConfig;
+
+const gconfig = bubbleChartFeatureConfig;
+const chartDataConfigl = simpleBubbleChartDataConfig;
 
 export const allCharts = atom([]);
 export const chartGlobalConfig = atom<any>(gconfig);
