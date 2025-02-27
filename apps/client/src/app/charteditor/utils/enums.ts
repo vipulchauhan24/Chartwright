@@ -19,12 +19,14 @@ export enum INPUT_TYPE {
   TEXT_AREA = 'text-area',
   COLOR = 'color',
   NUMBER = 'number',
+  TABLE = 'table',
 }
 
 export enum CHART_TYPE {
   BAR = 'bar',
   LINE = 'line',
   PIE = 'pie',
+  BUBBLE = 'bubble',
 }
 
 export enum CHART_FEATURE {

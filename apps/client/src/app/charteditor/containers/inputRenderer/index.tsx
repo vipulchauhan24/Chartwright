@@ -2,6 +2,7 @@ import CWCheckbox from '../../../components/checkbox';
 import CWColorInput from '../../../components/colorInput';
 import CWNumberInput from '../../../components/numberInput';
 import CWSelect from '../../../components/select';
+import CWTableInput from '../../../components/tableInput';
 import CWTextArea from '../../../components/textArea';
 import CWTextInput from '../../../components/textInput';
 import { DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
@@ -10,8 +11,11 @@ export interface IInputRenderer {
   id: string;
   type: string;
   label: string;
-  value: string | number | boolean | string[] | number[];
-  onChange: (event: any, key: DATA_SET_KEY) => void;
+  value: string | number | boolean | string[] | number[] | number[][];
+  onChange: (
+    event: any,
+    key: DATA_SET_KEY
+  ) => void | ((data: number[][]) => void);
   datasetKey: DATA_SET_KEY;
   placeholder?: string;
   options?: Array<{
@@ -96,6 +100,14 @@ function InputRenderer(props: IInputRenderer) {
           label={label}
           defaultValue={String(value)}
           onChange={(e) => onChange(e, datasetKey)}
+        />
+      );
+    case INPUT_TYPE.TABLE:
+      return (
+        <CWTableInput
+          id={id}
+          defaultValue={value as number[][]}
+          onChange={onChange as (data: number[][]) => void}
         />
       );
     default:

@@ -12,6 +12,7 @@ import Tippy from '@tippyjs/react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {
   generateBarAndLineChartDataOptions,
+  generateBubbleChartDataOptions,
   generatePieChartDataOptions,
 } from '../../../../service/chartDataOptions';
 
@@ -90,6 +91,15 @@ function ChartDataEditor() {
     [chartDataConfig, setChartDataConfig]
   );
 
+  const onBubbleChartDataUpdate = useCallback(
+    (data: Array<Array<number>>, indx: number) => {
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      config.options.series[indx].data = data;
+      setChartDataConfig(config);
+    },
+    [chartDataConfig, setChartDataConfig]
+  );
+
   const chartDataOptions = useMemo(() => {
     if (!config && !chartDataConfig) {
       return [];
@@ -101,6 +111,12 @@ function ChartDataEditor() {
         chartDataConfig,
         onChartDataOptionsUpdate
       );
+    } else if (chartDataConfig.options.chart.type === CHART_TYPE.BUBBLE) {
+      return generateBubbleChartDataOptions(
+        config,
+        chartDataConfig,
+        onBubbleChartDataUpdate
+      );
     }
 
     return generateBarAndLineChartDataOptions(
@@ -108,11 +124,16 @@ function ChartDataEditor() {
       chartDataConfig,
       onChartDataOptionsUpdate
     );
-  }, [chartDataConfig, config, onChartDataOptionsUpdate]);
+  }, [
+    chartDataConfig,
+    config,
+    onBubbleChartDataUpdate,
+    onChartDataOptionsUpdate,
+  ]);
 
   return (
     <div className="mt-2 px-4">
-      <ChartLabelEditor />
+      {chartDataConfig.options.labels && <ChartLabelEditor />}
       {chartDataOptions.map((options: IChartDataOptions, indx: number) => {
         return (
           <div className="mt-2" key={options.id}>
@@ -121,7 +142,8 @@ function ChartDataEditor() {
               panelHeading={options.panelHeading}
               defaultOpen={options.open}
               panelHeadingButton={
-                chartDataConfig.options.chart.type !== CHART_TYPE.PIE ? (
+                chartDataConfig.options.chart.type !== CHART_TYPE.PIE &&
+                chartDataConfig.options.chart.type !== CHART_TYPE.BUBBLE ? (
                   <Tippy content={`Delete ${options.panelHeading}`}>
                     <span
                       role="button"

@@ -2,7 +2,7 @@ import CWLink from '../../components/link';
 
 function AppHeader() {
   return (
-    <header className="h-[4.5rem] border-b border-primary-border py-2 px-4">
+    <header className="h-[4.5rem] border-b border-primary-border py-2 px-4 flex items-start">
       <CWLink
         href="/"
         nohover

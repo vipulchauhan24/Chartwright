@@ -1,4 +1,5 @@
 import { Field, Label, Textarea } from '@headlessui/react';
+import clsx from 'clsx';
 import { useRef } from 'react';
 
 interface ICWTextArea {
@@ -16,7 +17,9 @@ function CWTextArea(props: ICWTextArea) {
     onChange(e);
   };
   return (
-    <Field className="flex items-center justify-between gap-2">
+    <Field
+      className={clsx('flex items-center justify-between', label && 'gap-2')}
+    >
       {label && (
         <Label
           htmlFor={id}

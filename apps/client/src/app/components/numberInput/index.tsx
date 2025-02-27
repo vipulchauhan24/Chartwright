@@ -1,10 +1,11 @@
 import { Field, Input, Label } from '@headlessui/react';
 import IconButton from '../iconButton';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 
 interface ICWNumberInput {
   id: string;
-  label: string;
+  label?: string;
   defaultValue: number;
   onChange: (e: any) => void;
 }
@@ -41,13 +42,17 @@ function CWNumberInput(props: ICWNumberInput) {
   };
 
   return (
-    <Field className="flex items-center justify-between">
-      <Label
-        htmlFor={id}
-        className="text-base font-normal text-primary-text select-none"
-      >
-        {label}
-      </Label>
+    <Field
+      className={clsx('flex items-center justify-between', label && 'gap-2')}
+    >
+      {label && (
+        <Label
+          htmlFor={id}
+          className="text-base font-normal text-primary-text select-none"
+        >
+          {label}
+        </Label>
+      )}
       <div className="border border-primary-border rounded-lg flex items-center gap-1 pr-2">
         <Input
           id={id}

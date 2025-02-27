@@ -111,3 +111,34 @@ export const generatePieChartDataOptions = (
     },
   ];
 };
+
+export const generateBubbleChartDataOptions = (
+  config: any,
+  chartDataConfig: any,
+  onChartDataOptionsUpdate: (data: Array<Array<number>>, indx: number) => void
+) => {
+  return [
+    ...chartDataConfig.options.series.map(
+      (series: { name: string; data: Array<string> }, indx: number) => {
+        return {
+          id: `chart-data-editor-acc-${indx}`,
+          panelHeading: `${series.name}`,
+          open: indx === 0,
+          inputsProps: [
+            {
+              id: `edit-chart-data-${indx}`,
+              label: 'Data',
+              value: series.data,
+              datasetKey: DATA_SET_KEY.data,
+              onChange: (data: Array<Array<number>>) => {
+                onChartDataOptionsUpdate(data, indx);
+              },
+              type: INPUT_TYPE.TABLE,
+              enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+            },
+          ],
+        };
+      }
+    ),
+  ];
+};

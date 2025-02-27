@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 
 interface ICWLink {
@@ -11,11 +12,11 @@ function CWLink(props: ICWLink) {
   return (
     <Link
       to={href}
-      className={` text-primary-text  transition duration-200 ease-in-out ${
-        nohover
-          ? ''
-          : 'hover:border-b-primary-border hover:border-b hover:text-primary-main'
-      }`}
+      className={clsx(
+        'text-primary-text transition duration-200 ease-in-out',
+        !nohover &&
+          'hover:border-b-primary-border hover:border-b hover:text-primary-main'
+      )}
     >
       {label}
     </Link>
