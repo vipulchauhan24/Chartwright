@@ -29,15 +29,12 @@ function CWSelect(props: ICWSelect) {
         <Select
           id={id}
           onChange={onChange}
+          defaultValue={defaultValue}
           className="text-primary-text cursor-pointer w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
         >
           {options?.map((item: ISelectOptions) => {
             return (
-              <option
-                key={item.id}
-                value={item.value}
-                defaultValue={defaultValue}
-              >
+              <option key={item.id} value={item.value}>
                 {item.label}
               </option>
             );

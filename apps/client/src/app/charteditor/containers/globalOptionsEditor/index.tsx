@@ -5,7 +5,11 @@ import {
   chartGlobalConfig,
 } from '../../../../store/charts';
 import { CHART_FEATURE, DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
-import { alignments, legendPositions } from '../../utils/constants';
+import {
+  alignments,
+  legendPositions,
+  textAnchors,
+} from '../../utils/constants';
 import CWAccordian from '../../../components/accordian';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
 
@@ -25,14 +29,22 @@ function GlobalOptionsEditor() {
 
   const onLegendPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {
-      if (event && key !== DATA_SET_KEY.display) {
+      if (
+        event &&
+        key !== DATA_SET_KEY.enabled &&
+        key !== DATA_SET_KEY.showForSingleSeries
+      ) {
         event.stopPropagation();
       }
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.display:
+        case DATA_SET_KEY.enabled:
           config.options.legend.show = !config.options.legend.show;
+          break;
+        case DATA_SET_KEY.showForSingleSeries:
+          config.options.legend.showForSingleSeries =
+            !config.options.legend.showForSingleSeries;
           break;
         case DATA_SET_KEY.position:
           config.options.legend.position = event.target.value;
@@ -72,10 +84,21 @@ function GlobalOptionsEditor() {
           id: 'legend-enabled',
           label: 'Enabled',
           value: chartDataConfig.options.legend.show,
-          datasetKey: DATA_SET_KEY.display,
+          datasetKey: DATA_SET_KEY.enabled,
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
           enabled: config.globalOptions.legend.includes('enabled'),
+        },
+        {
+          id: 'legend-single-series',
+          label: 'Show for single series',
+          value: chartDataConfig.options.legend.showForSingleSeries,
+          datasetKey: DATA_SET_KEY.showForSingleSeries,
+          onChange: onLegendPropsUpdate,
+          type: INPUT_TYPE.CHECKBOX,
+          enabled: config.globalOptions.legend.includes(
+            DATA_SET_KEY.showForSingleSeries
+          ),
         },
         {
           id: 'legend-position',
@@ -302,7 +325,7 @@ function GlobalOptionsEditor() {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.display:
+        case DATA_SET_KEY.enabled:
           config.options.grid.show = !config.options.grid.show;
           break;
         case DATA_SET_KEY.gridXAxis:
@@ -336,7 +359,7 @@ function GlobalOptionsEditor() {
         {
           id: 'grid-enabled',
           label: 'Enabled',
-          datasetKey: DATA_SET_KEY.display,
+          datasetKey: DATA_SET_KEY.enabled,
           value: chartDataConfig.options.grid.show,
           onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
@@ -364,6 +387,77 @@ function GlobalOptionsEditor() {
     };
   }, [chartDataConfig, config, onGridPropsUpdate]);
 
+  const onDataLabelsPropsUpdate = useCallback(
+    (event: any, key: DATA_SET_KEY) => {
+      if (event && key !== DATA_SET_KEY.enabled) {
+        event.stopPropagation();
+      }
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      let configChanged = true;
+      switch (key) {
+        case DATA_SET_KEY.enabled:
+          config.options.dataLabels.enabled =
+            !config.options.dataLabels.enabled;
+          break;
+        case DATA_SET_KEY.textAnchor:
+          config.options.dataLabels.textAnchor = event.target.value;
+          break;
+        case DATA_SET_KEY.fontSize:
+          config.options.dataLabels.style.fontSize = event.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
+
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
+    },
+    [chartDataConfig, setChartDataConfig]
+  );
+
+  const dataLabelOptions = useMemo(() => {
+    if (!config || !config.globalOptions.dataLabels || !chartDataConfig) {
+      return {};
+    }
+
+    return {
+      id: 'data-labels-options',
+      panelHeading: 'Data Labels',
+      inputsProps: [
+        {
+          id: 'data-labels-enabled',
+          label: 'Enabled',
+          value: chartDataConfig.options.dataLabels.enabled,
+          datasetKey: DATA_SET_KEY.enabled,
+          onChange: onDataLabelsPropsUpdate,
+          type: INPUT_TYPE.CHECKBOX,
+          enabled: config.globalOptions.dataLabels.includes('enabled'),
+        },
+        {
+          id: 'data-labels-alignment',
+          label: 'Alignment',
+          datasetKey: DATA_SET_KEY.textAnchor,
+          value: chartDataConfig.options.dataLabels.textAnchor,
+          onChange: onDataLabelsPropsUpdate,
+          type: INPUT_TYPE.SELECT,
+          options: textAnchors,
+          enabled: config.globalOptions.dataLabels.includes('textAnchor'),
+        },
+        {
+          id: 'data-labels-font-size',
+          label: 'Font Size',
+          datasetKey: DATA_SET_KEY.fontSize,
+          value: chartDataConfig.options.dataLabels.style.fontSize,
+          onChange: onDataLabelsPropsUpdate,
+          type: INPUT_TYPE.NUMBER,
+          enabled: config.globalOptions.dataLabels.includes('font'),
+        },
+      ],
+    };
+  }, [chartDataConfig, config, onDataLabelsPropsUpdate]);
+
   const generateChartGlobalOptions = useCallback(() => {
     if (!config) {
       return;
@@ -383,12 +477,22 @@ function GlobalOptionsEditor() {
         case CHART_FEATURE.GRID:
           globalOpts.push(gridOptions as IChartGlobalOptions);
           break;
+        case CHART_FEATURE.DATA_LABELS:
+          globalOpts.push(dataLabelOptions as IChartGlobalOptions);
+          break;
         default:
           break;
       }
     });
     setGlobalOptions(globalOpts);
-  }, [config, gridOptions, legendOptions, subtitleOptions, titleOptions]);
+  }, [
+    config,
+    dataLabelOptions,
+    gridOptions,
+    legendOptions,
+    subtitleOptions,
+    titleOptions,
+  ]);
 
   useEffect(() => {
     if (config) {

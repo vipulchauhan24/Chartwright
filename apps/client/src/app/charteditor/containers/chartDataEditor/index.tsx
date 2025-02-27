@@ -92,10 +92,23 @@ function ChartDataEditor() {
   );
 
   const onBubbleChartDataUpdate = useCallback(
-    (data: Array<Array<number>>, indx: number) => {
+    (data: any, datasetKey: DATA_SET_KEY, indx: number) => {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
-      config.options.series[indx].data = data;
-      setChartDataConfig(config);
+      let configChanged = true;
+      switch (datasetKey) {
+        case DATA_SET_KEY.data:
+          config.options.series[indx].data = data;
+          break;
+        case DATA_SET_KEY.color:
+          config.options.colors[indx] = data.target.value;
+          break;
+        default:
+          configChanged = false;
+          break;
+      }
+      if (configChanged) {
+        setChartDataConfig(config);
+      }
     },
     [chartDataConfig, setChartDataConfig]
   );
@@ -142,8 +155,7 @@ function ChartDataEditor() {
               panelHeading={options.panelHeading}
               defaultOpen={options.open}
               panelHeadingButton={
-                chartDataConfig.options.chart.type !== CHART_TYPE.PIE &&
-                chartDataConfig.options.chart.type !== CHART_TYPE.BUBBLE ? (
+                chartDataConfig.options.chart.type !== CHART_TYPE.PIE ? (
                   <Tippy content={`Delete ${options.panelHeading}`}>
                     <span
                       role="button"

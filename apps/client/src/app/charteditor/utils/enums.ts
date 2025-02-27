@@ -2,13 +2,15 @@ export enum DATA_SET_KEY {
   label = 'label',
   data = 'data',
   backgroundColor = 'backgroundColor',
-  display = 'display',
+  enabled = 'enabled',
+  showForSingleSeries = 'showForSingleSeries',
   position = 'position',
   alignment = 'alignment',
   color = 'color',
   fontSize = 'font-size',
   gridXAxis = 'grid-x-axis',
   gridYAxis = 'grid-y-axis',
+  textAnchor = 'text-anchor',
 }
 
 export enum INPUT_TYPE {
@@ -34,5 +36,6 @@ export enum CHART_FEATURE {
   TITLE = 'title',
   SUBTITLE = 'subtitle',
   GRID = 'grid',
+  DATA_LABELS = 'dataLabels',
   OTHER = 'others',
 }

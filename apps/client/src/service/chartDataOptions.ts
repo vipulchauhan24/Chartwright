@@ -115,7 +115,11 @@ export const generatePieChartDataOptions = (
 export const generateBubbleChartDataOptions = (
   config: any,
   chartDataConfig: any,
-  onChartDataOptionsUpdate: (data: Array<Array<number>>, indx: number) => void
+  onChartDataOptionsUpdate: (
+    data: Array<Array<number>> | string,
+    datasetKey: DATA_SET_KEY,
+    indx: number
+  ) => void
 ) => {
   return [
     ...chartDataConfig.options.series.map(
@@ -130,11 +134,26 @@ export const generateBubbleChartDataOptions = (
               label: 'Data',
               value: series.data,
               datasetKey: DATA_SET_KEY.data,
-              onChange: (data: Array<Array<number>>) => {
-                onChartDataOptionsUpdate(data, indx);
+              onChange: (
+                data: Array<Array<number>>,
+                datasetKey: DATA_SET_KEY
+              ) => {
+                onChartDataOptionsUpdate(data, datasetKey, indx);
               },
               type: INPUT_TYPE.TABLE,
               enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+            },
+            ,
+            {
+              id: `edit-chart-color-${indx}`,
+              label: 'Background Color',
+              value: chartDataConfig.options.colors[indx],
+              datasetKey: DATA_SET_KEY.color,
+              onChange: (event: any, datasetKey: DATA_SET_KEY) => {
+                onChartDataOptionsUpdate(event, datasetKey, indx);
+              },
+              type: INPUT_TYPE.COLOR,
+              enabled: config.chartOptions.includes(DATA_SET_KEY.color),
             },
           ],
         };

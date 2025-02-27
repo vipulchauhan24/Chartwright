@@ -74,7 +74,7 @@ function CWTableInput(props: ICWTableInput) {
           {series.map(
             (value: { x: number; y: number; size: number }, indx: number) => {
               return (
-                <tr>
+                <tr key={`table-row-${indx}`}>
                   <td className="p-1 max-w-14">
                     <CWTextInput
                       defaultValue={`${value.x}`}

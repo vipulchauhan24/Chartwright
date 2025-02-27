@@ -107,7 +107,7 @@ function InputRenderer(props: IInputRenderer) {
         <CWTableInput
           id={id}
           defaultValue={value as number[][]}
-          onChange={onChange as (data: number[][]) => void}
+          onChange={(e) => onChange(e, datasetKey)}
         />
       );
     default:

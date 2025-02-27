@@ -27,18 +27,37 @@ export const legendPositions: Array<{
 
 export const alignments: Array<{ id: string; label: string; value: string }> = [
   {
-    id: 'legend-left',
+    id: 'alignments-left',
     label: 'Left',
     value: 'left',
   },
   {
-    id: 'legend-center',
+    id: 'alignments-center',
     label: 'Center',
     value: 'center',
   },
   {
-    id: 'legend-right',
+    id: 'alignments-right',
     label: 'Right',
     value: 'right',
   },
 ];
+
+export const textAnchors: Array<{ id: string; label: string; value: string }> =
+  [
+    {
+      id: 'text-anchor-start',
+      label: 'Start',
+      value: 'start',
+    },
+    {
+      id: 'text-anchor-middle',
+      label: 'Middle',
+      value: 'middle',
+    },
+    {
+      id: 'text-anchor-end',
+      label: 'End',
+      value: 'end',
+    },
+  ];

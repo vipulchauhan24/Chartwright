@@ -9,6 +9,15 @@
           [20, 30, 25],
           [25, 40, 35]
         ]
+      },
+      {
+        "name": "Series 2",
+        "data": [
+          [30, 40, 25],
+          [35, 45, 35],
+          [40, 50, 20],
+          [45, 55, 40]
+        ]
       }
     ],
     "chart": {
@@ -18,9 +27,13 @@
       }
     },
     "dataLabels": {
-      "enabled": false
+      "enabled": true,
+      "textAnchor": "middle",
+      "style": {
+        "fontSize": "14px"
+      }
     },
-    "colors": ["#77B6EA"],
+    "colors": ["#77B6EA", "#545454"],
     "xaxis": {
       "type": "category"
     },
