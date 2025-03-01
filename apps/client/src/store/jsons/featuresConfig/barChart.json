@@ -3,6 +3,7 @@
     "legend": [
       "render",
       "showForSingleSeries",
+      "floating",
       "position",
       "alignment",
       "color",

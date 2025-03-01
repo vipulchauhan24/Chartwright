@@ -4,6 +4,7 @@ export enum DATA_SET_KEY {
   backgroundColor = 'backgroundColor',
   render = 'render',
   showForSingleSeries = 'showForSingleSeries',
+  floating = 'floating',
   position = 'position',
   alignment = 'alignment',
   color = 'color',

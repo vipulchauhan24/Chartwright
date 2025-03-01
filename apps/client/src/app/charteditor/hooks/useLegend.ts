@@ -13,7 +13,8 @@ function useLegend() {
       if (
         event &&
         key !== DATA_SET_KEY.render &&
-        key !== DATA_SET_KEY.showForSingleSeries
+        key !== DATA_SET_KEY.showForSingleSeries &&
+        key !== DATA_SET_KEY.floating
       ) {
         event.stopPropagation();
       }
@@ -26,6 +27,9 @@ function useLegend() {
         case DATA_SET_KEY.showForSingleSeries:
           config.options.legend.showForSingleSeries =
             !config.options.legend.showForSingleSeries;
+          break;
+        case DATA_SET_KEY.floating:
+          config.options.legend.floating = !config.options.legend.floating;
           break;
         case DATA_SET_KEY.position:
           config.options.legend.position = event.target.value;
@@ -84,6 +88,16 @@ function useLegend() {
             DATA_SET_KEY.showForSingleSeries
           ),
           hint: 'Make legend visible when there is only single series of data.',
+        },
+        {
+          id: 'legend-floating',
+          label: 'Floating',
+          value: chartDataConfig.options.legend.floating,
+          datasetKey: DATA_SET_KEY.floating,
+          onChange: onLegendPropsUpdate,
+          type: INPUT_TYPE.CHECKBOX,
+          render: config.globalOptions.legend.includes(DATA_SET_KEY.floating),
+          hint: 'Make legend float above chart.',
         },
         {
           id: 'legend-position',

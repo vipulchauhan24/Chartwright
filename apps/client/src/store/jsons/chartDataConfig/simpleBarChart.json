@@ -43,6 +43,7 @@
     "legend": {
       "show": true,
       "showForSingleSeries": false,
+      "floating": false,
       "position": "top",
       "horizontalAlign": "center",
       "fontSize": "14px",
