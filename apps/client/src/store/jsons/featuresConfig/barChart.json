@@ -1,10 +1,31 @@
 {
   "globalOptions": {
-    "legend": ["enabled", "position", "alignment", "color", "font"],
+    "legend": [
+      "enabled",
+      "showForSingleSeries",
+      "position",
+      "alignment",
+      "color",
+      "font"
+    ],
     "title": ["text", "alignment", "color", "font"],
     "subtitle": ["text", "alignment", "color", "font"],
     "grid": ["enabled", "xaxis", "yaxis"],
+    "dataLabels": [
+      "enabled",
+      "textAnchor",
+      "font",
+      "color",
+      "position",
+      "orientation"
+    ],
     "others": ["background"]
   },
+  "plotOptions": [
+    "horizontal",
+    "borderRadius",
+    "borderRadiusApplication",
+    "barHeight"
+  ],
   "chartOptions": ["label", "data", "color"]
 }

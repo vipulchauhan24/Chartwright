@@ -15,6 +15,7 @@ import {
   generateBubbleChartDataOptions,
   generatePieChartDataOptions,
 } from '../../../../service/chartDataOptions';
+import usePlotOptions from '../../hooks/usePlotOptions';
 
 interface IChartDataOptions {
   id: string;
@@ -26,6 +27,7 @@ interface IChartDataOptions {
 function ChartDataEditor() {
   const [config] = useAtom(chartGlobalConfig);
   const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [plotOptions] = usePlotOptions();
 
   const deleteChartSeries = (index: number) => {
     const config = JSON.parse(JSON.stringify(chartDataConfig));
@@ -147,6 +149,24 @@ function ChartDataEditor() {
   return (
     <div className="mt-2 px-4">
       {chartDataConfig.options.labels && <ChartLabelEditor />}
+      {plotOptions && (
+        <div className="mt-2">
+          <CWAccordian
+            id={String(plotOptions.id)}
+            panelHeading={String(plotOptions.panelHeading)}
+            defaultOpen={true}
+            panelComponent={plotOptions.inputsProps?.map(
+              (props: IInputRenderer) => {
+                return (
+                  <div className="mt-2" key={props.id}>
+                    <InputRenderer {...props} />
+                  </div>
+                );
+              }
+            )}
+          />
+        </div>
+      )}
       {chartDataOptions.map((options: IChartDataOptions, indx: number) => {
         return (
           <div className="mt-2" key={options.id}>

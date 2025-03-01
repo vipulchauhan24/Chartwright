@@ -16,10 +16,29 @@
         "show": false
       }
     },
+    "plotOptions": {
+      "bar": {
+        "horizontal": false,
+        "dataLabels": {
+          "position": "center",
+          "maxItems": 100,
+          "orientation": "horizontal"
+        }
+      }
+    },
     "colors": ["#77B6EA", "#545454"],
     "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+    "dataLabels": {
+      "enabled": true,
+      "textAnchor": "middle",
+      "style": {
+        "fontSize": "14px",
+        "colors": ["#545454", "#77B6EA"]
+      }
+    },
     "legend": {
       "show": true,
+      "showForSingleSeries": false,
       "position": "top",
       "horizontalAlign": "center",
       "fontSize": "14px"

@@ -10,7 +10,12 @@ export enum DATA_SET_KEY {
   fontSize = 'font-size',
   gridXAxis = 'grid-x-axis',
   gridYAxis = 'grid-y-axis',
-  textAnchor = 'text-anchor',
+  textAnchor = 'textAnchor',
+  orientation = 'orientation',
+  borderRadius = 'borderRadius',
+  borderRadiusApplication = 'borderRadiusApplication',
+  horizontal = 'horizontal',
+  barHeight = 'barHeight',
 }
 
 export enum INPUT_TYPE {

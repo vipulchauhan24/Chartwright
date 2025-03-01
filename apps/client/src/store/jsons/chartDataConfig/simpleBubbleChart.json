@@ -30,7 +30,8 @@
       "enabled": true,
       "textAnchor": "middle",
       "style": {
-        "fontSize": "14px"
+        "fontSize": "14px",
+        "colors": ["#000", "#000"]
       }
     },
     "colors": ["#77B6EA", "#545454"],

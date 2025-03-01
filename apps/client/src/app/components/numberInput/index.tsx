@@ -63,12 +63,12 @@ function CWNumberInput(props: ICWNumberInput) {
         <IconButton
           icon={<MinusIcon className="size-4" aria-hidden={true} />}
           onClick={decrease}
-          tooltip="Decrease font size by one pixel."
+          tooltip="Decrease by one pixel."
         />
         <IconButton
           icon={<PlusIcon className="size-4" aria-hidden={true} />}
           onClick={increase}
-          tooltip="Increase font size by one pixel."
+          tooltip="Increase by one pixel."
         />
       </div>
     </Field>

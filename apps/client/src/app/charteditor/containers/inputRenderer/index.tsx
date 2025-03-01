@@ -1,6 +1,7 @@
 import CWCheckbox from '../../../components/checkbox';
 import CWColorInput from '../../../components/colorInput';
 import CWNumberInput from '../../../components/numberInput';
+import CWRangeInput from '../../../components/rangeInput';
 import CWSelect from '../../../components/select';
 import CWTableInput from '../../../components/tableInput';
 import CWTextArea from '../../../components/textArea';
@@ -25,6 +26,9 @@ export interface IInputRenderer {
   }>;
   enabled?: boolean;
   hint?: string;
+  min?: string;
+  max?: string;
+  step?: string;
 }
 
 function InputRenderer(props: IInputRenderer) {
@@ -39,6 +43,9 @@ function InputRenderer(props: IInputRenderer) {
     enabled,
     hint,
     placeholder,
+    min,
+    max,
+    step,
   } = props;
 
   if (!enabled) return null;
@@ -108,6 +115,18 @@ function InputRenderer(props: IInputRenderer) {
           id={id}
           defaultValue={value as number[][]}
           onChange={(e) => onChange(e, datasetKey)}
+        />
+      );
+    case INPUT_TYPE.RANGE:
+      return (
+        <CWRangeInput
+          id={id}
+          label={label}
+          onChange={(e) => onChange(e, datasetKey)}
+          min={String(min)}
+          max={String(max)}
+          step={String(step)}
+          defaultValue={String(value)}
         />
       );
     default:
