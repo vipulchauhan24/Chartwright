@@ -33,9 +33,9 @@ function useLegend() {
         case DATA_SET_KEY.alignment:
           config.options.legend.horizontalAlign = event.target.value;
           break;
-        // case DATA_SET_KEY.color:
-        //   config.options.plugins.legend.labels.color = event.target.value;
-        //   break;
+        case DATA_SET_KEY.color:
+          config.options.legend.labels.colors = event.target.value;
+          break;
         case DATA_SET_KEY.fontSize:
           config.options.legend.fontSize = event.target.value;
           break;
@@ -105,18 +105,6 @@ function useLegend() {
           options: alignments,
           render: config.globalOptions.legend.includes('alignment'),
         },
-        // {
-        //   id: 'legend-color',
-        //   label: 'Color',
-        //   datasetKey: DATA_SET_KEY.color,
-        //   value: chartConfigurations.options.plugins.legend.labels.color,
-        //   tooltip: 'Only Hex code supported. (#rrggbb)',
-        //   onChange: onLegendPropsUpdate,
-        //   type: INPUT_TYPE.COLOR,
-        //   render: chartGlobalConfigurations.globalOptions.legend.includes(
-        //     INPUT_TYPE.COLOR
-        //   ),
-        // },
         {
           id: 'legend-label-font-size',
           label: 'Font Size',
@@ -135,6 +123,16 @@ function useLegend() {
           type: INPUT_TYPE.SELECT,
           options: fontWeights,
           render: config.globalOptions.legend.includes('font'),
+        },
+        {
+          id: 'legend-color',
+          label: 'Color',
+          datasetKey: DATA_SET_KEY.color,
+          value: chartDataConfig.options.legend.labels.colors,
+          tooltip: 'Only Hex code supported. (#rrggbb)',
+          onChange: onLegendPropsUpdate,
+          type: INPUT_TYPE.COLOR,
+          render: config.globalOptions.legend.includes(INPUT_TYPE.COLOR),
         },
       ],
     };

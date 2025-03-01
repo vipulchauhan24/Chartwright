@@ -46,7 +46,10 @@
       "position": "top",
       "horizontalAlign": "center",
       "fontSize": "14px",
-      "fontWeight": "500"
+      "fontWeight": "500",
+      "labels": {
+        "colors": "#071013"
+      }
     },
     "title": {
       "text": "Chart title",
