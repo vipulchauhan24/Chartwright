@@ -1,5 +1,6 @@
 import { Field, Label, Select } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 
 interface ISelectOptions {
   id: string;
@@ -13,10 +14,11 @@ interface ICWSelect {
   defaultValue: string;
   onChange: (e: any) => void;
   options?: Array<ISelectOptions>;
+  disabled?: boolean;
 }
 
 function CWSelect(props: ICWSelect) {
-  const { id, label, options, defaultValue, onChange } = props;
+  const { id, label, options, defaultValue, onChange, disabled } = props;
   return (
     <Field className="flex items-center justify-between">
       <Label
@@ -28,9 +30,13 @@ function CWSelect(props: ICWSelect) {
       <div className="relative">
         <Select
           id={id}
+          disabled={disabled}
           onChange={onChange}
           defaultValue={defaultValue}
-          className="text-primary-text cursor-pointer w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className={clsx(
+            'text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none',
+            disabled && 'pointer-events-none opacity-50'
+          )}
         >
           {options?.map((item: ISelectOptions) => {
             return (

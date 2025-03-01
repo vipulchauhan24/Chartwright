@@ -29,7 +29,7 @@ function GlobalOptionsEditor() {
     (event: any, key: DATA_SET_KEY) => {
       if (
         event &&
-        key !== DATA_SET_KEY.enabled &&
+        key !== DATA_SET_KEY.render &&
         key !== DATA_SET_KEY.showForSingleSeries
       ) {
         event.stopPropagation();
@@ -37,7 +37,7 @@ function GlobalOptionsEditor() {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.enabled:
+        case DATA_SET_KEY.render:
           config.options.legend.show = !config.options.legend.show;
           break;
         case DATA_SET_KEY.showForSingleSeries:
@@ -82,10 +82,10 @@ function GlobalOptionsEditor() {
           id: 'legend-enabled',
           label: 'Enabled',
           value: chartDataConfig.options.legend.show,
-          datasetKey: DATA_SET_KEY.enabled,
+          datasetKey: DATA_SET_KEY.render,
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.legend.includes('enabled'),
+          render: config.globalOptions.legend.includes(DATA_SET_KEY.render),
         },
         {
           id: 'legend-single-series',
@@ -94,9 +94,10 @@ function GlobalOptionsEditor() {
           datasetKey: DATA_SET_KEY.showForSingleSeries,
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.legend.includes(
+          render: config.globalOptions.legend.includes(
             DATA_SET_KEY.showForSingleSeries
           ),
+          hint: 'Make legend visible when there is only single series of data.',
         },
         {
           id: 'legend-position',
@@ -106,7 +107,7 @@ function GlobalOptionsEditor() {
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: legendPositions,
-          enabled: config.globalOptions.legend.includes('position'),
+          render: config.globalOptions.legend.includes('position'),
         },
         {
           id: 'legend-alignment',
@@ -116,7 +117,7 @@ function GlobalOptionsEditor() {
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: alignments,
-          enabled: config.globalOptions.legend.includes('alignment'),
+          render: config.globalOptions.legend.includes('alignment'),
         },
         // {
         //   id: 'legend-color',
@@ -126,7 +127,7 @@ function GlobalOptionsEditor() {
         //   tooltip: 'Only Hex code supported. (#rrggbb)',
         //   onChange: onLegendPropsUpdate,
         //   type: INPUT_TYPE.COLOR,
-        //   enabled: chartGlobalConfigurations.globalOptions.legend.includes(
+        //   render: chartGlobalConfigurations.globalOptions.legend.includes(
         //     INPUT_TYPE.COLOR
         //   ),
         // },
@@ -137,7 +138,7 @@ function GlobalOptionsEditor() {
           value: chartDataConfig.options.legend.fontSize,
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          enabled: config.globalOptions.legend.includes('font'),
+          render: config.globalOptions.legend.includes('font'),
         },
       ],
     };
@@ -194,7 +195,7 @@ function GlobalOptionsEditor() {
           onChange: onTitlePropsUpdate,
           type: INPUT_TYPE.TEXT,
           placeholder: 'Enter text here...',
-          enabled: config.globalOptions.title.includes(INPUT_TYPE.TEXT),
+          render: config.globalOptions.title.includes(INPUT_TYPE.TEXT),
           hint: 'Clear text input on right to disable chart title.',
         },
         {
@@ -205,7 +206,7 @@ function GlobalOptionsEditor() {
           onChange: onTitlePropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: alignments,
-          enabled: config.globalOptions.title.includes('alignment'),
+          render: config.globalOptions.title.includes('alignment'),
         },
         // {
         //   id: 'title-color',
@@ -215,7 +216,7 @@ function GlobalOptionsEditor() {
         //   tooltip: 'Only Hex code supported. (#rrggbb)',
         //   onChange: onTitlePropsUpdate,
         //   type: INPUT_TYPE.COLOR,
-        //   enabled: chartGlobalConfigurations.globalOptions.title.includes(
+        //   render: chartGlobalConfigurations.globalOptions.title.includes(
         //     INPUT_TYPE.COLOR
         //   ),
         // },
@@ -226,7 +227,7 @@ function GlobalOptionsEditor() {
           value: chartDataConfig.options.title.style.fontSize,
           onChange: onTitlePropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          enabled: config.globalOptions.title.includes('font'),
+          render: config.globalOptions.title.includes('font'),
         },
       ],
     };
@@ -280,7 +281,7 @@ function GlobalOptionsEditor() {
           onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.TEXT,
           placeholder: 'Enter text here...',
-          enabled: config.globalOptions.subtitle.includes(INPUT_TYPE.TEXT),
+          render: config.globalOptions.subtitle.includes(INPUT_TYPE.TEXT),
           hint: 'Clear text input on right to disable chart subtitle.',
         },
         {
@@ -291,7 +292,7 @@ function GlobalOptionsEditor() {
           onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: alignments,
-          enabled: config.globalOptions.subtitle.includes('alignment'),
+          render: config.globalOptions.subtitle.includes('alignment'),
         },
         // {
         //   id: 'subtitle-color',
@@ -301,7 +302,7 @@ function GlobalOptionsEditor() {
         //   tooltip: 'Only Hex code supported. (#rrggbb)',
         //   onChange: onSubtitlePropsUpdate,
         //   type: INPUT_TYPE.COLOR,
-        //   enabled: config.globalOptions.subtitle.includes(INPUT_TYPE.COLOR),
+        //   render: config.globalOptions.subtitle.includes(INPUT_TYPE.COLOR),
         // },
         {
           id: 'subtitle-font-size',
@@ -312,7 +313,7 @@ function GlobalOptionsEditor() {
           tooltip: 'Max value allowed is 56px.',
           onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          enabled: config.globalOptions.subtitle.includes('font'),
+          render: config.globalOptions.subtitle.includes('font'),
         },
       ],
     };
@@ -323,7 +324,7 @@ function GlobalOptionsEditor() {
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.enabled:
+        case DATA_SET_KEY.render:
           config.options.grid.show = !config.options.grid.show;
           break;
         case DATA_SET_KEY.gridXAxis:
@@ -357,11 +358,11 @@ function GlobalOptionsEditor() {
         {
           id: 'grid-enabled',
           label: 'Enabled',
-          datasetKey: DATA_SET_KEY.enabled,
+          datasetKey: DATA_SET_KEY.render,
           value: chartDataConfig.options.grid.show,
           onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.grid.includes('enabled'),
+          render: config.globalOptions.grid.includes(DATA_SET_KEY.render),
         },
         {
           id: 'grid-xaxis',
@@ -370,7 +371,7 @@ function GlobalOptionsEditor() {
           value: chartDataConfig.options.grid.xaxis.lines.show,
           onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.grid.includes('xaxis'),
+          render: config.globalOptions.grid.includes('xaxis'),
         },
         {
           id: 'grid-yaxis',
@@ -379,7 +380,7 @@ function GlobalOptionsEditor() {
           value: chartDataConfig.options.grid.yaxis.lines.show,
           onChange: onGridPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.grid.includes('yaxis'),
+          render: config.globalOptions.grid.includes('yaxis'),
         },
       ],
     };

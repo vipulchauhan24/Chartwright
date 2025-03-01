@@ -24,7 +24,8 @@ export interface IInputRenderer {
     label: string;
     value: string;
   }>;
-  enabled?: boolean;
+  render: boolean;
+  disabled?: boolean;
   hint?: string;
   min?: string;
   max?: string;
@@ -40,15 +41,16 @@ function InputRenderer(props: IInputRenderer) {
     onChange,
     datasetKey,
     options,
-    enabled,
+    disabled,
     hint,
     placeholder,
     min,
     max,
     step,
+    render,
   } = props;
 
-  if (!enabled) return null;
+  if (!render) return null;
 
   switch (type) {
     case INPUT_TYPE.CHECKBOX:
@@ -58,6 +60,7 @@ function InputRenderer(props: IInputRenderer) {
           label={label}
           checked={Boolean(value)}
           onChange={(e) => onChange(e, datasetKey)}
+          hint={hint}
         />
       );
     case INPUT_TYPE.SELECT:
@@ -68,6 +71,7 @@ function InputRenderer(props: IInputRenderer) {
           defaultValue={String(value)}
           onChange={(e) => onChange(e, datasetKey)}
           options={options}
+          disabled={disabled}
         />
       );
     case INPUT_TYPE.NUMBER:
@@ -127,6 +131,8 @@ function InputRenderer(props: IInputRenderer) {
           max={String(max)}
           step={String(step)}
           defaultValue={String(value)}
+          disabled={disabled}
+          hint={hint}
         />
       );
     default:

@@ -30,6 +30,9 @@ function usePlotOptions() {
         case DATA_SET_KEY.barHeight:
           config.options.plotOptions.bar.barHeight = event.target.value + '%';
           break;
+        case DATA_SET_KEY.barWidth:
+          config.options.plotOptions.bar.columnWidth = event.target.value + '%';
+          break;
         default:
           configChanged = false;
           break;
@@ -58,7 +61,7 @@ function usePlotOptions() {
           datasetKey: DATA_SET_KEY.horizontal,
           onChange: onPlotOptionsPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.plotOptions.includes(DATA_SET_KEY.horizontal),
+          render: config.plotOptions.includes(DATA_SET_KEY.horizontal),
         },
         {
           id: 'border-radius',
@@ -67,7 +70,7 @@ function usePlotOptions() {
           datasetKey: DATA_SET_KEY.borderRadius,
           onChange: onPlotOptionsPropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          enabled: config.plotOptions.includes(DATA_SET_KEY.borderRadius),
+          render: config.plotOptions.includes(DATA_SET_KEY.borderRadius),
         },
         {
           id: 'border-radius-application',
@@ -78,7 +81,7 @@ function usePlotOptions() {
           onChange: onPlotOptionsPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: borderRadiusApplications,
-          enabled: config.plotOptions.includes(
+          render: config.plotOptions.includes(
             DATA_SET_KEY.borderRadiusApplication
           ),
         },
@@ -92,7 +95,27 @@ function usePlotOptions() {
           min: '0',
           max: '100',
           step: '1',
-          enabled: config.plotOptions.includes(DATA_SET_KEY.barHeight),
+          render: config.plotOptions.includes(DATA_SET_KEY.barHeight),
+          disabled: !chartDataConfig.options.plotOptions.bar.horizontal,
+          hint:
+            !chartDataConfig.options.plotOptions.bar.horizontal &&
+            'Make chart horizontal to enable.',
+        },
+        {
+          id: 'bar-width',
+          label: 'Bar Width',
+          datasetKey: DATA_SET_KEY.barWidth,
+          value: chartDataConfig.options.plotOptions.bar.columnWidth,
+          onChange: onPlotOptionsPropsUpdate,
+          type: INPUT_TYPE.RANGE,
+          min: '0',
+          max: '100',
+          step: '1',
+          render: config.plotOptions.includes(DATA_SET_KEY.barWidth),
+          disabled: chartDataConfig.options.plotOptions.bar.horizontal,
+          hint:
+            chartDataConfig.options.plotOptions.bar.horizontal &&
+            'Make chart vertical to enable.',
         },
       ],
     };

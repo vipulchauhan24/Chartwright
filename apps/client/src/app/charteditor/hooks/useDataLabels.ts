@@ -14,13 +14,13 @@ function useDataLabels() {
 
   const onDataLabelsPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY, indx?: number) => {
-      if (event && key !== DATA_SET_KEY.enabled) {
+      if (event && key !== DATA_SET_KEY.render) {
         event.stopPropagation();
       }
       const config = JSON.parse(JSON.stringify(chartDataConfig));
       let configChanged = true;
       switch (key) {
-        case DATA_SET_KEY.enabled:
+        case DATA_SET_KEY.render:
           config.options.dataLabels.enabled =
             !config.options.dataLabels.enabled;
           break;
@@ -67,12 +67,10 @@ function useDataLabels() {
           id: 'data-labels-enabled',
           label: 'Enabled',
           value: chartDataConfig.options.dataLabels.enabled,
-          datasetKey: DATA_SET_KEY.enabled,
+          datasetKey: DATA_SET_KEY.render,
           onChange: onDataLabelsPropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
-          enabled: config.globalOptions.dataLabels.includes(
-            DATA_SET_KEY.enabled
-          ),
+          render: config.globalOptions.dataLabels.includes(DATA_SET_KEY.render),
         },
         {
           id: 'data-labels-alignment',
@@ -82,7 +80,7 @@ function useDataLabels() {
           onChange: onDataLabelsPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: textAnchors,
-          enabled: config.globalOptions.dataLabels.includes(
+          render: config.globalOptions.dataLabels.includes(
             DATA_SET_KEY.textAnchor
           ),
         },
@@ -94,7 +92,7 @@ function useDataLabels() {
           onChange: onDataLabelsPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: dataLabelsPositions,
-          enabled: config.globalOptions.dataLabels.includes(
+          render: config.globalOptions.dataLabels.includes(
             DATA_SET_KEY.position
           ),
         },
@@ -106,7 +104,7 @@ function useDataLabels() {
           onChange: onDataLabelsPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: dataLabelsOrientations,
-          enabled: config.globalOptions.dataLabels.includes(
+          render: config.globalOptions.dataLabels.includes(
             DATA_SET_KEY.orientation
           ),
         },
@@ -117,7 +115,7 @@ function useDataLabels() {
           value: chartDataConfig.options.dataLabels.style.fontSize,
           onChange: onDataLabelsPropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          enabled: config.globalOptions.dataLabels.includes('font'),
+          render: config.globalOptions.dataLabels.includes('font'),
         },
         ...chartDataConfig.options.series.map((_: string, indx: number) => {
           return {
@@ -131,7 +129,7 @@ function useDataLabels() {
               onDataLabelsPropsUpdate(event, datasetKey, indx);
             },
             type: INPUT_TYPE.COLOR,
-            enabled: config.chartOptions.includes(DATA_SET_KEY.color),
+            render: config.chartOptions.includes(DATA_SET_KEY.color),
           };
         }),
       ],

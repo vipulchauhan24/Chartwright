@@ -1,7 +1,7 @@
 {
   "globalOptions": {
     "legend": [
-      "enabled",
+      "render",
       "showForSingleSeries",
       "position",
       "alignment",
@@ -10,8 +10,8 @@
     ],
     "title": ["text", "alignment", "color", "font"],
     "subtitle": ["text", "alignment", "color", "font"],
-    "grid": ["enabled", "xaxis", "yaxis"],
-    "dataLabels": ["enabled", "textAnchor", "font"],
+    "grid": ["render", "xaxis", "yaxis"],
+    "dataLabels": ["render", "textAnchor", "font"],
     "others": ["background"]
   },
   "chartOptions": ["label", "data", "color"]

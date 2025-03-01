@@ -22,6 +22,7 @@
         "borderRadius": 4,
         "borderRadiusApplication": "end",
         "barHeight": "90%",
+        "columnWidth": "90%",
         "dataLabels": {
           "position": "center",
           "maxItems": 100,

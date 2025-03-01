@@ -2,7 +2,7 @@ export enum DATA_SET_KEY {
   label = 'label',
   data = 'data',
   backgroundColor = 'backgroundColor',
-  enabled = 'enabled',
+  render = 'render',
   showForSingleSeries = 'showForSingleSeries',
   position = 'position',
   alignment = 'alignment',
@@ -16,6 +16,7 @@ export enum DATA_SET_KEY {
   borderRadiusApplication = 'borderRadiusApplication',
   horizontal = 'horizontal',
   barHeight = 'barHeight',
+  barWidth = 'barWidth',
 }
 
 export enum INPUT_TYPE {

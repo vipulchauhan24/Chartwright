@@ -1,6 +1,6 @@
 {
   "globalOptions": {
-    "legend": ["enabled", "position", "alignment", "color", "font"],
+    "legend": ["render", "position", "alignment", "color", "font"],
     "title": ["text", "alignment", "color", "font"],
     "subtitle": ["text", "alignment", "color", "font"],
     "others": ["background"]

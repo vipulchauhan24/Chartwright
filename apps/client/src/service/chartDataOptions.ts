@@ -34,7 +34,7 @@ export const generateBarAndLineChartDataOptions = (
               onChartDataOptionsUpdate(event, datasetKey, indx);
             },
             type: INPUT_TYPE.TEXT,
-            enabled: config.chartOptions.includes(DATA_SET_KEY.label),
+            render: config.chartOptions.includes(DATA_SET_KEY.label),
           },
           {
             id: `edit-chart-data-${indx}`,
@@ -45,7 +45,7 @@ export const generateBarAndLineChartDataOptions = (
               onChartDataOptionsUpdate(event, datasetKey, indx);
             },
             type: INPUT_TYPE.TEXT_AREA,
-            enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+            render: config.chartOptions.includes(DATA_SET_KEY.data),
           },
           {
             id: `edit-chart-color-${indx}`,
@@ -56,7 +56,7 @@ export const generateBarAndLineChartDataOptions = (
               onChartDataOptionsUpdate(event, datasetKey, indx);
             },
             type: INPUT_TYPE.COLOR,
-            enabled: config.chartOptions.includes(DATA_SET_KEY.color),
+            render: config.chartOptions.includes(DATA_SET_KEY.color),
           },
         ],
       };
@@ -90,7 +90,7 @@ export const generatePieChartDataOptions = (
             onChartDataOptionsUpdate(event, datasetKey, 0);
           },
           type: INPUT_TYPE.TEXT_AREA,
-          enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+          render: config.chartOptions.includes(DATA_SET_KEY.data),
         },
         ...chartDataConfig.options.series.map((_: string, indx: number) => {
           return {
@@ -104,7 +104,7 @@ export const generatePieChartDataOptions = (
               onChartDataOptionsUpdate(event, datasetKey, indx);
             },
             type: INPUT_TYPE.COLOR,
-            enabled: config.chartOptions.includes(DATA_SET_KEY.color),
+            render: config.chartOptions.includes(DATA_SET_KEY.color),
           };
         }),
       ],
@@ -141,7 +141,7 @@ export const generateBubbleChartDataOptions = (
                 onChartDataOptionsUpdate(data, datasetKey, indx);
               },
               type: INPUT_TYPE.TABLE,
-              enabled: config.chartOptions.includes(DATA_SET_KEY.data),
+              render: config.chartOptions.includes(DATA_SET_KEY.data),
             },
             ,
             {
@@ -153,7 +153,7 @@ export const generateBubbleChartDataOptions = (
                 onChartDataOptionsUpdate(event, datasetKey, indx);
               },
               type: INPUT_TYPE.COLOR,
-              enabled: config.chartOptions.includes(DATA_SET_KEY.color),
+              render: config.chartOptions.includes(DATA_SET_KEY.color),
             },
           ],
         };

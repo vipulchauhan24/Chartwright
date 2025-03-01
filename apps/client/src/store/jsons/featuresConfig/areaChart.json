@@ -1,9 +1,9 @@
 {
   "globalOptions": {
-    "legend": ["enabled", "position", "alignment", "color", "font"],
+    "legend": ["render", "position", "alignment", "color", "font"],
     "title": ["text", "alignment", "color", "font"],
     "subtitle": ["text", "alignment", "color", "font"],
-    "grid": ["enabled", "xaxis", "yaxis"],
+    "grid": ["render", "xaxis", "yaxis"],
     "others": ["background"]
   },
   "chartOptions": ["label", "data", "color"]
