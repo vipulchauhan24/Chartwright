@@ -43,6 +43,25 @@ export const alignments: Array<{ id: string; label: string; value: string }> = [
   },
 ];
 
+export const fontWeights: Array<{ id: string; label: string; value: string }> =
+  [
+    {
+      id: 'weight-normal',
+      label: 'Normal',
+      value: '500',
+    },
+    {
+      id: 'weight-bold',
+      label: 'Bold',
+      value: '700',
+    },
+    {
+      id: 'weight-extra-bold',
+      label: 'Extra bold',
+      value: '900',
+    },
+  ];
+
 export const textAnchors: Array<{ id: string; label: string; value: string }> =
   [
     {

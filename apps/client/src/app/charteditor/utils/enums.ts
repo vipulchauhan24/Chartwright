@@ -8,6 +8,7 @@ export enum DATA_SET_KEY {
   alignment = 'alignment',
   color = 'color',
   fontSize = 'font-size',
+  fontWeight = 'font-weight',
   gridXAxis = 'grid-x-axis',
   gridYAxis = 'grid-y-axis',
   textAnchor = 'textAnchor',
