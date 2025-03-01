@@ -48,6 +48,7 @@
       "horizontalAlign": "center",
       "fontSize": "14px",
       "fontWeight": "500",
+      "fontFamily": "Helvetica",
       "labels": {
         "colors": "#071013"
       }

@@ -2,7 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
 import { useAtom } from 'jotai';
 import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
-import { alignments, fontWeights, legendPositions } from '../utils/constants';
+import {
+  alignments,
+  fontFamilies,
+  fontWeights,
+  legendPositions,
+} from '../utils/constants';
 
 function useLegend() {
   const [config] = useAtom(chartGlobalConfig);
@@ -45,6 +50,9 @@ function useLegend() {
           break;
         case DATA_SET_KEY.fontWeight:
           config.options.legend.fontWeight = event.target.value;
+          break;
+        case DATA_SET_KEY.fontFamily:
+          config.options.legend.fontFamily = event.target.value;
           break;
         default:
           configChanged = false;
@@ -136,6 +144,16 @@ function useLegend() {
           onChange: onLegendPropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: fontWeights,
+          render: config.globalOptions.legend.includes('font'),
+        },
+        {
+          id: 'legend-label-font-family',
+          label: 'Font Family',
+          datasetKey: DATA_SET_KEY.fontFamily,
+          value: chartDataConfig.options.legend.fontFamily,
+          onChange: onLegendPropsUpdate,
+          type: INPUT_TYPE.SELECT,
+          options: fontFamilies,
           render: config.globalOptions.legend.includes('font'),
         },
         {

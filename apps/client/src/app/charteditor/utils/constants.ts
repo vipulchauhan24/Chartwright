@@ -62,6 +62,50 @@ export const fontWeights: Array<{ id: string; label: string; value: string }> =
     },
   ];
 
+export const fontFamilies: Array<{ id: string; label: string; value: string }> =
+  [
+    {
+      id: 'font-family-helvetica',
+      label: 'Helvetica',
+      value: 'Helvetica',
+    },
+    {
+      id: 'font-family-poppins',
+      label: 'Poppins',
+      value: 'Poppins',
+    },
+    {
+      id: 'font-family-garamond',
+      label: 'Garamond',
+      value: 'Garamond',
+    },
+    {
+      id: 'font-family-merriweather',
+      label: 'Merriweather',
+      value: 'Merriweather',
+    },
+    {
+      id: 'font-family-courier-new',
+      label: 'Courier New',
+      value: 'Courier New',
+    },
+    {
+      id: 'font-family-consolas',
+      label: 'Consolas',
+      value: 'Consolas',
+    },
+    {
+      id: 'font-family-menlo',
+      label: 'Menlo',
+      value: 'Menlo',
+    },
+    {
+      id: 'font-family-plus-jakarta-sans',
+      label: 'Plus Jakarta Sans',
+      value: 'Plus Jakarta Sans',
+    },
+  ];
+
 export const textAnchors: Array<{ id: string; label: string; value: string }> =
   [
     {
