@@ -74,7 +74,6 @@ function useLegend() {
     return {
       id: 'legend-options',
       panelHeading: 'Legend',
-      open: true,
       inputsProps: [
         {
           id: 'legend-enabled',

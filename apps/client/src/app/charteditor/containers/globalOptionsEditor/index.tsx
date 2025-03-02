@@ -10,6 +10,7 @@ import CWAccordian from '../../../components/accordian';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
 import useDataLabels from '../../hooks/useDataLabels';
 import useLegend from '../../hooks/useLegend';
+import useTitle from '../../hooks/useTitle';
 
 interface IChartGlobalOptions {
   id: string;
@@ -26,95 +27,7 @@ function GlobalOptionsEditor() {
   >([]);
   const [dataLabelOptions] = useDataLabels();
   const [legendOptions] = useLegend();
-
-  const onTitlePropsUpdate = useCallback(
-    (event: any, key: DATA_SET_KEY) => {
-      if (event) {
-        event.stopPropagation();
-      }
-      const config = JSON.parse(JSON.stringify(chartDataConfig));
-      let configChanged = true;
-      switch (key) {
-        case DATA_SET_KEY.position:
-          config.options.title.position = event.target.value;
-          break;
-        case DATA_SET_KEY.alignment:
-          config.options.title.align = event.target.value;
-          break;
-        // case DATA_SET_KEY.color:
-        //   config.options.plugins.title.color = event.target.value;
-        //   break;
-        case DATA_SET_KEY.fontSize:
-          config.options.title.style.fontSize = event.target.value;
-          break;
-        case DATA_SET_KEY.data:
-          config.options.title.text = event.target.value;
-          break;
-        default:
-          configChanged = false;
-          break;
-      }
-
-      if (configChanged) {
-        setChartDataConfig(config);
-      }
-    },
-    [chartDataConfig, setChartDataConfig]
-  );
-
-  const titleOptions = useMemo(() => {
-    if (!config || !config.globalOptions.title || !chartDataConfig) {
-      return {};
-    }
-    return {
-      id: 'title-options',
-      panelHeading: 'Title',
-      inputsProps: [
-        {
-          id: 'title-text',
-          label: 'Text',
-          datasetKey: DATA_SET_KEY.data,
-          value: chartDataConfig.options.title.text,
-          onChange: onTitlePropsUpdate,
-          type: INPUT_TYPE.TEXT,
-          placeholder: 'Enter text here...',
-          render: config.globalOptions.title.includes(INPUT_TYPE.TEXT),
-          hint: 'Clear text input on right to disable chart title.',
-        },
-        {
-          id: 'title-alignment',
-          label: 'Alignment',
-          datasetKey: DATA_SET_KEY.alignment,
-          value: chartDataConfig.options.title.align,
-          onChange: onTitlePropsUpdate,
-          type: INPUT_TYPE.SELECT,
-          options: alignments,
-          render: config.globalOptions.title.includes('alignment'),
-        },
-        // {
-        //   id: 'title-color',
-        //   label: 'Color',
-        //   datasetKey: DATA_SET_KEY.color,
-        //   value: chartConfigurations.options.plugins.title.color,
-        //   tooltip: 'Only Hex code supported. (#rrggbb)',
-        //   onChange: onTitlePropsUpdate,
-        //   type: INPUT_TYPE.COLOR,
-        //   render: chartGlobalConfigurations.globalOptions.title.includes(
-        //     INPUT_TYPE.COLOR
-        //   ),
-        // },
-        {
-          id: 'title-font-size',
-          label: 'Font Size',
-          datasetKey: DATA_SET_KEY.fontSize,
-          value: chartDataConfig.options.title.style.fontSize,
-          onChange: onTitlePropsUpdate,
-          type: INPUT_TYPE.NUMBER,
-          render: config.globalOptions.title.includes('font'),
-        },
-      ],
-    };
-  }, [chartDataConfig, config, onTitlePropsUpdate]);
+  const [titleOptions] = useTitle();
 
   const onSubtitlePropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {
@@ -276,14 +189,14 @@ function GlobalOptionsEditor() {
     const globalOpts: Array<IChartGlobalOptions> = [];
     Object.keys(config.globalOptions).forEach((opts) => {
       switch (opts) {
-        case CHART_FEATURE.LEGEND:
-          globalOpts.push(legendOptions as IChartGlobalOptions);
-          break;
         case CHART_FEATURE.TITLE:
           globalOpts.push(titleOptions as IChartGlobalOptions);
           break;
         case CHART_FEATURE.SUBTITLE:
           globalOpts.push(subtitleOptions as IChartGlobalOptions);
+          break;
+        case CHART_FEATURE.LEGEND:
+          globalOpts.push(legendOptions as IChartGlobalOptions);
           break;
         case CHART_FEATURE.GRID:
           globalOpts.push(gridOptions as IChartGlobalOptions);

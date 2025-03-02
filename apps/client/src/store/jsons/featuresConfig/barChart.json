@@ -1,5 +1,7 @@
 {
   "globalOptions": {
+    "title": ["text", "floating", "alignment", "color", "font"],
+    "subtitle": ["text", "alignment", "color", "font"],
     "legend": [
       "render",
       "showForSingleSeries",
@@ -9,8 +11,6 @@
       "color",
       "font"
     ],
-    "title": ["text", "alignment", "color", "font"],
-    "subtitle": ["text", "alignment", "color", "font"],
     "grid": ["render", "xaxis", "yaxis"],
     "dataLabels": [
       "render",
