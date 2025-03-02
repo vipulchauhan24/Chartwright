@@ -1,8 +1,16 @@
 import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
+import { IInputRenderer } from '../containers/inputRenderer';
 import { borderRadiusApplications } from '../utils/constants';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
 import { useAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
+
+interface IChartPlotOptions {
+  id: string;
+  panelHeading: string;
+  open?: boolean;
+  inputsProps: Array<IInputRenderer>;
+}
 
 function usePlotOptions() {
   const [config] = useAtom(chartGlobalConfig);
@@ -45,80 +53,95 @@ function usePlotOptions() {
     [chartDataConfig, setChartDataConfig]
   );
 
-  const plotOptions = useMemo(() => {
+  const plotOptions: any = useMemo(() => {
     if (!config || !config.globalOptions.dataLabels || !chartDataConfig) {
       return {};
     }
 
-    return {
+    const plotOption: IChartPlotOptions = {
       id: 'plot-options',
       panelHeading: 'Plot Options',
-      inputsProps: [
-        {
-          id: 'bar-horizontal',
-          label: 'Horizontal',
-          value: chartDataConfig.options.plotOptions.bar.horizontal,
-          datasetKey: DATA_SET_KEY.horizontal,
-          onChange: onPlotOptionsPropsUpdate,
-          type: INPUT_TYPE.CHECKBOX,
-          render: config.plotOptions.includes(DATA_SET_KEY.horizontal),
-        },
-        {
-          id: 'border-radius',
-          label: 'Border Radius',
-          value: chartDataConfig.options.plotOptions.bar.borderRadius,
-          datasetKey: DATA_SET_KEY.borderRadius,
-          onChange: onPlotOptionsPropsUpdate,
-          type: INPUT_TYPE.NUMBER,
-          render: config.plotOptions.includes(DATA_SET_KEY.borderRadius),
-        },
-        {
-          id: 'border-radius-application',
-          label: 'Border Radius Ap.',
-          datasetKey: DATA_SET_KEY.borderRadiusApplication,
-          value:
-            chartDataConfig.options.plotOptions.bar.borderRadiusApplication,
-          onChange: onPlotOptionsPropsUpdate,
-          type: INPUT_TYPE.SELECT,
-          options: borderRadiusApplications,
-          render: config.plotOptions.includes(
-            DATA_SET_KEY.borderRadiusApplication
-          ),
-        },
-        {
-          id: 'bar-height',
-          label: 'Bar Height',
-          datasetKey: DATA_SET_KEY.barHeight,
-          value: chartDataConfig.options.plotOptions.bar.barHeight,
-          onChange: onPlotOptionsPropsUpdate,
-          type: INPUT_TYPE.RANGE,
-          min: '0',
-          max: '100',
-          step: '1',
-          render: config.plotOptions.includes(DATA_SET_KEY.barHeight),
-          disabled: !chartDataConfig.options.plotOptions.bar.horizontal,
-          hint:
-            !chartDataConfig.options.plotOptions.bar.horizontal &&
-            'Make chart horizontal to enable.',
-        },
-        {
-          id: 'bar-width',
-          label: 'Bar Width',
-          datasetKey: DATA_SET_KEY.barWidth,
-          value: chartDataConfig.options.plotOptions.bar.columnWidth,
-          onChange: onPlotOptionsPropsUpdate,
-          type: INPUT_TYPE.RANGE,
-          min: '0',
-          max: '100',
-          step: '1',
-          render: config.plotOptions.includes(DATA_SET_KEY.barWidth),
-          disabled: chartDataConfig.options.plotOptions.bar.horizontal,
-          hint:
-            chartDataConfig.options.plotOptions.bar.horizontal &&
-            'Make chart vertical to enable.',
-        },
-      ],
+      inputsProps: [],
     };
+
+    if (chartDataConfig.options.plotOptions?.bar.horizontal) {
+      plotOption.inputsProps.push({
+        id: 'bar-horizontal',
+        label: 'Horizontal',
+        value: chartDataConfig.options.plotOptions.bar.horizontal,
+        datasetKey: DATA_SET_KEY.horizontal,
+        onChange: onPlotOptionsPropsUpdate,
+        type: INPUT_TYPE.CHECKBOX,
+        render: config.plotOptions.includes(DATA_SET_KEY.horizontal),
+      });
+    }
+
+    if (chartDataConfig.options.plotOptions?.bar.borderRadius) {
+      plotOption.inputsProps.push({
+        id: 'border-radius',
+        label: 'Border Radius',
+        value: chartDataConfig.options.plotOptions.bar.borderRadius,
+        datasetKey: DATA_SET_KEY.borderRadius,
+        onChange: onPlotOptionsPropsUpdate,
+        type: INPUT_TYPE.NUMBER,
+        render: config.plotOptions.includes(DATA_SET_KEY.borderRadius),
+      });
+    }
+
+    if (chartDataConfig.options.plotOptions?.bar.borderRadiusApplication) {
+      plotOption.inputsProps.push({
+        id: 'border-radius-application',
+        label: 'Border Radius Ap.',
+        datasetKey: DATA_SET_KEY.borderRadiusApplication,
+        value: chartDataConfig.options.plotOptions.bar.borderRadiusApplication,
+        onChange: onPlotOptionsPropsUpdate,
+        type: INPUT_TYPE.SELECT,
+        options: borderRadiusApplications,
+        render: config.plotOptions.includes(
+          DATA_SET_KEY.borderRadiusApplication
+        ),
+      });
+    }
+
+    if (chartDataConfig.options.plotOptions?.bar.barHeight) {
+      plotOption.inputsProps.push({
+        id: 'bar-height',
+        label: 'Bar Height',
+        datasetKey: DATA_SET_KEY.barHeight,
+        value: chartDataConfig.options.plotOptions.bar.barHeight,
+        onChange: onPlotOptionsPropsUpdate,
+        type: INPUT_TYPE.RANGE,
+        min: '0',
+        max: '100',
+        step: '1',
+        render: config.plotOptions.includes(DATA_SET_KEY.barHeight),
+        disabled: !chartDataConfig.options.plotOptions.bar.horizontal,
+        hint: !chartDataConfig.options.plotOptions.bar.horizontal
+          ? 'Make chart horizontal to enable.'
+          : undefined,
+      });
+    }
+
+    if (chartDataConfig.options.plotOptions?.bar.columnWidth) {
+      plotOption.inputsProps.push({
+        id: 'bar-width',
+        label: 'Bar Width',
+        datasetKey: DATA_SET_KEY.barWidth,
+        value: chartDataConfig.options.plotOptions.bar.columnWidth,
+        onChange: onPlotOptionsPropsUpdate,
+        type: INPUT_TYPE.RANGE,
+        min: '0',
+        max: '100',
+        step: '1',
+        render: config.plotOptions.includes(DATA_SET_KEY.barWidth),
+        disabled: chartDataConfig.options.plotOptions.bar.horizontal,
+        hint:
+          chartDataConfig.options.plotOptions.bar.horizontal &&
+          'Make chart vertical to enable.',
+      });
+    }
+
+    return plotOption;
   }, [chartDataConfig, config, onPlotOptionsPropsUpdate]);
 
   return [plotOptions];

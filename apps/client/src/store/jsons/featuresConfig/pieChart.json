@@ -1,9 +1,27 @@
 {
   "globalOptions": {
-    "legend": ["render", "position", "alignment", "color", "font"],
-    "title": ["text", "alignment", "color", "font"],
+    "title": ["text", "floating", "alignment", "color", "font"],
     "subtitle": ["text", "alignment", "color", "font"],
+    "legend": [
+      "render",
+      "showForSingleSeries",
+      "floating",
+      "position",
+      "alignment",
+      "color",
+      "font"
+    ],
+    "grid": ["render", "xaxis", "yaxis"],
+    "dataLabels": [
+      "render",
+      "textAnchor",
+      "font",
+      "color",
+      "position",
+      "orientation"
+    ],
     "others": ["background"]
   },
+  "plotOptions": [],
   "chartOptions": ["label", "data", "color"]
 }

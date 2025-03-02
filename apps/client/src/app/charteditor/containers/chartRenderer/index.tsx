@@ -34,15 +34,9 @@ function ChartRenderer() {
   }, [chartDataConfig]);
 
   return (
-    <div className="w-full h-full overflow-y-auto">
+    <div className="w-full h-[calc(100%_-_1.625rem)] overflow-y-auto">
       <div className="w-full p-3 flex items-center justify-center">
-        {/* <Chart
-        options={chartDataConfig.options}
-        series={chartDataConfig.series}
-        type={chartDataConfig.type}
-        width="500"
-      /> */}
-        <div ref={chartRef} className="w-3/4"></div>
+        <div ref={chartRef} className="w-11/12"></div>
       </div>
     </div>
   );

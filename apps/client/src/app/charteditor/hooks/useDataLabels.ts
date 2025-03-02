@@ -59,7 +59,7 @@ function useDataLabels() {
       return {};
     }
 
-    return {
+    const dataLabelOptions = {
       id: 'data-labels-options',
       panelHeading: 'Data Labels',
       inputsProps: [
@@ -82,30 +82,6 @@ function useDataLabels() {
           options: textAnchors,
           render: config.globalOptions.dataLabels.includes(
             DATA_SET_KEY.textAnchor
-          ),
-        },
-        {
-          id: 'data-labels-position',
-          label: 'Position',
-          datasetKey: DATA_SET_KEY.position,
-          value: chartDataConfig.options.plotOptions.bar.dataLabels.position,
-          onChange: onDataLabelsPropsUpdate,
-          type: INPUT_TYPE.SELECT,
-          options: dataLabelsPositions,
-          render: config.globalOptions.dataLabels.includes(
-            DATA_SET_KEY.position
-          ),
-        },
-        {
-          id: 'data-labels-orientation',
-          label: 'Orientation',
-          datasetKey: DATA_SET_KEY.orientation,
-          value: chartDataConfig.options.plotOptions.bar.dataLabels.orientation,
-          onChange: onDataLabelsPropsUpdate,
-          type: INPUT_TYPE.SELECT,
-          options: dataLabelsOrientations,
-          render: config.globalOptions.dataLabels.includes(
-            DATA_SET_KEY.orientation
           ),
         },
         {
@@ -134,6 +110,36 @@ function useDataLabels() {
         }),
       ],
     };
+
+    if (chartDataConfig.options.plotOptions?.bar.dataLabels.position) {
+      dataLabelOptions.inputsProps.push({
+        id: 'data-labels-position',
+        label: 'Position',
+        datasetKey: DATA_SET_KEY.position,
+        value: chartDataConfig.options.plotOptions.bar.dataLabels.position,
+        onChange: onDataLabelsPropsUpdate,
+        type: INPUT_TYPE.SELECT,
+        options: dataLabelsPositions,
+        render: config.globalOptions.dataLabels.includes(DATA_SET_KEY.position),
+      });
+    }
+
+    if (chartDataConfig.options.plotOptions?.bar.dataLabels.orientation) {
+      dataLabelOptions.inputsProps.push({
+        id: 'data-labels-orientation',
+        label: 'Orientation',
+        datasetKey: DATA_SET_KEY.orientation,
+        value: chartDataConfig.options.plotOptions.bar.dataLabels.orientation,
+        onChange: onDataLabelsPropsUpdate,
+        type: INPUT_TYPE.SELECT,
+        options: dataLabelsOrientations,
+        render: config.globalOptions.dataLabels.includes(
+          DATA_SET_KEY.orientation
+        ),
+      });
+    }
+
+    return dataLabelOptions;
   }, [chartDataConfig, config, onDataLabelsPropsUpdate]);
 
   return [dataLabelOptions];

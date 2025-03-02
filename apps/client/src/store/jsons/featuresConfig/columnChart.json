@@ -1,15 +1,16 @@
 {
   "globalOptions": {
+    "title": ["text", "floating", "alignment", "color", "font"],
+    "subtitle": ["text", "alignment", "color", "font"],
     "legend": [
       "render",
       "showForSingleSeries",
+      "floating",
       "position",
       "alignment",
       "color",
       "font"
     ],
-    "title": ["text", "alignment", "color", "font"],
-    "subtitle": ["text", "alignment", "color", "font"],
     "grid": ["render", "xaxis", "yaxis"],
     "dataLabels": [
       "render",
@@ -21,5 +22,6 @@
     ],
     "others": ["background"]
   },
+  "plotOptions": [],
   "chartOptions": ["label", "data", "color"]
 }

@@ -1,3 +1,40 @@
+export const simpleChartTypes: Array<{
+  id: string;
+  label: string;
+  value: string;
+}> = [
+  {
+    id: 'bar-chart-dd',
+    label: 'Bar Chart',
+    value: 'simpleBarChart',
+  },
+  {
+    id: 'column-chart-dd',
+    label: 'Column Chart',
+    value: 'simpleColumnChart',
+  },
+  {
+    id: 'line-chart-dd',
+    label: 'Line Chart',
+    value: 'simpleLineChart',
+  },
+  {
+    id: 'area-chart-dd',
+    label: 'Area Chart',
+    value: 'simpleAreaChart',
+  },
+  {
+    id: 'bubble-chart-dd',
+    label: 'Bubble Chart',
+    value: 'simpleBubbleChart',
+  },
+  {
+    id: 'pie-chart-dd',
+    label: 'Pie Chart',
+    value: 'simplePieChart',
+  },
+];
+
 export const legendPositions: Array<{
   id: string;
   label: string;

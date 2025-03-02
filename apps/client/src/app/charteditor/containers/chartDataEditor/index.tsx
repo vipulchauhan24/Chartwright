@@ -149,7 +149,7 @@ function ChartDataEditor() {
   return (
     <div className="mt-2 px-4">
       {chartDataConfig.options.labels && <ChartLabelEditor />}
-      {plotOptions && (
+      {plotOptions && plotOptions.inputsProps.length ? (
         <div className="mt-2">
           <CWAccordian
             id={String(plotOptions.id)}
@@ -166,7 +166,7 @@ function ChartDataEditor() {
             )}
           />
         </div>
-      )}
+      ) : null}
       {chartDataOptions.map((options: IChartDataOptions, indx: number) => {
         return (
           <div className="mt-2" key={options.id}>

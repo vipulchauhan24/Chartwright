@@ -13,22 +13,24 @@ interface ICWDropdown {
     label: string;
     value: string;
   }>;
+  onChange: (vaue: string) => void;
 }
 
 function CWDropdown(props: ICWDropdown) {
-  const { items } = props;
+  const { items, onChange } = props;
   const [selected, setSelected] = useState(items[0]);
 
   const onItemSelected = (selectedItemValue: any) => {
     const selectedItem = items.find((item) => item.value === selectedItemValue);
     if (selectedItem) {
       setSelected(selectedItem);
+      onChange(selectedItemValue);
     }
   };
 
   return (
     <Listbox value={selected} onChange={onItemSelected}>
-      <ListboxButton className="text-primary-text py-2 pl-3 pr-8 border border-primary-border rounded-lg relative w-32 truncate">
+      <ListboxButton className="text-primary-text text-md py-2 pl-3 pr-8 border border-primary-border rounded-lg relative w-32 truncate">
         {selected.label}
         <ChevronDownIcon
           className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-primary-text"
@@ -38,15 +40,15 @@ function CWDropdown(props: ICWDropdown) {
       <ListboxOptions
         anchor="bottom"
         transition
-        className="border border-primary-border rounded-lg"
+        className="border border-primary-border rounded-lg bg-secondary-background"
       >
         {items.map((item) => (
           <ListboxOption
             key={item.id}
             value={item.value}
-            className="group flex items-center gap-2 py-2 px-1 w-32 select-none cursor-pointer hover:bg-primary-background"
+            className="py-2 px-1 w-32 select-none cursor-pointer hover:bg-primary-main text-md text-primary-text hover:text-primary-background"
           >
-            <div className="text-sm/6 text-primary-text">{item.label}</div>
+            {item.label}
           </ListboxOption>
         ))}
       </ListboxOptions>

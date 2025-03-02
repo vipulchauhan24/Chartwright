@@ -11,6 +11,8 @@ import GlobalOptionsEditor from './containers/globalOptionsEditor';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import ChartDataEditor from './containers/chartDataEditor';
+import CWDropdown from '../components/dropdown';
+import { simpleChartTypes } from './utils/constants';
 
 function ChartEditor() {
   const [, fetchData] = useAtom(fetchAllChartData);
@@ -24,9 +26,20 @@ function ChartEditor() {
 
   useEffect(() => {
     if (data.length) {
-      fetchConfigData((data[0] as any).chart_id['S']);
+      // fetchConfigData((data[0] as any).chart_id['S']);
     }
   }, [data, fetchConfigData]);
+
+  useEffect(() => {
+    if (isLoading) {
+      // fetchConfigData((data[0] as any).chart_id['S']);
+      fetchConfigData('simpleBarChart');
+    }
+  }, [fetchConfigData, isLoading]);
+
+  const onChangeChartRequest = (value: string) => {
+    fetchConfigData(value);
+  };
 
   if (isLoading) {
     return (
@@ -47,7 +60,13 @@ function ChartEditor() {
             <CWLink href="#" label="Need Help?" />
           </div>
         </aside>
-        <ChartRenderer />
+        <div className="h-full w-full p-4">
+          <CWDropdown
+            items={simpleChartTypes}
+            onChange={onChangeChartRequest}
+          />
+          <ChartRenderer />
+        </div>
         <aside className="w-1/5 min-w-80 h-full border-l border-primary-border overflow-y-auto">
           <ChartDataEditor />
         </aside>
