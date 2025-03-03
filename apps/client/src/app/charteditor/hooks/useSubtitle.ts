@@ -4,11 +4,11 @@ import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
 import { alignments, fontFamilies, fontWeights } from '../utils/constants';
 
-function useTitle() {
+function useSubTitle() {
   const [config] = useAtom(chartGlobalConfig);
   const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
 
-  const onTitlePropsUpdate = useCallback(
+  const onSubtitlePropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {
       if (event && key !== DATA_SET_KEY.floating) {
         event.stopPropagation();
@@ -17,25 +17,25 @@ function useTitle() {
       let configChanged = true;
       switch (key) {
         case DATA_SET_KEY.alignment:
-          config.options.title.align = event.target.value;
+          config.options.subtitle.align = event.target.value;
           break;
         case DATA_SET_KEY.color:
-          config.options.title.style.color = event.target.value;
+          config.options.subtitle.style.color = event.target.value;
           break;
         case DATA_SET_KEY.fontSize:
-          config.options.title.style.fontSize = event.target.value;
+          config.options.subtitle.style.fontSize = event.target.value;
           break;
         case DATA_SET_KEY.fontWeight:
-          config.options.title.style.fontWeight = event.target.value;
+          config.options.subtitle.style.fontWeight = event.target.value;
           break;
         case DATA_SET_KEY.fontFamily:
-          config.options.title.style.fontFamily = event.target.value;
+          config.options.subtitle.style.fontFamily = event.target.value;
           break;
         case DATA_SET_KEY.data:
-          config.options.title.text = event.target.value;
+          config.options.subtitle.text = event.target.value;
           break;
         case DATA_SET_KEY.floating:
-          config.options.title.floating = !config.options.title.floating;
+          config.options.subtitle.floating = !config.options.subtitle.floating;
           break;
         default:
           configChanged = false;
@@ -49,90 +49,89 @@ function useTitle() {
     [chartDataConfig, setChartDataConfig]
   );
 
-  const titleOptions = useMemo(() => {
-    if (!config || !config.globalOptions.title || !chartDataConfig) {
+  const subtitleOptions = useMemo(() => {
+    if (!config || !config.globalOptions.subtitle || !chartDataConfig) {
       return {};
     }
     return {
-      id: 'title-options',
-      panelHeading: 'Title',
-      open: true,
+      id: 'subtitle-options',
+      panelHeading: 'Subtitle',
       inputsProps: [
         {
-          id: 'title-text',
+          id: 'subtitle-text',
           label: 'Text',
           datasetKey: DATA_SET_KEY.data,
-          value: chartDataConfig.options.title.text,
-          onChange: onTitlePropsUpdate,
+          value: chartDataConfig.options.subtitle.text,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.TEXT,
           placeholder: 'Enter text here...',
-          render: config.globalOptions.title.includes(INPUT_TYPE.TEXT),
-          hint: 'Clear text input on right to disable chart title.',
+          render: config.globalOptions.subtitle.includes(INPUT_TYPE.TEXT),
+          hint: 'Clear text input on right to disable chart subtitle.',
         },
         {
-          id: 'title-floating',
+          id: 'subtitle-floating',
           label: 'Floating',
-          value: chartDataConfig.options.title.floating,
+          value: chartDataConfig.options.subtitle.floating,
           datasetKey: DATA_SET_KEY.floating,
-          onChange: onTitlePropsUpdate,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.CHECKBOX,
           render: config.globalOptions.legend.includes(DATA_SET_KEY.floating),
-          hint: 'Make title float above chart.',
+          hint: 'Make subtitle float above chart.',
         },
         {
-          id: 'title-alignment',
+          id: 'subtitle-alignment',
           label: 'Alignment',
           datasetKey: DATA_SET_KEY.alignment,
-          value: chartDataConfig.options.title.align,
-          onChange: onTitlePropsUpdate,
+          value: chartDataConfig.options.subtitle.align,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: alignments,
-          render: config.globalOptions.title.includes('alignment'),
+          render: config.globalOptions.subtitle.includes('alignment'),
         },
         {
-          id: 'title-font-size',
+          id: 'subtitle-font-size',
           label: 'Font Size',
           datasetKey: DATA_SET_KEY.fontSize,
-          value: chartDataConfig.options.title.style.fontSize,
-          onChange: onTitlePropsUpdate,
+          value: chartDataConfig.options.subtitle.style.fontSize,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.NUMBER,
-          render: config.globalOptions.title.includes('font'),
+          render: config.globalOptions.subtitle.includes('font'),
         },
         {
-          id: 'title-font-weight',
+          id: 'subtitle-font-weight',
           label: 'Font Weight',
           datasetKey: DATA_SET_KEY.fontWeight,
-          value: chartDataConfig.options.title.style.fontWeight,
-          onChange: onTitlePropsUpdate,
+          value: chartDataConfig.options.subtitle.style.fontWeight,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: fontWeights,
-          render: config.globalOptions.title.includes('font'),
+          render: config.globalOptions.subtitle.includes('font'),
         },
         {
-          id: 'title-font-family',
+          id: 'subtitle-font-family',
           label: 'Font Family',
           datasetKey: DATA_SET_KEY.fontFamily,
-          value: chartDataConfig.options.title.style.fontFamily,
-          onChange: onTitlePropsUpdate,
+          value: chartDataConfig.options.subtitle.style.fontFamily,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.SELECT,
           options: fontFamilies,
           render: config.globalOptions.legend.includes('font'),
         },
         {
-          id: 'title-color',
+          id: 'subtitle-color',
           label: 'Color',
           datasetKey: DATA_SET_KEY.color,
-          value: chartDataConfig.options.title.style.color,
+          value: chartDataConfig.options.subtitle.style.color,
           tooltip: 'Only Hex code supported. (#rrggbb)',
-          onChange: onTitlePropsUpdate,
+          onChange: onSubtitlePropsUpdate,
           type: INPUT_TYPE.COLOR,
-          render: config.globalOptions.title.includes(INPUT_TYPE.COLOR),
+          render: config.globalOptions.subtitle.includes(INPUT_TYPE.COLOR),
         },
       ],
     };
-  }, [chartDataConfig, config, onTitlePropsUpdate]);
+  }, [chartDataConfig, config, onSubtitlePropsUpdate]);
 
-  return [titleOptions];
+  return [subtitleOptions];
 }
 
-export default useTitle;
+export default useSubTitle;

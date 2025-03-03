@@ -67,8 +67,12 @@
     "subtitle": {
       "text": "Chart subtitle",
       "align": "left",
+      "floating": false,
       "style": {
-        "fontSize": "12px"
+        "fontSize": "14px",
+        "fontWeight": "900",
+        "fontFamily": "Helvetica",
+        "color": "#071013"
       }
     },
     "grid": {

@@ -5,12 +5,12 @@ import {
   chartGlobalConfig,
 } from '../../../../store/charts';
 import { CHART_FEATURE, DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
-import { alignments } from '../../utils/constants';
 import CWAccordian from '../../../components/accordian';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
 import useDataLabels from '../../hooks/useDataLabels';
 import useLegend from '../../hooks/useLegend';
 import useTitle from '../../hooks/useTitle';
+import useSubTitle from '../../hooks/useSubtitle';
 
 interface IChartGlobalOptions {
   id: string;
@@ -28,92 +28,7 @@ function GlobalOptionsEditor() {
   const [dataLabelOptions] = useDataLabels();
   const [legendOptions] = useLegend();
   const [titleOptions] = useTitle();
-
-  const onSubtitlePropsUpdate = useCallback(
-    (event: any, key: DATA_SET_KEY) => {
-      if (event) {
-        event.stopPropagation();
-      }
-      const config = JSON.parse(JSON.stringify(chartDataConfig));
-      let configChanged = true;
-      switch (key) {
-        case DATA_SET_KEY.alignment:
-          config.options.subtitle.align = event.target.value;
-          break;
-        // case DATA_SET_KEY.color:
-        //   config.options.plugins.subtitle.color = event.target.value;
-        //   break;
-        case DATA_SET_KEY.fontSize:
-          config.options.subtitle.style.fontSize = event.target.value;
-          break;
-        case DATA_SET_KEY.data:
-          config.options.subtitle.text = event.target.value;
-          break;
-        default:
-          configChanged = false;
-          break;
-      }
-
-      if (configChanged) {
-        setChartDataConfig(config);
-      }
-    },
-    [chartDataConfig, setChartDataConfig]
-  );
-
-  const subtitleOptions = useMemo(() => {
-    if (!config || !config.globalOptions.subtitle || !chartDataConfig) {
-      return {};
-    }
-    return {
-      id: 'subtitle-options',
-      panelHeading: 'Subtitle',
-      inputsProps: [
-        {
-          id: 'subtitle-text',
-          label: 'Text',
-          datasetKey: DATA_SET_KEY.data,
-          value: chartDataConfig.options.subtitle.text,
-          onChange: onSubtitlePropsUpdate,
-          type: INPUT_TYPE.TEXT,
-          placeholder: 'Enter text here...',
-          render: config.globalOptions.subtitle.includes(INPUT_TYPE.TEXT),
-          hint: 'Clear text input on right to disable chart subtitle.',
-        },
-        {
-          id: 'subtitle-alignment',
-          label: 'Alignment',
-          datasetKey: DATA_SET_KEY.alignment,
-          value: chartDataConfig.options.subtitle.align,
-          onChange: onSubtitlePropsUpdate,
-          type: INPUT_TYPE.SELECT,
-          options: alignments,
-          render: config.globalOptions.subtitle.includes('alignment'),
-        },
-        // {
-        //   id: 'subtitle-color',
-        //   label: 'Color',
-        //   datasetKey: DATA_SET_KEY.color,
-        //   value: chartDataConfig.options.subtitle.color,
-        //   tooltip: 'Only Hex code supported. (#rrggbb)',
-        //   onChange: onSubtitlePropsUpdate,
-        //   type: INPUT_TYPE.COLOR,
-        //   render: config.globalOptions.subtitle.includes(INPUT_TYPE.COLOR),
-        // },
-        {
-          id: 'subtitle-font-size',
-          label: 'Font Size',
-          subLabel: 'px',
-          datasetKey: DATA_SET_KEY.fontSize,
-          value: chartDataConfig.options.subtitle.style.fontSize,
-          tooltip: 'Max value allowed is 56px.',
-          onChange: onSubtitlePropsUpdate,
-          type: INPUT_TYPE.NUMBER,
-          render: config.globalOptions.subtitle.includes('font'),
-        },
-      ],
-    };
-  }, [chartDataConfig, config, onSubtitlePropsUpdate]);
+  const [subtitleOptions] = useSubTitle();
 
   const onGridPropsUpdate = useCallback(
     (_event: any, key: DATA_SET_KEY) => {
