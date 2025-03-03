@@ -53,19 +53,15 @@ function usePlotOptions() {
     [chartDataConfig, setChartDataConfig]
   );
 
-  const plotOptions: any = useMemo(() => {
-    if (!config || !config.globalOptions.dataLabels || !chartDataConfig) {
-      return {};
+  const inputPropsForBarChart = useMemo(() => {
+    if (
+      !chartDataConfig.options.plotOptions ||
+      !chartDataConfig.options.plotOptions.bar
+    ) {
+      return [];
     }
-
-    const plotOption: IChartPlotOptions = {
-      id: 'plot-options',
-      panelHeading: 'Plot Options',
-      inputsProps: [],
-    };
-
-    if (chartDataConfig.options.plotOptions?.bar.horizontal) {
-      plotOption.inputsProps.push({
+    return [
+      {
         id: 'bar-horizontal',
         label: 'Horizontal',
         value: chartDataConfig.options.plotOptions.bar.horizontal,
@@ -73,11 +69,8 @@ function usePlotOptions() {
         onChange: onPlotOptionsPropsUpdate,
         type: INPUT_TYPE.CHECKBOX,
         render: config.plotOptions.includes(DATA_SET_KEY.horizontal),
-      });
-    }
-
-    if (chartDataConfig.options.plotOptions?.bar.borderRadius) {
-      plotOption.inputsProps.push({
+      },
+      {
         id: 'border-radius',
         label: 'Border Radius',
         value: chartDataConfig.options.plotOptions.bar.borderRadius,
@@ -85,11 +78,8 @@ function usePlotOptions() {
         onChange: onPlotOptionsPropsUpdate,
         type: INPUT_TYPE.NUMBER,
         render: config.plotOptions.includes(DATA_SET_KEY.borderRadius),
-      });
-    }
-
-    if (chartDataConfig.options.plotOptions?.bar.borderRadiusApplication) {
-      plotOption.inputsProps.push({
+      },
+      {
         id: 'border-radius-application',
         label: 'Border Radius Ap.',
         datasetKey: DATA_SET_KEY.borderRadiusApplication,
@@ -100,11 +90,8 @@ function usePlotOptions() {
         render: config.plotOptions.includes(
           DATA_SET_KEY.borderRadiusApplication
         ),
-      });
-    }
-
-    if (chartDataConfig.options.plotOptions?.bar.barHeight) {
-      plotOption.inputsProps.push({
+      },
+      {
         id: 'bar-height',
         label: 'Bar Height',
         datasetKey: DATA_SET_KEY.barHeight,
@@ -112,18 +99,15 @@ function usePlotOptions() {
         onChange: onPlotOptionsPropsUpdate,
         type: INPUT_TYPE.RANGE,
         min: '0',
-        max: '100',
+        max: '99',
         step: '1',
         render: config.plotOptions.includes(DATA_SET_KEY.barHeight),
         disabled: !chartDataConfig.options.plotOptions.bar.horizontal,
         hint: !chartDataConfig.options.plotOptions.bar.horizontal
           ? 'Make chart horizontal to enable.'
           : undefined,
-      });
-    }
-
-    if (chartDataConfig.options.plotOptions?.bar.columnWidth) {
-      plotOption.inputsProps.push({
+      },
+      {
         id: 'bar-width',
         label: 'Bar Width',
         datasetKey: DATA_SET_KEY.barWidth,
@@ -138,11 +122,32 @@ function usePlotOptions() {
         hint:
           chartDataConfig.options.plotOptions.bar.horizontal &&
           'Make chart vertical to enable.',
-      });
+      },
+    ];
+  }, [chartDataConfig, config, onPlotOptionsPropsUpdate]);
+
+  const plotOptions: any = useMemo(() => {
+    if (!config || !config.globalOptions.dataLabels || !chartDataConfig) {
+      return {};
     }
 
+    const plotOption: IChartPlotOptions = {
+      id: 'plot-options',
+      panelHeading: 'Plot Options',
+      inputsProps: [],
+    };
+
+    switch (chartDataConfig.options.chart.type) {
+      case 'bar':
+        plotOption.inputsProps = inputPropsForBarChart;
+        break;
+
+      default:
+        plotOption.inputsProps = [];
+        break;
+    }
     return plotOption;
-  }, [chartDataConfig, config, onPlotOptionsPropsUpdate]);
+  }, [chartDataConfig, config, inputPropsForBarChart]);
 
   return [plotOptions];
 }

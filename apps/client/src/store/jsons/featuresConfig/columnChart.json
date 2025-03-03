@@ -22,6 +22,12 @@
     ],
     "others": ["background"]
   },
-  "plotOptions": [],
+  "plotOptions": [
+    "horizontal",
+    "borderRadius",
+    "borderRadiusApplication",
+    "barHeight",
+    "barWidth"
+  ],
   "chartOptions": ["label", "data", "color"]
 }
