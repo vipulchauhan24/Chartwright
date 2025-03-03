@@ -22,7 +22,14 @@
       "style": {
         "fontSize": "12px",
         "fontWeight": "700",
-        "colors": ["#545454", "#77B6EA"]
+        "colors": [
+          "#775DD0",
+          "#FF4560",
+          "#00E396",
+          "#008FFB",
+          "#FF4560",
+          "#FEB019"
+        ]
       }
     },
     "legend": {
@@ -43,7 +50,7 @@
       "align": "left",
       "floating": false,
       "style": {
-        "fontSize": "14px",
+        "fontSize": "16px",
         "fontWeight": "900",
         "fontFamily": "Helvetica",
         "color": "#071013"
@@ -55,7 +62,7 @@
       "floating": false,
       "style": {
         "fontSize": "14px",
-        "fontWeight": "900",
+        "fontWeight": "700",
         "fontFamily": "Helvetica",
         "color": "#071013"
       }

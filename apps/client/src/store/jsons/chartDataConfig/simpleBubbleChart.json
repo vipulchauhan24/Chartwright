@@ -58,7 +58,7 @@
       "align": "left",
       "floating": false,
       "style": {
-        "fontSize": "14px",
+        "fontSize": "16px",
         "fontWeight": "900",
         "fontFamily": "Helvetica",
         "color": "#071013"
@@ -70,7 +70,7 @@
       "floating": false,
       "style": {
         "fontSize": "14px",
-        "fontWeight": "900",
+        "fontWeight": "700",
         "fontFamily": "Helvetica",
         "color": "#071013"
       }

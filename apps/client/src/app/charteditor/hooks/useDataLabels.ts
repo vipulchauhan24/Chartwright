@@ -98,8 +98,8 @@ function useDataLabels() {
             id: `data-labels-color-${indx}`,
             label: `Color ${indx + 1}`,
             value:
-              chartDataConfig.options.colors[indx] ||
-              chartDataConfig.options.colors[0],
+              chartDataConfig.options.dataLabels.style.colors[indx] ||
+              chartDataConfig.options.dataLabels.style.colors[0],
             datasetKey: DATA_SET_KEY.color,
             onChange: (event: any, datasetKey: DATA_SET_KEY) => {
               onDataLabelsPropsUpdate(event, datasetKey, indx);
