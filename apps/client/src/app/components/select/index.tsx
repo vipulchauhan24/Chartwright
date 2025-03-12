@@ -34,7 +34,7 @@ function CWSelect(props: ICWSelect) {
           onChange={onChange}
           defaultValue={defaultValue}
           className={clsx(
-            'text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none',
+            'text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none',
             disabled && 'pointer-events-none opacity-50'
           )}
         >

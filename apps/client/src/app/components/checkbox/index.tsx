@@ -37,7 +37,7 @@ function CWCheckbox(props: ICWCheckbox) {
         id={id}
         checked={checked}
         onChange={onChange}
-        className="group cursor-pointer size-6 rounded-md bg-white/10 p-1 ring-1 ring-primary-border data-[checked]:ring-primary-main ring-inset data-[checked]:bg-primary-main"
+        className="group cursor-pointer size-6 rounded-md p-1 ring-1 ring-primary-border data-[checked]:ring-primary-main ring-inset data-[checked]:bg-primary-main"
       >
         <CheckIcon className="hidden size-4 stroke-primary-background group-data-[checked]:block" />
       </Checkbox>

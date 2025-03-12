@@ -26,7 +26,7 @@ function CWColorInput(props: ICWColorInput) {
           type="color"
           value={defaultValue}
           onChange={onChange}
-          className="text-primary-text border border-primary-border px-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text border border-primary-border px-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
       </div>
     </Field>

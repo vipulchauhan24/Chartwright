@@ -31,6 +31,7 @@ export enum INPUT_TYPE {
   COLOR = 'color',
   NUMBER = 'number',
   TABLE = 'table',
+  RADIO = 'radio',
 }
 
 export enum CHART_TYPE {

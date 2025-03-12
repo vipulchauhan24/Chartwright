@@ -217,3 +217,30 @@ export const borderRadiusApplications: Array<{
     value: 'end',
   },
 ];
+
+export const exportImageTypes: Array<{
+  id: string;
+  label: string;
+  value: string;
+}> = [
+  {
+    id: 'export-svg',
+    label: 'Svg',
+    value: 'svg',
+  },
+  {
+    id: 'export-png',
+    label: 'Png',
+    value: 'png',
+  },
+  {
+    id: 'export-jpg',
+    label: 'Jpg',
+    value: 'jpg',
+  },
+  {
+    id: 'export-webp',
+    label: 'Webp',
+    value: 'webp',
+  },
+];

@@ -58,7 +58,7 @@ function CWNumberInput(props: ICWNumberInput) {
           id={id}
           value={defaultValue}
           onChange={validateNumberInputChange}
-          className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+          className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         <IconButton
           icon={<MinusIcon className="size-4" aria-hidden={true} />}

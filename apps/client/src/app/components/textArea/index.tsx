@@ -32,7 +32,7 @@ function CWTextArea(props: ICWTextArea) {
         id={id}
         value={value.current}
         onChange={update}
-        className="text-primary-text border w-full border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 appearance-none"
+        className="text-primary-text border w-full border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         rows={3}
       />
     </Field>
