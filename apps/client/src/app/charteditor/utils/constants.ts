@@ -224,19 +224,19 @@ export const exportImageTypes: Array<{
   value: string;
 }> = [
   {
-    id: 'export-svg',
-    label: 'Svg',
-    value: 'svg',
-  },
-  {
     id: 'export-png',
     label: 'Png',
     value: 'png',
   },
   {
-    id: 'export-jpg',
-    label: 'Jpg',
-    value: 'jpg',
+    id: 'export-svg',
+    label: 'Svg',
+    value: 'svg',
+  },
+  {
+    id: 'export-jpeg',
+    label: 'Jpeg',
+    value: 'jpeg',
   },
   {
     id: 'export-webp',

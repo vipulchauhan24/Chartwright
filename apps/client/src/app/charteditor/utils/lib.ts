@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf';
+
 export function changeBaseStringImageType(baseString: string, type: string) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -15,12 +17,26 @@ export function changeBaseStringImageType(baseString: string, type: string) {
       // Draw the PNG image onto the canvas
       ctx.drawImage(img, 0, 0);
 
-      // Convert the canvas to a JPEG base64 string
       const jpgBase64 = canvas.toDataURL(type, 1.0);
 
       resolve(jpgBase64);
     };
 
     img.onerror = (err) => reject(err);
+  });
+}
+
+// Function to convert Base64 Image to Base64 PDF
+export function base64ImageToBase64PDF(base64Image: string) {
+  return new Promise((resolve) => {
+    const pdf = new jsPDF(); // Create a new PDF document
+
+    // Add image to the PDF (centered)
+    pdf.addImage(base64Image, 'PNG', 10, 10, 180, 160); // Adjust as needed
+
+    // Convert PDF to Base64
+    const base64PDF = pdf.output('datauristring'); // Extract Base64 part
+
+    resolve(base64PDF);
   });
 }

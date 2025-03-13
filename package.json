@@ -68,6 +68,7 @@
     "class-validator": "^0.14.1",
     "clsx": "^2.1.1",
     "jotai": "^2.12.1",
+    "jspdf": "^3.0.0",
     "mitt": "^3.0.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",

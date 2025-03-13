@@ -5,14 +5,16 @@ import { useCallback, useEffect, useRef } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import { Handler } from 'mitt';
-import { changeBaseStringImageType } from '../../utils/lib';
+import {
+  base64ImageToBase64PDF,
+  changeBaseStringImageType,
+} from '../../utils/lib';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(chartDataConfigStore);
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
   const timeoutRef = useRef<any>(null);
-  const exportFileType = useRef<unknown>('svg');
 
   const destroy = () => {
     if (apexRef.current) {
@@ -37,7 +39,6 @@ function ChartRenderer() {
       const b64 = 'data:image/svg+xml;base64,' + window.btoa(div.innerHTML);
       emitter.emit(EVENTS.PREVIEW_IMAGE, {
         imgURI: b64,
-        type: exportFileType.current,
       });
     } catch (error) {
       console.error('Conversion error:', error);
@@ -48,7 +49,6 @@ function ChartRenderer() {
     apexRef.current.dataURI().then((props: any) => {
       emitter.emit(EVENTS.PREVIEW_IMAGE, {
         imgURI: props.imgURI,
-        type: exportFileType.current,
       });
     });
   };
@@ -59,7 +59,6 @@ function ChartRenderer() {
         .then((jpgBase64) => {
           emitter.emit(EVENTS.PREVIEW_IMAGE, {
             imgURI: jpgBase64,
-            type: exportFileType.current,
           });
         })
         .catch((err) => console.error(err));
@@ -72,7 +71,6 @@ function ChartRenderer() {
         .then((webpBase64) => {
           emitter.emit(EVENTS.PREVIEW_IMAGE, {
             imgURI: webpBase64,
-            type: exportFileType.current,
           });
         })
         .catch((err) => console.error(err));
@@ -80,7 +78,6 @@ function ChartRenderer() {
   };
 
   const onImageFileTypeUpdate: Handler<unknown> = useCallback((event: any) => {
-    exportFileType.current = event.type;
     switch (event.type) {
       case 'svg':
         generateSvg();
@@ -88,7 +85,7 @@ function ChartRenderer() {
       case 'png':
         generatePng();
         break;
-      case 'jpg':
+      case 'jpeg':
         generateJpg();
         break;
       case 'webp':
@@ -99,13 +96,31 @@ function ChartRenderer() {
     }
   }, []);
 
+  const generatePdf = () => {
+    apexRef.current.dataURI().then((props: any) => {
+      base64ImageToBase64PDF(props.imgURI)
+        .then((pdfBase64) => {
+          emitter.emit(EVENTS.PREVIEW_IMAGE, {
+            imgURI: pdfBase64,
+          });
+        })
+        .catch((err) => console.error(err));
+    });
+  };
+
+  const onPdfFileTypeUpdate: Handler<unknown> = useCallback(() => {
+    generatePdf();
+  }, []);
+
   useEffect(() => {
     emitter.on(EVENTS.ON_IMAGE_FILE_TYPE_UPDATE, onImageFileTypeUpdate);
+    emitter.on(EVENTS.ON_PDF_FILE_TYPE_UPDATE, onPdfFileTypeUpdate);
 
     return () => {
       emitter.off(EVENTS.ON_IMAGE_FILE_TYPE_UPDATE, onImageFileTypeUpdate);
+      emitter.off(EVENTS.ON_PDF_FILE_TYPE_UPDATE, onPdfFileTypeUpdate);
     };
-  }, [onImageFileTypeUpdate]);
+  }, [onImageFileTypeUpdate, onPdfFileTypeUpdate]);
 
   useEffect(() => {
     if (timeoutRef.current) {
