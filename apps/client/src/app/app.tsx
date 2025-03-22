@@ -1,57 +1,49 @@
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import ChartEditor from './charteditor';
 import RenderChart from './renderChart';
-import { useAuth } from 'react-oidc-context';
-import CWButton from './components/button';
-import { useEffect } from 'react';
-import Spinner from './components/spinner';
+import { AuthProvider } from 'react-oidc-context';
+import Home from './home';
+import AuthGaurd from './authGaurd';
+
+const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
-  const auth = useAuth();
-
-  const continueAsGuest = () => {
-    console.log('continueAsGuest');
+  const cognitoAuthConfig = {
+    authority: VITE_AUTHORITY,
+    client_id: VITE_CLIENT_ID,
+    redirect_uri: window.location.origin,
+    response_type: 'code',
+    scope: VITE_SCOPE,
   };
 
-  const continueAsUser = () => {
-    auth.signinRedirect();
-  };
-
-  if (auth.isLoading) {
+  const ChartRoutes = () => {
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-        <Spinner />
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <AuthGaurd>
+              <Home />
+            </AuthGaurd>
+          }
+        />
+        <Route
+          path="/chart"
+          element={
+            <AuthGaurd>
+              <ChartEditor />
+            </AuthGaurd>
+          }
+        />
+        <Route path="/chart/render/:id" element={<RenderChart />} />
+      </Routes>
     );
-  }
-
-  if (!auth.isAuthenticated) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-primary-background">
-        <div className="flex gap-2">
-          <CWButton label="Continue as guest" onClick={continueAsGuest} />
-          <CWButton label="Continue as user" onClick={continueAsUser} />
-        </div>
-      </div>
-    );
-  }
-
-  const RedirectToChartUrl = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-      navigate('/chart');
-    });
-
-    return null;
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<RedirectToChartUrl />} />
-      <Route path="/chart" element={<ChartEditor />} />
-      <Route path="/chart/render/:id" element={<RenderChart />} />
-    </Routes>
+    <AuthProvider {...cognitoAuthConfig}>
+      <ChartRoutes />
+    </AuthProvider>
   );
 }
 
