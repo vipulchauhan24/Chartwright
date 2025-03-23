@@ -10,14 +10,11 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setIsUserAuthenticated(auth.isAuthenticated);
     const isGuestUser = sessionStorage.getItem('isGuestUser');
     if (isGuestUser === 'true') {
       setIsUserAuthenticated(true);
     }
-  }, []);
-
-  useEffect(() => {
-    setIsUserAuthenticated(auth.isAuthenticated);
     setIsLoading(false);
   }, [auth.isAuthenticated]);
 

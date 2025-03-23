@@ -15,6 +15,7 @@ import CWDropdown from '../components/dropdown';
 import { simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
 import ExportChart from './containers/export';
+import ChartGallery from './containers/chartGallery';
 
 function ChartEditor() {
   const [, fetchData] = useAtom(fetchAllChartData);
@@ -22,6 +23,7 @@ function ChartEditor() {
   const [data] = useAtom(allCharts);
   const [isLoading] = useAtom(loadingChartConfig);
   const [showExportChartModal, setShowExportChartModal] = useState(false);
+  const [showChartGallery, setShowChartGallery] = useState(false);
 
   useEffect(() => {
     fetchData(); // Fetch data on mount
@@ -46,6 +48,10 @@ function ChartEditor() {
 
   const exportChart = () => {
     setShowExportChartModal(true);
+  };
+
+  const openChartGallery = () => {
+    setShowChartGallery(true);
   };
 
   if (isLoading) {
@@ -75,6 +81,7 @@ function ChartEditor() {
                 onChange={onChangeChartRequest}
               />
               <CWButton label="Export" onClick={exportChart} />
+              <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
             </div>
             <ChartRenderer />
           </div>
@@ -85,6 +92,10 @@ function ChartEditor() {
         <ExportChart
           isOpen={showExportChartModal}
           setIsOpen={setShowExportChartModal}
+        />
+        <ChartGallery
+          isOpen={showChartGallery}
+          setIsOpen={setShowChartGallery}
         />
       </>
     </AppShell>
