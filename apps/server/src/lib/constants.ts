@@ -1,3 +1,5 @@
 export enum TABLE_NAME {
-  DEFAULT_CHARTS = 'default_charts',
+  NULL = 'null',
+  CHART_FEATURE = 'chart_feature',
+  CHARTS = 'charts',
 }

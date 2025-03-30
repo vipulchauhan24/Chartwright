@@ -1,28 +1,27 @@
 import { IsString, IsNotEmpty, IsDateString } from 'class-validator';
 
-export class UpdateChartDTO {
+export class AddChartDTO {
   @IsString()
   @IsNotEmpty()
-  chartName: string;
+  title!: string;
 
   @IsString()
   @IsNotEmpty()
-  chartConfig: string;
+  config!: JSON;
 
   @IsString()
   @IsNotEmpty()
-  baseConfig: string;
-
-  @IsString()
-  @IsNotEmpty()
-  user: string;
-
-  @IsString()
-  @IsNotEmpty()
-  image: string;
+  created_by!: string;
 
   @IsString()
   @IsNotEmpty()
   @IsDateString()
-  timestamp: string;
+  created_date!: string;
+
+  @IsString()
+  thumbnail!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  type!: string;
 }

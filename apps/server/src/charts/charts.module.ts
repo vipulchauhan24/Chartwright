@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ChartsController } from './charts.controller';
 import { ChartService } from './charts.service';
-import { DynamoORM } from '../../db/orm/dynamoORM';
-import { S3ORM } from '../../s3/orm/s3ORM';
+import { DynamoORM } from '../lib/db/orm/dynamoORM';
+import { S3ORM } from '../lib/s3/orm/s3ORM';
 
 @Module({
   controllers: [ChartsController],

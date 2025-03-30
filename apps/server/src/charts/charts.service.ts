@@ -1,13 +1,30 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TABLE_NAME } from '../lib/constants';
-import { DynamoORM } from '../../db/orm/dynamoORM';
-import { S3ORM } from '../../s3/orm/s3ORM';
+import { DynamoORM } from '../lib/db/orm/dynamoORM';
+import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
 
 @Injectable()
 export class ChartService {
-  constructor(private dynamoORM: DynamoORM, private s3ORM: S3ORM) {
-    dynamoORM.tableName = TABLE_NAME.DEFAULT_CHARTS;
+  constructor(private dynamoORM: DynamoORM, private s3ORM: S3ORM) {}
+
+  async getChartGlobalConfigByChartType(type: string) {
+    try {
+      this.dynamoORM.tableName = TABLE_NAME.CHART_FEATURE; //set table name.
+      const items = await this.dynamoORM.getItem({
+        type: {
+          S: type,
+        },
+      });
+
+      return items || {};
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   async getAllChartIds() {
@@ -41,36 +58,38 @@ export class ChartService {
   }
 
   async addOrUpdateChartConfig(params: {
-    chartId: string;
-    chartName: string;
-    chartConfig: string;
-    baseConfig: string;
-    user: string;
-    image: string;
-    timestamp: string;
+    id: string;
+    title: string;
+    config: JSON;
+    created_by: string;
+    created_date: string;
+    thumbnail: string;
+    type: string;
   }) {
     try {
+      this.dynamoORM.tableName = TABLE_NAME.CHARTS; //set table name.
+
       return await this.dynamoORM.addOrUpdateItem({
-        chart_id: {
-          S: params.chartId,
+        id: {
+          S: params.id,
         },
-        chart_name: {
-          S: params.chartName,
+        title: {
+          S: params.title,
         },
-        chart_config: {
-          S: params.chartConfig,
+        config: {
+          S: JSON.stringify(params.config),
         },
-        base_config: {
-          S: params.baseConfig,
+        created_by: {
+          S: params.created_by,
         },
-        user_name: {
-          S: params.user,
+        created_date: {
+          S: params.created_date,
         },
-        chart_image: {
-          S: params.image,
+        thumbnail: {
+          S: params.thumbnail,
         },
-        utc_timestamp: {
-          S: params.timestamp,
+        type: {
+          S: params.type,
         },
       });
     } catch (error) {

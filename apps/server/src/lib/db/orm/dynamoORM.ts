@@ -5,11 +5,15 @@ import {
   PutItemCommand,
   ScanCommand,
 } from '@aws-sdk/client-dynamodb';
-import { TABLE_NAME } from '../../src/lib/constants';
+import { TABLE_NAME } from '../../constants';
 import { dynamoDBClient } from '../config';
 
 export class DynamoORM {
   tableName: TABLE_NAME;
+
+  constructor() {
+    this.tableName = TABLE_NAME.NULL;
+  }
 
   async getItem(key: Record<string, AttributeValue>) {
     const { Item } = await dynamoDBClient().send(
