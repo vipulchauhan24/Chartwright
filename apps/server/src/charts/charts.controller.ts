@@ -11,7 +11,6 @@ import {
   Res,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
-import { v4 as uuidv4 } from 'uuid';
 import { AddChartDTO } from './validations/addChart.dto';
 import { type Response } from 'express';
 
@@ -35,19 +34,18 @@ export class ChartsController {
     return this.chartService.getChartConfigById(id);
   }
 
-  @Post('chart-config')
+  @Post('save-chart')
   @UsePipes(ValidationPipe)
-  addChartConfig(@Body() chartUpdateReqBody: AddChartDTO) {
+  saveChart(@Body() chartUpdateReqBody: AddChartDTO) {
     const params = {
-      id: uuidv4(),
       title: chartUpdateReqBody.title,
       config: chartUpdateReqBody.config,
       created_by: chartUpdateReqBody.created_by,
       created_date: chartUpdateReqBody.created_date,
       thumbnail: chartUpdateReqBody.thumbnail,
-      type: chartUpdateReqBody.type,
+      chart_type: chartUpdateReqBody.type,
     };
-    return this.chartService.addOrUpdateChartConfig(params);
+    return this.chartService.saveChart(params);
   }
 
   @Delete('chart-config/:id')

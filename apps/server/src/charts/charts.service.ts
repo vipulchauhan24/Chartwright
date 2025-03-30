@@ -3,21 +3,24 @@ import { TABLE_NAME } from '../lib/constants';
 import { DynamoORM } from '../lib/db/orm/dynamoORM';
 import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
+import { PostgresORM } from '../lib/db/postgres';
 
 @Injectable()
 export class ChartService {
-  constructor(private dynamoORM: DynamoORM, private s3ORM: S3ORM) {}
+  constructor(
+    private postgresORM: PostgresORM,
+    private dynamoORM: DynamoORM,
+    private s3ORM: S3ORM
+  ) {}
 
   async getChartGlobalConfigByChartType(type: string) {
     try {
-      this.dynamoORM.tableName = TABLE_NAME.CHART_FEATURE; //set table name.
-      const items = await this.dynamoORM.getItem({
-        type: {
-          S: type,
-        },
-      });
+      const items = await this.postgresORM.runQuery(
+        `SELECT * FROM ${TABLE_NAME.CHART_FEATURE} WHERE type = $1`,
+        [type]
+      );
 
-      return items || {};
+      return items;
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -57,41 +60,28 @@ export class ChartService {
     }
   }
 
-  async addOrUpdateChartConfig(params: {
-    id: string;
+  async saveChart(params: {
     title: string;
     config: JSON;
+    chart_type: string;
+    thumbnail: string;
     created_by: string;
     created_date: string;
-    thumbnail: string;
-    type: string;
   }) {
     try {
-      this.dynamoORM.tableName = TABLE_NAME.CHARTS; //set table name.
-
-      return await this.dynamoORM.addOrUpdateItem({
-        id: {
-          S: params.id,
-        },
-        title: {
-          S: params.title,
-        },
-        config: {
-          S: JSON.stringify(params.config),
-        },
-        created_by: {
-          S: params.created_by,
-        },
-        created_date: {
-          S: params.created_date,
-        },
-        thumbnail: {
-          S: params.thumbnail,
-        },
-        type: {
-          S: params.type,
-        },
-      });
+      const { title, config, chart_type, thumbnail, created_by, created_date } =
+        params;
+      return await this.postgresORM.runQuery(
+        `INSERT INTO ${TABLE_NAME.CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          title,
+          JSON.stringify(config),
+          chart_type,
+          thumbnail,
+          created_by,
+          created_date,
+        ]
+      );
     } catch (error) {
       console.error(error);
       throw new HttpException(
