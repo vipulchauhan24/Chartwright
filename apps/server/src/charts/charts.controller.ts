@@ -5,13 +5,12 @@ import {
   Get,
   Param,
   Post,
-  Put,
   UsePipes,
   ValidationPipe,
   Res,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
-import { AddChartDTO } from './validations/addChart.dto';
+import { SaveChartDTO } from './validations/saveChart.dto';
 import { type Response } from 'express';
 
 @Controller()
@@ -24,51 +23,37 @@ export class ChartsController {
     return this.chartService.getChartGlobalConfigByChartType(type);
   }
 
-  @Get('chart-id-all')
-  getAllChartIds() {
-    return this.chartService.getAllChartIds();
+  @Get('chart-gallery')
+  getChartGalleryData() {
+    return this.chartService.getChartGalleryData();
   }
 
-  @Get('chart-config/:id')
+  @Get('chart/:id')
   getChartById(@Param('id') id: string) {
-    return this.chartService.getChartConfigById(id);
+    return this.chartService.getChartById(id);
   }
 
   @Post('save-chart')
   @UsePipes(ValidationPipe)
-  saveChart(@Body() chartUpdateReqBody: AddChartDTO) {
+  saveChart(@Body() saveChartReqBody: SaveChartDTO) {
     const params = {
-      title: chartUpdateReqBody.title,
-      config: chartUpdateReqBody.config,
-      created_by: chartUpdateReqBody.created_by,
-      created_date: chartUpdateReqBody.created_date,
-      thumbnail: chartUpdateReqBody.thumbnail,
-      chart_type: chartUpdateReqBody.type,
+      id: saveChartReqBody.id,
+      title: saveChartReqBody.title,
+      config: saveChartReqBody.config,
+      created_by: saveChartReqBody.created_by,
+      created_date: saveChartReqBody.created_date,
+      thumbnail: saveChartReqBody.thumbnail,
+      chart_type: saveChartReqBody.chart_type,
+      updated_by: saveChartReqBody.updated_by,
+      updated_date: saveChartReqBody.updated_date,
+      is_for_gallery: saveChartReqBody.is_for_gallery,
     };
     return this.chartService.saveChart(params);
   }
 
-  @Delete('chart-config/:id')
-  deleteChartConfig(@Param('id') id: string) {
-    return this.chartService.deleteChartConfigById(id);
-  }
-
-  @Put('chart-config/:id')
-  @UsePipes(ValidationPipe)
-  updateChartConfig(
-    @Param('id') id: string,
-    @Body() chartUpdateReqBody: AddChartDTO
-  ) {
-    // const params = {
-    //   chartId: id,
-    //   chartName: chartUpdateReqBody.chartName,
-    //   chartConfig: chartUpdateReqBody.chartConfig,
-    //   baseConfig: chartUpdateReqBody.baseConfig,
-    //   user: chartUpdateReqBody.user,
-    //   image: chartUpdateReqBody.image,
-    //   timestamp: chartUpdateReqBody.timestamp,
-    // };
-    // return this.chartService.addOrUpdateChartConfig(params);
+  @Delete('delete-chart/:id')
+  deleteChart(@Param('id') id: string) {
+    return this.chartService.deleteChart(id);
   }
 
   @Get('chart-config/image/:key')
