@@ -1,21 +1,20 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { TABLE_NAME } from '../lib/constants';
 import { DynamoORM } from '../lib/db/orm/dynamoORM';
 import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
-import { PostgresORM } from '../lib/db/postgres';
 
 @Injectable()
 export class ChartService {
   constructor(
-    private postgresORM: PostgresORM,
+    @Inject('DATABASE_CONNECTION') private db: any,
     private dynamoORM: DynamoORM,
     private s3ORM: S3ORM
   ) {}
 
   async getChartGlobalConfigByChartType(type: string) {
     try {
-      const items = await this.postgresORM.runQuery(
+      const items = await this.db.execute(
         `SELECT * FROM ${TABLE_NAME.CHART_FEATURE} WHERE type = $1`,
         [type]
       );
@@ -71,7 +70,7 @@ export class ChartService {
     try {
       const { title, config, chart_type, thumbnail, created_by, created_date } =
         params;
-      return await this.postgresORM.runQuery(
+      return await this.db.execute(
         `INSERT INTO ${TABLE_NAME.CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           title,

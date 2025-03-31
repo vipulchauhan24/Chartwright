@@ -1,15 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   CognitoIdentityClient,
   GetIdCommand,
   GetCredentialsForIdentityCommand,
 } from '@aws-sdk/client-cognito-identity';
+import { TABLE_NAME } from '../lib/constants';
 
 const identityPoolId = 'ap-south-1:19fd0fac-1d23-4626-a81d-83f3594fbc9d'; // Replace with your Identity Pool ID
 const region = 'ap-south-1'; // Replace with your AWS region
 
 @Injectable()
 export class AuthService {
+  constructor(@Inject('DATABASE_CONNECTION') private db: any) {}
+
   async signinAsGuest() {
     try {
       const client = new CognitoIdentityClient({ region });
@@ -28,6 +31,33 @@ export class AuthService {
       return credentialsResponse.Credentials;
     } catch (error) {
       console.error('Guest sign-in error:', error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async signinAsUser(params: {
+    email: string;
+    cognito_id: string;
+    created_date: string;
+  }) {
+    try {
+      const { email, cognito_id, created_date } = params;
+      const user = await this.db.execute(
+        `SELECT * FROM ${TABLE_NAME.USERS} WHERE cognito_id = '${cognito_id}';`
+      );
+
+      if (user.length) {
+        return user[0];
+      }
+
+      return await this.db.execute(
+        `INSERT INTO ${TABLE_NAME.USERS} (user_name, email, cognito_id, created_date) VALUES ('${email}', '${email}', '${cognito_id}', '${created_date}');`
+      );
+    } catch (error) {
+      console.error('User sign-in error:', error);
       throw new HttpException(
         'Internal server error.',
         HttpStatus.INTERNAL_SERVER_ERROR

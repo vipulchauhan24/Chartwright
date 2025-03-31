@@ -27,9 +27,8 @@ import simpleBubbleChartDataConfig from '../store/jsons/chartDataConfig/simpleBu
 
 export const fetchAllChartData = atom(null, async (get, set) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/chart-id-all');
-
-    set(allCharts, response.data);
+    // const response = await axios.get('http://localhost:3000/api/chart-id-all');
+    // set(allCharts, response.data);
   } catch (error) {
     console.error('Error fetching data:', error);
     set(allCharts, []);
