@@ -6,32 +6,32 @@ export const simpleChartTypes: Array<{
   {
     id: 'bar-chart-dd',
     label: 'Bar Chart',
-    value: 'simpleBarChart',
+    value: 'simple-bar-chart',
   },
   {
     id: 'column-chart-dd',
     label: 'Column Chart',
-    value: 'simpleColumnChart',
+    value: 'simple-column-chart',
   },
   {
     id: 'line-chart-dd',
     label: 'Line Chart',
-    value: 'simpleLineChart',
+    value: 'simple-line-chart',
   },
   {
     id: 'area-chart-dd',
     label: 'Area Chart',
-    value: 'simpleAreaChart',
+    value: 'simple-area-chart',
   },
   {
     id: 'bubble-chart-dd',
     label: 'Bubble Chart',
-    value: 'simpleBubbleChart',
+    value: 'simple-bubble-chart',
   },
   {
     id: 'pie-chart-dd',
     label: 'Pie Chart',
-    value: 'simplePieChart',
+    value: 'simple-pie-chart',
   },
 ];
 

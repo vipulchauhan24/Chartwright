@@ -2,6 +2,6 @@ import { atom } from 'jotai';
 
 export const chartGallery = atom([]);
 export const chartGlobalConfigs = atom([]);
-export const currentChartGlobalConfig = atom<any>();
-export const currentChartConfigStore = atom<any>();
+export const currentChartGlobalConfig = atom();
+export const currentChartConfigStore = atom();
 export const loadingChartConfig = atom(true);

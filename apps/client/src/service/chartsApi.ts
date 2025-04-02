@@ -24,47 +24,6 @@ export const fetchChartGallery = atom(null, async (get, set) => {
   }
 });
 
-export const fetchChartDataById = atom(null, async (get, set, chart_id) => {
-  try {
-    const response = await axios.get(`/api/chart-config/${chart_id}`);
-    // switch (chart_id) {
-    //   case 'simpleBarChart':
-    //     set(chartGlobalConfig, barChartFeatureConfig);
-    //     set(chartDataConfigStore, simpleBarChartDataConfig);
-    //     break;
-    //   case 'simpleColumnChart':
-    //     set(chartGlobalConfig, columnChartFeatureConfig);
-    //     set(chartDataConfigStore, simpleColumnChartDataConfig);
-    //     break;
-    //   case 'simpleLineChart':
-    //     set(chartGlobalConfig, lineChartFeatureConfig);
-    //     set(chartDataConfigStore, simpleLineChartDataConfig);
-    //     break;
-    //   case 'simpleAreaChart':
-    //     set(chartGlobalConfig, areaChartFeatureConfig);
-    //     set(chartDataConfigStore, simpleAreaChartDataConfig);
-    //     break;
-    //   case 'simpleBubbleChart':
-    //     set(chartGlobalConfig, bubbleChartFeatureConfig);
-    //     set(chartDataConfigStore, simpleBubbleChartDataConfig);
-    //     break;
-    //   case 'simplePieChart':
-    //     set(chartGlobalConfig, pieChartFeatureConfig);
-    //     set(chartDataConfigStore, simplePieChartDataConfig);
-    //     break;
-    //   default:
-    //     break;
-    // }
-
-    set(currentChartConfigStore, JSON.parse(response.data['config']));
-  } catch (error) {
-    console.error('Error in "fetchChartDataById":', error);
-    set(currentChartConfigStore, null);
-  } finally {
-    set(loadingChartConfig, false);
-  }
-});
-
 export const setDefaultChartConfig = atom(
   null,
   async (get, set, chartMatchId) => {

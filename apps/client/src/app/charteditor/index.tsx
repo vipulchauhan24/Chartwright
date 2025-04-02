@@ -36,7 +36,7 @@ function ChartEditor() {
   }, [chartGalleryData, getDefaultChartConfig, isLoading]);
 
   const onChangeChartRequest = (value: string) => {
-    // fetchChartConfig(value);
+    getDefaultChartConfig(value);
   };
 
   const exportChart = () => {

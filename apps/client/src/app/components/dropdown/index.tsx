@@ -46,7 +46,7 @@ function CWDropdown(props: ICWDropdown) {
           <ListboxOption
             key={item.id}
             value={item.value}
-            className="py-2 px-1 w-32 select-none cursor-pointer hover:bg-primary-main text-md text-primary-text hover:text-primary-background"
+            className="p-2 w-32 select-none cursor-pointer hover:bg-primary-main text-md text-primary-text hover:text-primary-background"
           >
             {item.label}
           </ListboxOption>
