@@ -8,6 +8,7 @@ import { User } from 'oidc-client-ts';
 import axios from 'axios';
 import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
+import PageNotFound from './pageNotFound';
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
@@ -57,6 +58,7 @@ export function App() {
           }
         />
         <Route path="/chart/render/:id" element={<RenderChart />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     );
   };
