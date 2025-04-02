@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  chartDataConfigStore,
-  chartGlobalConfig,
+  currentChartConfigStore,
+  currentChartGlobalConfig,
 } from '../../../../store/charts';
 import { CHART_FEATURE, DATA_SET_KEY, INPUT_TYPE } from '../../utils/enums';
 import CWAccordian from '../../../components/accordian';
@@ -20,8 +20,10 @@ interface IChartGlobalOptions {
 }
 
 function GlobalOptionsEditor() {
-  const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [config] = useAtom(currentChartGlobalConfig);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
   const [globalOptions, setGlobalOptions] = useState<
     Array<IChartGlobalOptions>
   >([]);

@@ -10,13 +10,13 @@ export class ChartService {
     private s3ORM: S3ORM
   ) {}
 
-  async getChartGlobalConfigByChartType(type: string) {
+  async getChartGlobalConfigs() {
     try {
       const items = await this.db.execute(
-        `SELECT * FROM ${TABLE_NAME.CHART_FEATURE} WHERE type = '${type}';`
+        `SELECT * FROM ${TABLE_NAME.CHART_FEATURE};`
       );
 
-      return items.length ? items[0] : {};
+      return items;
     } catch (error) {
       console.error(error);
       throw new HttpException(

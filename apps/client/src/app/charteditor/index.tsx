@@ -1,10 +1,10 @@
 import { useAtom } from 'jotai';
 import AppShell from './layout/appshell';
 import {
-  fetchAllChartConfigById,
-  fetchAllChartData,
+  fetchChartGallery,
+  setDefaultChartConfig,
 } from '../../service/chartsApi';
-import { allCharts, loadingChartConfig } from '../../store/charts';
+import { chartGallery, loadingChartConfig } from '../../store/charts';
 import { useEffect, useState } from 'react';
 import ChartRenderer from './containers/chartRenderer';
 import GlobalOptionsEditor from './containers/globalOptionsEditor';
@@ -18,32 +18,25 @@ import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
 
 function ChartEditor() {
-  const [, fetchData] = useAtom(fetchAllChartData);
-  const [, fetchConfigData] = useAtom(fetchAllChartConfigById);
-  const [data] = useAtom(allCharts);
+  const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
+  const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
+  const [chartGalleryData] = useAtom(chartGallery);
   const [isLoading] = useAtom(loadingChartConfig);
   const [showExportChartModal, setShowExportChartModal] = useState(false);
   const [showChartGallery, setShowChartGallery] = useState(false);
 
   useEffect(() => {
-    fetchData(); // Fetch data on mount
-  }, [fetchData]);
+    fetchChartGalleryData(); // Fetch data on mount
+  }, [fetchChartGalleryData]);
 
   useEffect(() => {
-    if (data.length) {
-      // fetchConfigData((data[0] as any).chart_id['S']);
+    if (chartGalleryData.length && !isLoading) {
+      getDefaultChartConfig('simple-bar-chart');
     }
-  }, [data, fetchConfigData]);
-
-  useEffect(() => {
-    if (isLoading) {
-      // fetchConfigData((data[0] as any).chart_id['S']);
-      fetchConfigData('simpleBarChart');
-    }
-  }, [fetchConfigData, isLoading]);
+  }, [chartGalleryData, getDefaultChartConfig, isLoading]);
 
   const onChangeChartRequest = (value: string) => {
-    fetchConfigData(value);
+    // fetchChartConfig(value);
   };
 
   const exportChart = () => {

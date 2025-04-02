@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import CWAccordian from '../../../components/accordian';
 import {
-  chartDataConfigStore,
-  chartGlobalConfig,
+  currentChartConfigStore,
+  currentChartGlobalConfig,
 } from '../../../../store/charts';
 import ChartLabelEditor from '../chartLabelEditor';
 import { CHART_TYPE, DATA_SET_KEY } from '../../utils/enums';
@@ -25,8 +25,10 @@ interface IChartDataOptions {
 }
 
 function ChartDataEditor() {
-  const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [config] = useAtom(currentChartGlobalConfig);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
   const [plotOptions] = usePlotOptions();
 
   const deleteChartSeries = (index: number) => {
@@ -148,14 +150,14 @@ function ChartDataEditor() {
 
   return (
     <div className="mt-2 px-4">
-      {chartDataConfig.options.labels && <ChartLabelEditor />}
-      {plotOptions && plotOptions.inputsProps.length ? (
+      {chartDataConfig?.options.labels && <ChartLabelEditor />}
+      {plotOptions?.inputsProps?.length ? (
         <div className="mt-2">
           <CWAccordian
             id={String(plotOptions.id)}
             panelHeading={String(plotOptions.panelHeading)}
             defaultOpen={true}
-            panelComponent={plotOptions.inputsProps?.map(
+            panelComponent={plotOptions?.inputsProps?.map(
               (props: IInputRenderer) => {
                 return (
                   <div className="mt-2" key={props.id}>

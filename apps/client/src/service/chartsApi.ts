@@ -1,82 +1,105 @@
 import { atom } from 'jotai';
 import axios from 'axios';
 import {
-  allCharts,
-  chartDataConfigStore,
-  chartGlobalConfig,
+  chartGallery,
+  chartGlobalConfigs,
+  currentChartConfigStore,
+  currentChartGlobalConfig,
   loadingChartConfig,
 } from '../store/charts';
 
-import lineChartFeatureConfig from '../store/jsons/featuresConfig/linechart.json';
-import simpleLineChartDataConfig from '../store/jsons/chartDataConfig/simpleLineChart.json';
-
-import columnChartFeatureConfig from '../store/jsons/featuresConfig/columnChart.json';
-import simpleColumnChartDataConfig from '../store/jsons/chartDataConfig/simpleColumnChart.json';
-
-import pieChartFeatureConfig from '../store/jsons/featuresConfig/pieChart.json';
-import simplePieChartDataConfig from '../store/jsons/chartDataConfig/simplePieChart.json';
-
-import areaChartFeatureConfig from '../store/jsons/featuresConfig/areaChart.json';
-import simpleAreaChartDataConfig from '../store/jsons/chartDataConfig/simpleAreaChart.json';
-
-import barChartFeatureConfig from '../store/jsons/featuresConfig/barChart.json';
-import simpleBarChartDataConfig from '../store/jsons/chartDataConfig/simpleBarChart.json';
-
-import bubbleChartFeatureConfig from '../store/jsons/featuresConfig/bubbleChart.json';
-import simpleBubbleChartDataConfig from '../store/jsons/chartDataConfig/simpleBubbleChart.json';
-
-export const fetchAllChartData = atom(null, async (get, set) => {
+export const fetchChartGallery = atom(null, async (get, set) => {
   try {
-    // const response = await axios.get('http://localhost:3000/api/chart-id-all');
-    // set(allCharts, response.data);
+    const chartGalleryResponse = await axios.get('api/chart-gallery');
+    const chartGlobalConfigsResponse = await axios.get(
+      'api/chart-global-configs'
+    );
+    set(chartGallery, chartGalleryResponse.data);
+    set(chartGlobalConfigs, chartGlobalConfigsResponse.data);
   } catch (error) {
-    console.error('Error fetching data:', error);
-    set(allCharts, []);
+    console.error('Error in "fetchChartGallery":', error);
+    set(chartGallery, []);
   } finally {
     set(loadingChartConfig, false);
   }
 });
 
-export const fetchAllChartConfigById = atom(
-  null,
-  async (get, set, chart_id) => {
-    try {
-      // const response = await axios.get(
-      //   `http://localhost:3000/api/chart-config/${chart_id}`
-      // );
-      switch (chart_id) {
-        case 'simpleBarChart':
-          set(chartGlobalConfig, barChartFeatureConfig);
-          set(chartDataConfigStore, simpleBarChartDataConfig);
-          break;
-        case 'simpleColumnChart':
-          set(chartGlobalConfig, columnChartFeatureConfig);
-          set(chartDataConfigStore, simpleColumnChartDataConfig);
-          break;
-        case 'simpleLineChart':
-          set(chartGlobalConfig, lineChartFeatureConfig);
-          set(chartDataConfigStore, simpleLineChartDataConfig);
-          break;
-        case 'simpleAreaChart':
-          set(chartGlobalConfig, areaChartFeatureConfig);
-          set(chartDataConfigStore, simpleAreaChartDataConfig);
-          break;
-        case 'simpleBubbleChart':
-          set(chartGlobalConfig, bubbleChartFeatureConfig);
-          set(chartDataConfigStore, simpleBubbleChartDataConfig);
-          break;
-        case 'simplePieChart':
-          set(chartGlobalConfig, pieChartFeatureConfig);
-          set(chartDataConfigStore, simplePieChartDataConfig);
-          break;
-        default:
-          break;
-      }
+export const fetchChartDataById = atom(null, async (get, set, chart_id) => {
+  try {
+    const response = await axios.get(`/api/chart-config/${chart_id}`);
+    // switch (chart_id) {
+    //   case 'simpleBarChart':
+    //     set(chartGlobalConfig, barChartFeatureConfig);
+    //     set(chartDataConfigStore, simpleBarChartDataConfig);
+    //     break;
+    //   case 'simpleColumnChart':
+    //     set(chartGlobalConfig, columnChartFeatureConfig);
+    //     set(chartDataConfigStore, simpleColumnChartDataConfig);
+    //     break;
+    //   case 'simpleLineChart':
+    //     set(chartGlobalConfig, lineChartFeatureConfig);
+    //     set(chartDataConfigStore, simpleLineChartDataConfig);
+    //     break;
+    //   case 'simpleAreaChart':
+    //     set(chartGlobalConfig, areaChartFeatureConfig);
+    //     set(chartDataConfigStore, simpleAreaChartDataConfig);
+    //     break;
+    //   case 'simpleBubbleChart':
+    //     set(chartGlobalConfig, bubbleChartFeatureConfig);
+    //     set(chartDataConfigStore, simpleBubbleChartDataConfig);
+    //     break;
+    //   case 'simplePieChart':
+    //     set(chartGlobalConfig, pieChartFeatureConfig);
+    //     set(chartDataConfigStore, simplePieChartDataConfig);
+    //     break;
+    //   default:
+    //     break;
+    // }
 
-      // set(chartGlobalConfig, JSON.parse(response.data['base_config']['S']));
+    set(currentChartConfigStore, JSON.parse(response.data['config']));
+  } catch (error) {
+    console.error('Error in "fetchChartDataById":', error);
+    set(currentChartConfigStore, null);
+  } finally {
+    set(loadingChartConfig, false);
+  }
+});
+
+export const setDefaultChartConfig = atom(
+  null,
+  async (get, set, chartMatchId) => {
+    try {
+      const availableDefaultCharts = get(chartGallery);
+      const availableChartGlobalConfigs = get(chartGlobalConfigs);
+      for (const indx in availableDefaultCharts) {
+        const chartMatchPattern = String(availableDefaultCharts[indx]['title'])
+          .toLowerCase()
+          .split(' ')
+          .join('-');
+        if (chartMatchPattern === chartMatchId) {
+          for (const idx in availableChartGlobalConfigs) {
+            if (
+              availableDefaultCharts[indx]['chart_type'] ===
+              availableChartGlobalConfigs[idx]['type']
+            ) {
+              set(
+                currentChartGlobalConfig,
+                availableChartGlobalConfigs[idx]['config']
+              );
+            }
+          }
+
+          set(
+            currentChartConfigStore,
+            JSON.parse(availableDefaultCharts[indx]['config'])
+          );
+          return;
+        }
+      }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      set(chartGlobalConfig, null);
+      console.error('Error in "setDefaultChartConfig":', error);
+      set(currentChartGlobalConfig, null);
+      set(currentChartConfigStore, null);
     } finally {
       set(loadingChartConfig, false);
     }

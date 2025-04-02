@@ -1,10 +1,10 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { fetchAllChartConfigById } from '../../service/chartsApi';
+import { fetchChartDataById } from '../../service/chartsApi';
 import ChartRenderer from '../charteditor/containers/chartRenderer';
 
 function RenderChart() {
-  const [, fetchConfigData] = useAtom(fetchAllChartConfigById);
+  const [, fetchConfigData] = useAtom(fetchChartDataById);
 
   useEffect(() => {
     fetchConfigData('simpleBarChart');

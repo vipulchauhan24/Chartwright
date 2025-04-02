@@ -1,4 +1,7 @@
-import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
+import {
+  currentChartConfigStore,
+  currentChartGlobalConfig,
+} from '../../../store/charts';
 import { IInputRenderer } from '../containers/inputRenderer';
 import { borderRadiusApplications } from '../utils/constants';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
@@ -13,8 +16,10 @@ interface IChartPlotOptions {
 }
 
 function usePlotOptions() {
-  const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [config] = useAtom(currentChartGlobalConfig);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
 
   const onPlotOptionsPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {
@@ -55,7 +60,7 @@ function usePlotOptions() {
 
   const inputPropsForBarChart = useMemo(() => {
     if (
-      !chartDataConfig.options.plotOptions ||
+      !chartDataConfig?.options.plotOptions ||
       !chartDataConfig.options.plotOptions.bar
     ) {
       return [];

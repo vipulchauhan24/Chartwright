@@ -1,6 +1,9 @@
 import { useAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
-import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
+import {
+  currentChartConfigStore,
+  currentChartGlobalConfig,
+} from '../../../store/charts';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
 import {
   dataLabelsOrientations,
@@ -9,8 +12,10 @@ import {
 } from '../utils/constants';
 
 function useDataLabels() {
-  const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [config] = useAtom(currentChartGlobalConfig);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
 
   const onDataLabelsPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY, indx?: number) => {

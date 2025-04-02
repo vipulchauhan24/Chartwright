@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { DATA_SET_KEY, INPUT_TYPE } from '../utils/enums';
 import { useAtom } from 'jotai';
-import { chartDataConfigStore, chartGlobalConfig } from '../../../store/charts';
+import {
+  currentChartConfigStore,
+  currentChartGlobalConfig,
+} from '../../../store/charts';
 import {
   alignments,
   fontFamilies,
@@ -10,8 +13,10 @@ import {
 } from '../utils/constants';
 
 function useLegend() {
-  const [config] = useAtom(chartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [config] = useAtom(currentChartGlobalConfig);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
 
   const onLegendPropsUpdate = useCallback(
     (event: any, key: DATA_SET_KEY) => {

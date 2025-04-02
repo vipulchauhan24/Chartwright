@@ -17,10 +17,9 @@ import { type Response } from 'express';
 export class ChartsController {
   constructor(private chartService: ChartService) {}
 
-  @Get('chart-global-config/:type')
-  @UsePipes(ValidationPipe)
-  getChartGlobalConfigByChartType(@Param('type') type: string) {
-    return this.chartService.getChartGlobalConfigByChartType(type);
+  @Get('chart-global-configs')
+  getChartGlobalConfigs() {
+    return this.chartService.getChartGlobalConfigs();
   }
 
   @Get('chart-gallery')

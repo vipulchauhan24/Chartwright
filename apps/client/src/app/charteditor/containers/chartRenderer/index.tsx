@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { chartDataConfigStore } from '../../../../store/charts';
+import { currentChartConfigStore } from '../../../../store/charts';
 import ApexCharts from 'apexcharts';
 import { useCallback, useEffect, useRef } from 'react';
 import emitter from '../../../../service/eventBus';
@@ -11,7 +11,7 @@ import {
 } from '../../utils/lib';
 
 function ChartRenderer() {
-  const [chartDataConfig] = useAtom(chartDataConfigStore);
+  const [chartDataConfig] = useAtom(currentChartConfigStore);
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
   const timeoutRef = useRef<any>(null);

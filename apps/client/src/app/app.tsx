@@ -6,7 +6,8 @@ import Home from './home';
 import AuthGaurd from './authGaurd';
 import { User } from 'oidc-client-ts';
 import axios from 'axios';
-
+import { DevTools } from 'jotai-devtools';
+import 'jotai-devtools/styles.css';
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
@@ -17,7 +18,7 @@ export function App() {
         cognito_id: user.profile.sub,
         created_date: new Date().toISOString(),
       };
-      await axios.post('http://localhost:3000/api/user-signin', loginPayload);
+      await axios.post('/api/user-signin', loginPayload);
     } catch (error) {
       console.error(error);
     }
@@ -62,6 +63,7 @@ export function App() {
 
   return (
     <AuthProvider {...cognitoAuthConfig}>
+      <DevTools />
       <ChartRoutes />
     </AuthProvider>
   );

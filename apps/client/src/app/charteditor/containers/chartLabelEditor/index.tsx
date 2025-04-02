@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CWTextArea from '../../../components/textArea';
 import CWButton from '../../../components/button';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import Tippy from '@tippyjs/react';
 import CWAccordian from '../../../components/accordian';
 import { useAtom } from 'jotai';
-import { chartDataConfigStore } from '../../../../store/charts';
+import { currentChartConfigStore } from '../../../../store/charts';
 import CWChip from '../../../components/chip';
 
 function ChartLabelEditor() {
-  const [chartDataConfig, setChartDataConfig] = useAtom(chartDataConfigStore);
+  const [chartDataConfig, setChartDataConfig] = useAtom(
+    currentChartConfigStore
+  );
   const [labelsEditable, setLabelsEditable] = useState<boolean>(false);
   const [chartLabelsData, setChartLabelData] = useState<Array<string>>(
     chartDataConfig.options.labels
