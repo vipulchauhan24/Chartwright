@@ -78,15 +78,15 @@ function ChartEditor() {
               <CWLink href="#" label="Need Help?" />
             </div>
           </aside>
-          <div className="h-full w-full p-4">
-            <div className="flex items-center gap-2">
+          <div className="h-full w-full px-4 pb-4 overflow-auto">
+            <div className="flex items-center justify-end gap-2 pt-4 bg-white top-0 sticky z-50">
+              <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
+              <CWButton label="Export" onClick={exportChart} />
               <CWDropdown
                 items={simpleChartTypes}
                 onChange={onChangeChartRequest}
                 selectedIndex={chartSelectedIndx}
               />
-              <CWButton label="Export" onClick={exportChart} />
-              <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
             </div>
             <ChartRenderer />
           </div>

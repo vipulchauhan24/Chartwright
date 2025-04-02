@@ -92,7 +92,7 @@ function ExportChart(props: IExportChart) {
             <ul>
               <CWRadioInput items={items} onChange={onChange} />
             </ul>
-            <div className="mt-4">
+            <div className="mt-2">
               <div>
                 <CWTextInput
                   id="export-file-name"
@@ -165,7 +165,7 @@ function ExportChart(props: IExportChart) {
           </TabPanels>
         </TabGroup>
 
-        <div className="mt-4 flex items-center justify-end gap-2">
+        <div className="mt-2 flex items-center justify-end gap-2">
           <CWButton label="Cancel" onClick={closeModal} />
           <CWButton label="Save" onClick={saveChart} />
         </div>

@@ -15,11 +15,11 @@ function ChartGallery(props: IChartGallery) {
 
   return (
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Chart Gallery">
-      <div className="mt-10 grid grid-cols-3 gap-6 max-h-96 overflow-auto">
+      <div className=" mt-10 grid gap-4 grid-cols-3 max-h-96 overflow-auto">
         {charts.map((chart) => {
           return (
             <Button
-              className="w-80 rounded-lg overflow-hidden bg-primary-background"
+              className="w-full h-40 max-w-full rounded-lg border border-primary-border p-2 relative"
               onClick={() => {
                 onSetChartViaGalleryOptions(
                   String(chart['title']).toLowerCase().split(' ').join('-')
@@ -28,11 +28,16 @@ function ChartGallery(props: IChartGallery) {
               }}
             >
               <img
-                className="w-full"
+                className="w-full h-full rounded-lg object-contain object-center"
                 src={`api/chart/image/${chart['thumbnail']}`}
-                alt="Sunset in the mountains"
+                alt={chart['title']}
+                loading="lazy"
               />
-              <h4 className="text-xl my-2 text-center">{chart['title']}</h4>
+              <div className="opacity-0 hover:opacity-100 absolute w-full h-full bg-black/50 top-0 left-0 flex items-center justify-center rounded-lg">
+                <h4 className="text-xl text-center font-semibold text-white">
+                  {chart['title']}
+                </h4>
+              </div>
             </Button>
           );
         })}

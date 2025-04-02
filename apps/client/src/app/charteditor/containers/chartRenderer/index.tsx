@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { currentChartConfigStore } from '../../../../store/charts';
 import ApexCharts from 'apexcharts';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import { Handler } from 'mitt';
@@ -9,12 +9,15 @@ import {
   base64ImageToBase64PDF,
   changeBaseStringImageType,
 } from '../../utils/lib';
+import { PhotoIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
   const timeoutRef = useRef<any>(null);
+  const [isChartRendered, setIsChartRendered] = useState<boolean>(false);
 
   const destroy = () => {
     if (apexRef.current) {
@@ -122,6 +125,10 @@ function ChartRenderer() {
     };
   }, [onImageFileTypeUpdate, onPdfFileTypeUpdate]);
 
+  const onChartMounted = () => {
+    setIsChartRendered(true);
+  };
+
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -129,6 +136,9 @@ function ChartRenderer() {
     if (chartDataConfig && chartRef.current) {
       timeoutRef.current = setTimeout(() => {
         destroy();
+        chartDataConfig.options.chart['events'] = {
+          mounted: onChartMounted,
+        };
         const chart = new ApexCharts(chartRef.current, chartDataConfig.options);
         chart.render();
         apexRef.current = chart;
@@ -141,10 +151,18 @@ function ChartRenderer() {
   }, [chartDataConfig]);
 
   return (
-    <div className="w-full h-[calc(100%_-_1.625rem)] overflow-y-auto">
-      <div className="w-full p-3 flex items-center justify-center">
-        <div ref={chartRef} className="w-11/12"></div>
-      </div>
+    <div
+      className={clsx(
+        'w-full h-full p-3 relative',
+        !isChartRendered && 'h-full'
+      )}
+    >
+      {!isChartRendered && (
+        <div className="absolute h-full w-full top-0 left-0 flex items-center justify-center animate-pulse bg-primary-background rounded-xl">
+          <PhotoIcon className="size-10 stroke-primary-border" />
+        </div>
+      )}
+      <div ref={chartRef} className="w-full"></div>
     </div>
   );
 }

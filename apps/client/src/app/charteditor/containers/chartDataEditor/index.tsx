@@ -149,7 +149,7 @@ function ChartDataEditor() {
   ]);
 
   return (
-    <div className="mt-2 px-4">
+    <div className="p-4">
       {chartDataConfig?.options.labels && <ChartLabelEditor />}
       {plotOptions?.inputsProps?.length ? (
         <div className="mt-2">

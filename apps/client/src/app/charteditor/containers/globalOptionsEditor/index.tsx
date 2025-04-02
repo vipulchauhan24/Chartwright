@@ -11,6 +11,7 @@ import useDataLabels from '../../hooks/useDataLabels';
 import useLegend from '../../hooks/useLegend';
 import useTitle from '../../hooks/useTitle';
 import useSubTitle from '../../hooks/useSubtitle';
+import clsx from 'clsx';
 
 interface IChartGlobalOptions {
   id: string;
@@ -142,10 +143,10 @@ function GlobalOptionsEditor() {
   }, [config, generateChartGlobalOptions]);
 
   return (
-    <div className="px-4">
-      {globalOptions.map((options: IChartGlobalOptions) => {
+    <div className="p-4">
+      {globalOptions.map((options: IChartGlobalOptions, indx: number) => {
         return (
-          <div className="mt-2" key={options.id}>
+          <div className={clsx(indx && 'mt-2')} key={options.id}>
             <CWAccordian
               id={options.id}
               panelHeading={options.panelHeading}

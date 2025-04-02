@@ -1,4 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import IconButton from '../iconButton';
 
 interface ICWModal {
   title: string;
@@ -18,7 +20,7 @@ function CWModal(props: ICWModal) {
     <Dialog
       open={isOpen}
       as="div"
-      className="relative z-10 focus:outline-none"
+      className="relative z-[999] focus:outline-none"
       onClose={toggleOpen}
     >
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -27,12 +29,20 @@ function CWModal(props: ICWModal) {
             transition
             className="rounded-xl bg-white border border-primary-border p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
           >
-            <DialogTitle
-              as="h3"
-              className="text-2xl font-semibold text-primary-text"
-            >
-              {title}
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle
+                as="h3"
+                className="text-2xl font-semibold text-primary-text"
+              >
+                {title}
+              </DialogTitle>
+              <IconButton
+                icon={<XMarkIcon className="size-4" aria-hidden={true} />}
+                onClick={toggleOpen}
+                tooltip="Close"
+              />
+            </div>
+
             {children}
           </DialogPanel>
         </div>
