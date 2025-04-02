@@ -55,7 +55,7 @@ export class ChartsController {
     return this.chartService.deleteChart(id);
   }
 
-  @Get('chart-config/image/:key')
+  @Get('chart/image/:key')
   async getChartImageByKey(@Param('key') key: string, @Res() res: Response) {
     const { imageStream, type } = await this.chartService.getImageStreamByKey(
       key

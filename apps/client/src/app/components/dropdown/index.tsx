@@ -5,7 +5,7 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ICWDropdown {
   items: Array<{
@@ -14,11 +14,12 @@ interface ICWDropdown {
     value: string;
   }>;
   onChange: (vaue: string) => void;
+  selectedIndex: number;
 }
 
 function CWDropdown(props: ICWDropdown) {
-  const { items, onChange } = props;
-  const [selected, setSelected] = useState(items[0]);
+  const { items, onChange, selectedIndex } = props;
+  const [selected, setSelected] = useState(items[selectedIndex]);
 
   const onItemSelected = (selectedItemValue: any) => {
     const selectedItem = items.find((item) => item.value === selectedItemValue);
@@ -27,6 +28,10 @@ function CWDropdown(props: ICWDropdown) {
       onChange(selectedItemValue);
     }
   };
+
+  useEffect(() => {
+    setSelected(items[selectedIndex]);
+  }, [items, selectedIndex]);
 
   return (
     <Listbox value={selected} onChange={onItemSelected}>

@@ -1,24 +1,41 @@
 import { Button } from '@headlessui/react';
 import CWModal from '../../../components/modal';
+import { useAtom } from 'jotai';
+import { chartGallery } from '../../../../store/charts';
 
 interface IChartGallery {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSetChartViaGalleryOptions: (value: string) => void;
 }
 
 function ChartGallery(props: IChartGallery) {
-  const { isOpen, setIsOpen } = props;
+  const { isOpen, setIsOpen, onSetChartViaGalleryOptions } = props;
+  const [charts] = useAtom(chartGallery);
+
   return (
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Chart Gallery">
       <div className="mt-10 grid grid-cols-3 gap-6 max-h-96 overflow-auto">
-        <Button className="w-80 rounded-lg overflow-hidden bg-primary-background">
-          <img
-            className="w-full"
-            src="https://images.unsplash.com/photo-1591696205602-2f950c417cb9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Sunset in the mountains"
-          />
-          <h4 className="text-xl my-2 text-center">Bar chart</h4>
-        </Button>
+        {charts.map((chart) => {
+          return (
+            <Button
+              className="w-80 rounded-lg overflow-hidden bg-primary-background"
+              onClick={() => {
+                onSetChartViaGalleryOptions(
+                  String(chart['title']).toLowerCase().split(' ').join('-')
+                );
+                setIsOpen(false);
+              }}
+            >
+              <img
+                className="w-full"
+                src={`api/chart/image/${chart['thumbnail']}`}
+                alt="Sunset in the mountains"
+              />
+              <h4 className="text-xl my-2 text-center">{chart['title']}</h4>
+            </Button>
+          );
+        })}
       </div>
     </CWModal>
   );

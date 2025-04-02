@@ -24,6 +24,7 @@ function ChartEditor() {
   const [isLoading] = useAtom(loadingChartConfig);
   const [showExportChartModal, setShowExportChartModal] = useState(false);
   const [showChartGallery, setShowChartGallery] = useState(false);
+  const [chartSelectedIndx, setChartSelectedIndx] = useState(0);
 
   useEffect(() => {
     fetchChartGalleryData(); // Fetch data on mount
@@ -45,6 +46,16 @@ function ChartEditor() {
 
   const openChartGallery = () => {
     setShowChartGallery(true);
+  };
+
+  const onSetChartViaGalleryOptions = (value: string) => {
+    getDefaultChartConfig(value);
+    for (const indx in simpleChartTypes) {
+      if (simpleChartTypes[indx].value === value) {
+        setChartSelectedIndx(Number(indx));
+        break;
+      }
+    }
   };
 
   if (isLoading) {
@@ -72,6 +83,7 @@ function ChartEditor() {
               <CWDropdown
                 items={simpleChartTypes}
                 onChange={onChangeChartRequest}
+                selectedIndex={chartSelectedIndx}
               />
               <CWButton label="Export" onClick={exportChart} />
               <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
@@ -89,6 +101,7 @@ function ChartEditor() {
         <ChartGallery
           isOpen={showChartGallery}
           setIsOpen={setShowChartGallery}
+          onSetChartViaGalleryOptions={onSetChartViaGalleryOptions}
         />
       </>
     </AppShell>
