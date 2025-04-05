@@ -16,6 +16,7 @@ import { simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
+import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
 
 function ChartEditor() {
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
@@ -81,7 +82,18 @@ function ChartEditor() {
           <div className="h-full w-full px-4 pb-4 overflow-auto">
             <div className="flex items-center justify-end gap-2 pt-4 bg-white top-0 sticky z-50">
               <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
-              <CWButton label="Export" onClick={exportChart} />
+              <CWButton
+                primary
+                label={
+                  <p className="flex items-center gap-1">
+                    Export
+                    <span>
+                      <ArrowUpRightIcon className="size-4" />
+                    </span>
+                  </p>
+                }
+                onClick={exportChart}
+              />
               <CWDropdown
                 items={simpleChartTypes}
                 onChange={onChangeChartRequest}

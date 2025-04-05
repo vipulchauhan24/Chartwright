@@ -5,17 +5,21 @@ interface ICWButton {
   label: string | React.ReactNode;
   onClick: (e: any) => void;
   additionalCssClasses?: string;
+  primary?: boolean;
 }
 
 function CWButton(props: ICWButton) {
-  const { label, onClick, additionalCssClasses } = props;
+  const { label, onClick, additionalCssClasses, primary } = props;
 
   return (
     <Button
       onClick={onClick}
       className={clsx(
         additionalCssClasses,
-        'transition duration-200 ease-in-out text-primary-text py-2 px-3 border border-primary-border rounded-lg relative hover:bg-primary-main hover:text-primary-background hover:border-primary-main'
+        'transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative',
+        primary
+          ? 'text-white border-primary-main bg-primary-main hover:bg-white hover:text-primary-main'
+          : 'text-primary-text border-primary-border hover:bg-primary-main hover:text-primary-background hover:border-primary-main'
       )}
     >
       {label}
