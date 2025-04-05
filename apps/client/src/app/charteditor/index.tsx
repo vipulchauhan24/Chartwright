@@ -17,9 +17,11 @@ import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
 import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
+import { isExportDisabled } from '../../store/app';
 
 function ChartEditor() {
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
+  const [exportDisabled] = useAtom(isExportDisabled);
   const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
   const [chartGalleryData] = useAtom(chartGallery);
   const [isLoading] = useAtom(loadingChartConfig);
@@ -83,6 +85,7 @@ function ChartEditor() {
             <div className="flex items-center justify-end gap-2 pt-4 bg-white top-0 sticky z-50">
               <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
               <CWButton
+                disabled={exportDisabled}
                 primary
                 label={
                   <p className="flex items-center gap-1">

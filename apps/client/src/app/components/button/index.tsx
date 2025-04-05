@@ -6,15 +6,18 @@ interface ICWButton {
   onClick: (e: any) => void;
   additionalCssClasses?: string;
   primary?: boolean;
+  disabled?: boolean;
 }
 
 function CWButton(props: ICWButton) {
-  const { label, onClick, additionalCssClasses, primary } = props;
+  const { label, onClick, additionalCssClasses, primary, disabled } = props;
 
   return (
     <Button
+      disabled={disabled}
       onClick={onClick}
       className={clsx(
+        disabled && 'pointer-events-none opacity-50',
         additionalCssClasses,
         'transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative',
         primary

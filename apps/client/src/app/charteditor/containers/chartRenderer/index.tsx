@@ -11,9 +11,12 @@ import {
 } from '../../utils/lib';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { isExportDisabled } from '../../../../store/app';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
+  const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
+
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
   const timeoutRef = useRef<any>(null);
@@ -127,6 +130,7 @@ function ChartRenderer() {
 
   const onChartMounted = () => {
     setIsChartRendered(true);
+    setIsExportChartDisabled(false);
   };
 
   useEffect(() => {

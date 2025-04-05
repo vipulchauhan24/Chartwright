@@ -16,19 +16,13 @@ interface IExportChart {
 function ExportChart(props: IExportChart) {
   const { isOpen, setIsOpen } = props;
   const [imageURI, setImageURI] = useState<string>();
-  const [fileName, setFileName] = useState<string>('SimpleBarChart');
+  const [fileName, setFileName] = useState<string>('chart');
 
   const closeModal = () => {
     setIsOpen(false);
   };
 
-  const updatePreviewImage: any = ({
-    imgURI,
-    type,
-  }: {
-    imgURI: string;
-    type: string;
-  }) => {
+  const updatePreviewImage: any = ({ imgURI }: { imgURI: string }) => {
     setImageURI(imgURI);
   };
 
@@ -88,21 +82,21 @@ function ExportChart(props: IExportChart) {
     switch (title) {
       case 'Image':
         return (
-          <TabPanel className="py-4">
+          <TabPanel className="py-4 min-h-[412px] min-w-[376px]">
             <ul>
               <CWRadioInput items={items} onChange={onChange} />
             </ul>
             <div className="mt-2">
-              <div>
-                <CWTextInput
-                  id="export-file-name"
-                  label="Filename:"
-                  placeholder="Type file name here..."
-                  defaultValue={fileName}
-                  onChange={onFileNameInputUpdate}
-                />
-              </div>
-              <h4 className="text-base font-normal pb-2">Preview:</h4>
+              <CWTextInput
+                id="export-file-name"
+                label="Filename:"
+                placeholder="Type file name here..."
+                defaultValue={fileName}
+                onChange={onFileNameInputUpdate}
+              />
+              <h4 className="text-base font-normal pb-2 mt-4">
+                Image Preview:
+              </h4>
               {imageURI && (
                 <img
                   src={imageURI}
@@ -115,7 +109,7 @@ function ExportChart(props: IExportChart) {
         );
       case 'Pdf':
         return (
-          <TabPanel className="py-4">
+          <TabPanel className="py-4 min-h-[412px] min-w-[376px]">
             <div>
               <CWTextInput
                 id="export-file-name"
@@ -134,7 +128,9 @@ function ExportChart(props: IExportChart) {
   };
 
   const onTabChange = (index: number) => {
-    if (index === 1) {
+    if (index === 0) {
+      onExportAsImageFileTypeUpdate('png');
+    } else {
       onExportAsPDFFileTypeUpdate();
     }
   };
@@ -143,16 +139,16 @@ function ExportChart(props: IExportChart) {
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Export">
       <div>
         <TabGroup
-          className="mt-8"
+          className="mt-2"
           onChange={(index) => {
             onTabChange(index);
           }}
         >
-          <TabList className="flex gap-4">
+          <TabList className="flex gap-1 border-b border-primary-main">
             {tabList.map(({ title }) => (
               <Tab
                 key={title}
-                className="rounded-full py-1 px-3 text-sm/6 font-semibold focus:outline-none data-[selected]:bg-primary-main data-[hover]:bg-primary-main data-[selected]:text-white data-[hover]:text-white"
+                className="py-2 px-1 text-sm/6 font-semibold focus:outline-none data-[selected]:border-b-2 data-[hover]:border-primary-main data-[selected]:text-primary-main data-[hover]:text-primary-main"
               >
                 {title}
               </Tab>
