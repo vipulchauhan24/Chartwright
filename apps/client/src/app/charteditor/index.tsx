@@ -16,7 +16,11 @@ import { simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
-import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowUpRightIcon,
+  ChartPieIcon,
+  FolderArrowDownIcon,
+} from '@heroicons/react/24/outline';
 import { isExportDisabled } from '../../store/app';
 
 function ChartEditor() {
@@ -83,16 +87,22 @@ function ChartEditor() {
           </aside>
           <div className="h-full w-full px-4 pb-4 overflow-auto">
             <div className="flex items-center justify-end gap-2 pt-4 bg-white top-0 sticky z-50">
-              <CWButton label="Open Chart Gallery" onClick={openChartGallery} />
+              <CWButton
+                label={
+                  <p className="flex items-center gap-2">
+                    <ChartPieIcon className="size-4" />
+                    View Gallery
+                  </p>
+                }
+                onClick={openChartGallery}
+              />
               <CWButton
                 disabled={exportDisabled}
                 primary
                 label={
-                  <p className="flex items-center gap-1">
+                  <p className="flex items-center gap-2">
+                    <FolderArrowDownIcon className="size-4" />
                     Export
-                    <span>
-                      <ArrowUpRightIcon className="size-4" />
-                    </span>
                   </p>
                 }
                 onClick={exportChart}
