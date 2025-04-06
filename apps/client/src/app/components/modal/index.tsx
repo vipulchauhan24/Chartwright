@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 import IconButton from '../iconButton';
+import { X } from 'lucide-react';
 
 interface ICWModal {
   title: string;
@@ -37,7 +37,7 @@ function CWModal(props: ICWModal) {
                 {title}
               </DialogTitle>
               <IconButton
-                icon={<XMarkIcon className="size-4" aria-hidden={true} />}
+                icon={<X className="size-4" aria-hidden={true} />}
                 onClick={toggleOpen}
                 tooltip="Close"
               />

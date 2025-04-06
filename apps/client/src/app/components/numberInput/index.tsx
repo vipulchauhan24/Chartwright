@@ -1,7 +1,7 @@
 import { Field, Input, Label } from '@headlessui/react';
 import IconButton from '../iconButton';
-import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { Minus, Plus } from 'lucide-react';
 
 interface ICWNumberInput {
   id: string;
@@ -61,12 +61,12 @@ function CWNumberInput(props: ICWNumberInput) {
           className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         <IconButton
-          icon={<MinusIcon className="size-4" aria-hidden={true} />}
+          icon={<Minus className="size-4" aria-hidden={true} />}
           onClick={decrease}
           tooltip="Decrease by one pixel."
         />
         <IconButton
-          icon={<PlusIcon className="size-4" aria-hidden={true} />}
+          icon={<Plus className="size-4" aria-hidden={true} />}
           onClick={increase}
           tooltip="Increase by one pixel."
         />

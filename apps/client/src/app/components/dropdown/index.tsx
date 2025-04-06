@@ -4,7 +4,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ICWDropdown {
@@ -37,7 +37,7 @@ function CWDropdown(props: ICWDropdown) {
     <Listbox value={selected} onChange={onItemSelected}>
       <ListboxButton className="text-primary-text text-md py-2 pl-3 pr-8 border border-primary-border rounded-lg relative w-32 truncate">
         {selected.label}
-        <ChevronDownIcon
+        <ChevronDown
           className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-primary-text"
           aria-hidden="true"
         />

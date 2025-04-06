@@ -9,7 +9,7 @@ import { CHART_TYPE, DATA_SET_KEY } from '../../utils/enums';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
 import { useCallback, useMemo } from 'react';
 import Tippy from '@tippyjs/react';
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { Plus, Trash2 } from 'lucide-react';
 import {
   generateBarAndLineChartDataOptions,
   generateBubbleChartDataOptions,
@@ -231,7 +231,8 @@ function ChartDataEditor() {
                       }}
                       className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
                     >
-                      <TrashIcon className="size-4" aria-hidden={true} />
+                      {/* <TrashIcon className="size-4" aria-hidden={true} /> */}
+                      <Trash2 className="size-4" aria-hidden={true} />
                     </span>
                   </Tippy>
                 ) : null
@@ -255,7 +256,8 @@ function ChartDataEditor() {
           primary
           label={
             <p className="flex items-center gap-2">
-              <PlusIcon className="size-4" />
+              {/* <PlusIcon className="size-4" /> */}
+              <Plus className="size-4" aria-hidden={true} />
               Add Series
             </p>
           }

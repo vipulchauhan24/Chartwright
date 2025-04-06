@@ -1,5 +1,5 @@
 import { Button } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { X } from 'lucide-react';
 
 interface ICWChip {
   label: string;
@@ -16,7 +16,7 @@ function CWChip(props: ICWChip) {
         onClick={onDelete}
         className="transition duration-200 ease-in-out text-primary-text border border-primary-border rounded-lg relative hover:bg-primary-main hover:text-primary-background hover:border-primary-main"
       >
-        <XMarkIcon className="size-4" />
+        <X className="size-4" aria-hidden={true} />
       </Button>
     </div>
   );

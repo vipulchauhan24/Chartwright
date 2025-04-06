@@ -1,6 +1,6 @@
 import { Field, Label, Select } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { ChevronDown } from 'lucide-react';
 
 interface ISelectOptions {
   id: string;
@@ -46,7 +46,7 @@ function CWSelect(props: ICWSelect) {
             );
           })}
         </Select>
-        <ChevronDownIcon
+        <ChevronDown
           className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-primary-text"
           aria-hidden="true"
         />

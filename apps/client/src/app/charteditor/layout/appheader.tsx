@@ -1,6 +1,7 @@
 import { useAuth } from 'react-oidc-context';
 import CWLink from '../../components/link';
 import CWButton from '../../components/button';
+import { LogIn, LogOut } from 'lucide-react';
 
 const { VITE_CLIENT_ID } = import.meta.env;
 
@@ -29,9 +30,23 @@ function AppHeader() {
       />
       <div>
         {auth.isAuthenticated ? (
-          <CWButton label="Sign out" onClick={logout} />
+          <CWButton
+            label={
+              <span className="flex items-center gap-1">
+                Sign out <LogOut className="size-4" aria-hidden={true} />
+              </span>
+            }
+            onClick={logout}
+          />
         ) : (
-          <CWButton label="Sign in" onClick={redirectToLoginPage} />
+          <CWButton
+            label={
+              <span className="flex items-center gap-1">
+                Sign in <LogIn className="size-4" aria-hidden={true} />
+              </span>
+            }
+            onClick={redirectToLoginPage}
+          />
         )}
       </div>
     </header>

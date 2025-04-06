@@ -1,7 +1,7 @@
 import IconButton from '../iconButton';
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import CWTextInput from '../textInput';
 import { useEffect, useState } from 'react';
+import { Plus, Trash } from 'lucide-react';
 
 interface ICWTableInput {
   id: string;
@@ -108,18 +108,14 @@ function CWTableInput(props: ICWTableInput) {
                   <td>
                     <div className="flex gap-1">
                       <IconButton
-                        icon={
-                          <TrashIcon className="size-4" aria-hidden={true} />
-                        }
+                        icon={<Trash className="size-4" aria-hidden={true} />}
                         onClick={() => {
                           onDelete(indx);
                         }}
                       />
                       {indx === series.length - 1 && (
                         <IconButton
-                          icon={
-                            <PlusIcon className="size-4" aria-hidden={true} />
-                          }
+                          icon={<Plus className="size-4" aria-hidden={true} />}
                           onClick={onAdd}
                         />
                       )}

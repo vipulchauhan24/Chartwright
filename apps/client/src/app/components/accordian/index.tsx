@@ -3,7 +3,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChevronDown } from 'lucide-react';
 
 interface ICWAccordian {
   id: string;
@@ -33,7 +33,10 @@ function CWAccordian(props: ICWAccordian) {
             </span>
             {panelHeadingButton}
           </div>
-          <ChevronDownIcon className="size-5 group-data-[open]:rotate-180" />
+          <ChevronDown
+            className="size-5 group-data-[open]:rotate-180"
+            aria-hidden={true}
+          />
         </DisclosureButton>
         <DisclosurePanel className="mt-2 pb-4 px-4">
           {panelComponent}

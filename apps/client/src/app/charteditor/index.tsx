@@ -16,12 +16,8 @@ import { simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
-import {
-  ArrowUpRightIcon,
-  ChartPieIcon,
-  FolderArrowDownIcon,
-} from '@heroicons/react/24/outline';
 import { isExportDisabled } from '../../store/app';
+import { ChartPie, FolderDown } from 'lucide-react';
 
 function ChartEditor() {
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
@@ -90,7 +86,8 @@ function ChartEditor() {
               <CWButton
                 label={
                   <p className="flex items-center gap-2">
-                    <ChartPieIcon className="size-4" />
+                    {/* <ChartPieIcon className="size-4" /> */}
+                    <ChartPie className="size-4" aria-hidden={true} />
                     View Gallery
                   </p>
                 }
@@ -101,7 +98,7 @@ function ChartEditor() {
                 primary
                 label={
                   <p className="flex items-center gap-2">
-                    <FolderArrowDownIcon className="size-4" />
+                    <FolderDown className="size-4" aria-hidden={true} />
                     Export
                   </p>
                 }

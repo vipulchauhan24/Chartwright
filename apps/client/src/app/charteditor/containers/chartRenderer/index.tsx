@@ -9,9 +9,9 @@ import {
   base64ImageToBase64PDF,
   changeBaseStringImageType,
 } from '../../utils/lib';
-import { PhotoIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { isExportDisabled } from '../../../../store/app';
+import { ChartNoAxesCombined } from 'lucide-react';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
@@ -163,7 +163,10 @@ function ChartRenderer() {
     >
       {!isChartRendered && (
         <div className="absolute h-full w-full top-0 left-0 flex items-center justify-center animate-pulse bg-primary-background rounded-xl">
-          <PhotoIcon className="size-10 stroke-primary-border" />
+          <ChartNoAxesCombined
+            className="size-10 stroke-primary-border"
+            aria-hidden={true}
+          />
         </div>
       )}
       <div ref={chartRef} className="w-full"></div>

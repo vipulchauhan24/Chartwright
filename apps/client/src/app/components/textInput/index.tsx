@@ -1,7 +1,7 @@
 import { Field, Input, Label } from '@headlessui/react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import Tippy from '@tippyjs/react';
 import clsx from 'clsx';
+import { Info } from 'lucide-react';
 import { useRef } from 'react';
 
 interface ICWTextInput {
@@ -37,7 +37,7 @@ function CWTextInput(props: ICWTextInput) {
         )}
         {hint && (
           <Tippy content={hint}>
-            <InformationCircleIcon className="w-5 h-5" />
+            <Info className="size-4 opacity-80" aria-hidden={true} />
           </Tippy>
         )}
       </div>

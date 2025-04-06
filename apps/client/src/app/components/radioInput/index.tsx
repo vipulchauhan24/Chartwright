@@ -1,5 +1,5 @@
 import { Radio, RadioGroup } from '@headlessui/react';
-import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import { CircleCheck } from 'lucide-react';
 import { useState } from 'react';
 
 interface ICWRadioInput {
@@ -44,7 +44,7 @@ function CWRadioInput(props: ICWRadioInput) {
             <p className="font-semibold text-sm text-primary-text select-none">
               {item.label}
             </p>
-            <CheckCircleIcon className="size-6 stroke-primary-border group-data-[checked]:stroke-primary-main" />
+            <CircleCheck className="size-6 stroke-primary-border group-data-[checked]:stroke-primary-main" />
           </div>
         </Radio>
       ))}

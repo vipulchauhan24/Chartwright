@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import CWTextArea from '../../../components/textArea';
 import CWButton from '../../../components/button';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import Tippy from '@tippyjs/react';
 import CWAccordian from '../../../components/accordian';
 import { useAtom } from 'jotai';
 import { currentChartConfigStore } from '../../../../store/charts';
 import CWChip from '../../../components/chip';
+import { Pencil } from 'lucide-react';
 
 function ChartLabelEditor() {
   const [chartDataConfig, setChartDataConfig] = useAtom(
@@ -66,7 +66,7 @@ function ChartLabelEditor() {
               role="button"
               className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
             >
-              <PencilSquareIcon className="size-4" aria-hidden={true} />
+              <Pencil className="size-4" aria-hidden={true} />
             </span>
           </Tippy>
         ) : null

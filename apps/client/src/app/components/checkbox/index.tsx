@@ -1,7 +1,7 @@
 import { Checkbox, Field, Label } from '@headlessui/react';
-import { CheckIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import Tippy from '@tippyjs/react';
 import clsx from 'clsx';
+import { Check, Info } from 'lucide-react';
 
 interface ICWCheckbox {
   id: string;
@@ -29,7 +29,7 @@ function CWCheckbox(props: ICWCheckbox) {
         )}
         {hint && (
           <Tippy content={hint}>
-            <InformationCircleIcon className="w-5 h-5" />
+            <Info className="size-4 opacity-80" aria-hidden={true} />
           </Tippy>
         )}
       </div>
@@ -39,7 +39,10 @@ function CWCheckbox(props: ICWCheckbox) {
         onChange={onChange}
         className="group cursor-pointer size-6 rounded-md p-1 ring-1 ring-primary-border data-[checked]:ring-primary-main ring-inset data-[checked]:bg-primary-main"
       >
-        <CheckIcon className="hidden size-4 stroke-primary-background group-data-[checked]:block" />
+        <Check
+          className="hidden size-4 stroke-primary-background group-data-[checked]:block"
+          aria-hidden={true}
+        />
       </Checkbox>
     </Field>
   );
