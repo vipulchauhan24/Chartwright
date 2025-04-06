@@ -1,5 +1,5 @@
+import CWButton from '../components/button';
 import CWLink from '../components/link';
-import CWLinkButton from '../components/linkButton';
 
 function ErrorBoundaryPage() {
   return (
@@ -10,7 +10,12 @@ function ErrorBoundaryPage() {
           Woops! Something went wrong.
         </h1>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <CWLinkButton href="/" label="Go back home" />
+          <CWButton
+            onClick={() => {
+              window.location.reload();
+            }}
+            label="Refresh"
+          />
           <CWLink
             href="/"
             label={

@@ -10,9 +10,9 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <ErrorBoundary fallback={<ErrorBoundaryPage />}>
-    <BrowserRouter>
+  <BrowserRouter>
+    <ErrorBoundary fallback={<ErrorBoundaryPage />}>
       <App />
-    </BrowserRouter>
-  </ErrorBoundary>
+    </ErrorBoundary>
+  </BrowserRouter>
 );

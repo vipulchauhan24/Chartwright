@@ -222,7 +222,7 @@ function ChartDataEditor() {
               panelHeading={options.panelHeading}
               defaultOpen={options.open}
               panelHeadingButton={
-                chartDataConfig.options.chart.type !== CHART_TYPE.PIE ? (
+                chartDataConfig?.options.chart.type !== CHART_TYPE.PIE ? (
                   <Tippy content={`Delete ${options.panelHeading}`}>
                     <span
                       role="button"
@@ -249,7 +249,7 @@ function ChartDataEditor() {
           </div>
         );
       })}
-      {chartDataConfig.options.chart.type !== CHART_TYPE.PIE && (
+      {chartDataConfig?.options.chart.type !== CHART_TYPE.PIE && (
         <CWButton
           additionalCssClasses="mt-2"
           primary
