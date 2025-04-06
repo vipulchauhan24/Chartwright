@@ -39,6 +39,7 @@ export enum CHART_TYPE {
   LINE = 'line',
   PIE = 'pie',
   BUBBLE = 'bubble',
+  AREA = 'area',
 }
 
 export enum CHART_FEATURE {

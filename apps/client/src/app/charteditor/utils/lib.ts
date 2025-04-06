@@ -40,3 +40,33 @@ export function base64ImageToBase64PDF(base64Image: string) {
     resolve(base64PDF);
   });
 }
+
+export function generateRandomNumbers(length: number) {
+  const numbers = [];
+  for (let i = 0; i < length; i++) {
+    numbers.push(Math.floor(Math.random() * 100));
+  }
+  return numbers;
+}
+
+export function generateSeriesForChart(length: number, count: number) {
+  return {
+    name: `Series ${count + 1}`,
+    data: generateRandomNumbers(length),
+  };
+}
+
+export function generateSeriesForBubbleChart(
+  rowLength: number,
+  columnLength: number,
+  count: number
+) {
+  const matrix = [];
+  for (let indx = 0; indx < rowLength; indx++) {
+    matrix.push(generateRandomNumbers(columnLength));
+  }
+  return {
+    name: `Series ${count + 1}`,
+    data: matrix,
+  };
+}

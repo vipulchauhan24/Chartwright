@@ -9,13 +9,18 @@ import { CHART_TYPE, DATA_SET_KEY } from '../../utils/enums';
 import InputRenderer, { IInputRenderer } from '../inputRenderer';
 import { useCallback, useMemo } from 'react';
 import Tippy from '@tippyjs/react';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import {
   generateBarAndLineChartDataOptions,
   generateBubbleChartDataOptions,
   generatePieChartDataOptions,
 } from '../../../../service/chartDataOptions';
 import usePlotOptions from '../../hooks/usePlotOptions';
+import CWButton from '../../../components/button';
+import {
+  generateSeriesForBubbleChart,
+  generateSeriesForChart,
+} from '../../utils/lib';
 
 interface IChartDataOptions {
   id: string;
@@ -148,6 +153,46 @@ function ChartDataEditor() {
     onChartDataOptionsUpdate,
   ]);
 
+  const addSeries = () => {
+    const config = JSON.parse(JSON.stringify(chartDataConfig));
+    switch (config.options.chart.type) {
+      case CHART_TYPE.AREA:
+      case CHART_TYPE.BAR:
+      case CHART_TYPE.LINE:
+        config.options.series = [
+          ...config.options.series,
+          generateSeriesForChart(
+            config.options.series[0].data.length,
+            config.options.series.length
+          ),
+        ];
+        config.options.colors = [
+          ...config.options.colors,
+          config.options.colors[0],
+        ];
+        break;
+      case CHART_TYPE.BUBBLE:
+        config.options.series = [
+          ...config.options.series,
+          generateSeriesForBubbleChart(
+            config.options.series[0].data.length,
+            config.options.series[0].data[0].length,
+            config.options.series.length
+          ),
+        ];
+        config.options.colors = [
+          ...config.options.colors,
+          config.options.colors[0],
+        ];
+        break;
+
+      default:
+        break;
+    }
+
+    setChartDataConfig(config);
+  };
+
   return (
     <div className="p-4">
       {chartDataConfig?.options.labels && <ChartLabelEditor />}
@@ -204,6 +249,19 @@ function ChartDataEditor() {
           </div>
         );
       })}
+      {chartDataConfig.options.chart.type !== CHART_TYPE.PIE && (
+        <CWButton
+          additionalCssClasses="mt-2"
+          primary
+          label={
+            <p className="flex items-center gap-2">
+              <PlusIcon className="size-4" />
+              Add Series
+            </p>
+          }
+          onClick={addSeries}
+        />
+      )}
     </div>
   );
 }
