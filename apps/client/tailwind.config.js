@@ -18,6 +18,7 @@ module.exports = {
         main: '#FF715B',
         background: '#F2FDFF',
         success: '#16DB65',
+        error: '#d90429',
         border: '#B0BEC5',
         text: '#071013',
       },

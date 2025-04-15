@@ -1,14 +1,18 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { setDefaultChartConfig } from '../../service/chartsApi';
+import { fetchChartConfig } from '../../service/chartsApi';
 import ChartRenderer from '../charteditor/containers/chartRenderer';
+import { useParams } from 'react-router-dom';
 
 function RenderChart() {
-  const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
+  const { id } = useParams();
+  const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
 
   useEffect(() => {
-    getDefaultChartConfig('simple-bar-chart');
-  });
+    if (id) {
+      fetchDefaultChartConfig(id);
+    }
+  }, [fetchDefaultChartConfig, id]);
 
   return <ChartRenderer />;
 }

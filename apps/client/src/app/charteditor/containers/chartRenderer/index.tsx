@@ -152,17 +152,12 @@ function ChartRenderer() {
     return () => {
       clearTimeout(timeoutRef.current);
     };
-  }, [chartDataConfig]);
+  }, [chartDataConfig, onChartMounted]);
 
   return (
-    <div
-      className={clsx(
-        'w-full h-full p-3 relative',
-        !isChartRendered && 'h-full'
-      )}
-    >
+    <div className="w-full h-[calc(100%_-_58px)] p-3 relative">
       {!isChartRendered && (
-        <div className="absolute h-full w-full top-0 left-0 flex items-center justify-center animate-pulse bg-primary-background rounded-xl">
+        <div className="h-full w-full flex items-center justify-center animate-pulse bg-primary-background rounded-xl">
           <ChartNoAxesCombined
             className="size-10 stroke-primary-border"
             aria-hidden={true}

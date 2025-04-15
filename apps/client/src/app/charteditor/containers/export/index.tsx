@@ -163,7 +163,7 @@ function ExportChart(props: IExportChart) {
 
         <div className="mt-2 flex items-center justify-end gap-2">
           <CWButton label="Cancel" onClick={closeModal} />
-          <CWButton label="Save" onClick={saveChart} />
+          <CWButton primary label="Save" onClick={saveChart} />
         </div>
       </div>
     </CWModal>

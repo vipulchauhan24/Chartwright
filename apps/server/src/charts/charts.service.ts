@@ -90,18 +90,25 @@ export class ChartService {
         config
       )}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}', ${
         is_for_gallery ? true : false
-      })`;
+      }) RETURNING *;`;
 
       if (id) {
         query = `UPDATE ${
           TABLE_NAME.CHARTS
         } SET title = '${title}', config='${JSON.stringify(
           config
-        )}', updated_by='${updated_by}', updated_date='${updated_date}' where id = '${id}';`;
+        )}', updated_by='${updated_by}', updated_date='${updated_date}' where id = '${id}' RETURNING *;`;
       }
-      return await this.db.execute(query);
-    } catch (error) {
+      const result = await this.db.execute(query);
+      return result[0];
+    } catch (error: any) {
       console.error(error);
+      if (
+        error?.message ===
+        'duplicate key value violates unique constraint "title_unique"'
+      ) {
+        throw new HttpException('Chart title duplicate.', HttpStatus.CONFLICT);
+      }
       throw new HttpException(
         'Internal server error.',
         HttpStatus.INTERNAL_SERVER_ERROR

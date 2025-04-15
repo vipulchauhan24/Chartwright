@@ -231,7 +231,6 @@ function ChartDataEditor() {
                       }}
                       className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
                     >
-                      {/* <TrashIcon className="size-4" aria-hidden={true} /> */}
                       <Trash2 className="size-4" aria-hidden={true} />
                     </span>
                   </Tippy>
@@ -256,7 +255,6 @@ function ChartDataEditor() {
           primary
           label={
             <p className="flex items-center gap-2">
-              {/* <PlusIcon className="size-4" /> */}
               <Plus className="size-4" aria-hidden={true} />
               Add Series
             </p>

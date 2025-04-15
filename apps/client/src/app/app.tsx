@@ -19,7 +19,9 @@ export function App() {
         cognito_id: user.profile.sub,
         created_date: new Date().toISOString(),
       };
-      await axios.post('/api/user-signin', loginPayload);
+      const response = await axios.post('/api/user-signin', loginPayload);
+      const userId = response.data.id;
+      localStorage.setItem('user_id', userId);
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +52,7 @@ export function App() {
           }
         />
         <Route
-          path="/chart"
+          path="/chart/:id?"
           element={
             <AuthGaurd>
               <ChartEditor />

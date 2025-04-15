@@ -13,6 +13,7 @@ function AppHeader() {
   };
 
   const logout = async () => {
+    localStorage.removeItem('user_id');
     await auth.signoutRedirect({
       extraQueryParams: {
         client_id: VITE_CLIENT_ID,
@@ -31,6 +32,7 @@ function AppHeader() {
       <div>
         {auth.isAuthenticated ? (
           <CWButton
+            primary
             label={
               <span className="flex items-center gap-1">
                 Sign out <LogOut className="size-4" aria-hidden={true} />
@@ -40,6 +42,7 @@ function AppHeader() {
           />
         ) : (
           <CWButton
+            primary
             label={
               <span className="flex items-center gap-1">
                 Sign in <LogIn className="size-4" aria-hidden={true} />

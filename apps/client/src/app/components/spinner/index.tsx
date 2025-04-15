@@ -1,7 +1,7 @@
 function Spinner() {
   return (
     <svg
-      className="mr-3 -ml-1 size-5 animate-spin text-primary-text"
+      className="size-5 animate-spin text-primary-text"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   chartGallery,
   chartGlobalConfigs,
+  chartTitle,
   currentChartConfigStore,
   currentChartGlobalConfig,
   loadingChartConfig,
@@ -52,15 +53,45 @@ export const setDefaultChartConfig = atom(
             currentChartConfigStore,
             JSON.parse(availableDefaultCharts[indx]['config'])
           );
-          return;
+          set(chartTitle, availableDefaultCharts[indx]['title']);
+          break;
         }
       }
     } catch (error) {
       console.error('Error in "setDefaultChartConfig":', error);
       set(currentChartGlobalConfig, null);
       set(currentChartConfigStore, null);
+      set(chartTitle, '');
     } finally {
       set(loadingChartConfig, false);
     }
   }
 );
+
+export const fetchChartConfig = atom(null, async (get, set, chartId) => {
+  try {
+    const response = await axios.get(`api/chart/${chartId}`);
+    const chartConfig = response.data;
+    const availableChartGlobalConfigs = get(chartGlobalConfigs);
+    for (const idx in availableChartGlobalConfigs) {
+      if (
+        chartConfig['chart_type'] === availableChartGlobalConfigs[idx]['type']
+      ) {
+        set(
+          currentChartGlobalConfig,
+          availableChartGlobalConfigs[idx]['config']
+        );
+        break;
+      }
+    }
+
+    set(currentChartConfigStore, JSON.parse(chartConfig['config']));
+    set(chartTitle, chartConfig['title']);
+  } catch {
+    set(currentChartGlobalConfig, null);
+    set(currentChartConfigStore, null);
+    set(chartTitle, 'chartTitle');
+  } finally {
+    set(loadingChartConfig, false);
+  }
+});

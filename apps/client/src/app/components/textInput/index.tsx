@@ -41,7 +41,7 @@ function CWTextInput(props: ICWTextInput) {
           </Tippy>
         )}
       </div>
-      <div className="relative w-full">
+      <div>
         <Input
           id={id}
           type="text"
