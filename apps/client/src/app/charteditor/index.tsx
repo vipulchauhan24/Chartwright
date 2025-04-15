@@ -108,37 +108,39 @@ function ChartEditor() {
             </div>
           </aside>
           <div className="h-full w-full px-4 pb-4 overflow-auto">
-            <div className="flex items-center justify-end gap-2 pt-4 bg-white top-0 sticky z-50">
-              {auth.isAuthenticated && (
+            <div className="flex items-center justify-between pt-4 bg-white top-0 sticky z-50">
+              <div className="flex items-center gap-2">
                 <CWButton
                   label={
-                    <p className="flex items-center gap-2">
-                      <Save className="size-4" aria-hidden={true} />
-                      Save Changes
-                    </p>
+                    <>
+                      <ChartPie className="size-4" aria-hidden={true} />
+                      View Gallery
+                    </>
                   }
-                  onClick={openSaveChartModal}
+                  onClick={openChartGallery}
                 />
-              )}
-              <CWButton
-                label={
-                  <p className="flex items-center gap-2">
-                    <ChartPie className="size-4" aria-hidden={true} />
-                    View Gallery
-                  </p>
-                }
-                onClick={openChartGallery}
-              />
-              <CWButton
-                disabled={exportDisabled}
-                label={
-                  <p className="flex items-center gap-2">
-                    <FolderDown className="size-4" aria-hidden={true} />
-                    Export
-                  </p>
-                }
-                onClick={exportChart}
-              />
+                <CWButton
+                  disabled={exportDisabled}
+                  label={
+                    <>
+                      <FolderDown className="size-4" aria-hidden={true} />
+                      <span>Export</span>
+                    </>
+                  }
+                  onClick={exportChart}
+                />
+                {auth.isAuthenticated && (
+                  <CWButton
+                    label={
+                      <>
+                        <Save className="size-4" aria-hidden={true} />
+                        Save Changes
+                      </>
+                    }
+                    onClick={openSaveChartModal}
+                  />
+                )}
+              </div>
               <CWDropdown
                 items={simpleChartTypes}
                 onChange={onChangeChartRequest}

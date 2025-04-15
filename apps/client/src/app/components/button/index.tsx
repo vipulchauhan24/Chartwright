@@ -19,7 +19,7 @@ function CWButton(props: ICWButton) {
       className={clsx(
         disabled && 'pointer-events-none opacity-50',
         additionalCssClasses,
-        'transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative',
+        'transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative flex items-center gap-2',
         primary
           ? 'text-white border-primary-main bg-primary-main hover:bg-white hover:text-primary-main'
           : 'text-primary-text border-primary-border hover:bg-primary-main hover:text-primary-background hover:border-primary-main'
