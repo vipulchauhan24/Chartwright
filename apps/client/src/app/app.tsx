@@ -5,10 +5,10 @@ import { AuthProvider } from 'react-oidc-context';
 import Home from './home';
 import AuthGaurd from './authGaurd';
 import { User } from 'oidc-client-ts';
-import axios from 'axios';
 import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
 import PageNotFound from './pageNotFound';
+import { userLogin } from '../service/userAPI';
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
@@ -19,9 +19,7 @@ export function App() {
         cognito_id: user.profile.sub,
         created_date: new Date().toISOString(),
       };
-      const response = await axios.post('/api/user-signin', loginPayload);
-      const userId = response.data.id;
-      localStorage.setItem('user_id', userId);
+      await userLogin(loginPayload);
     } catch (error) {
       console.error(error);
     }

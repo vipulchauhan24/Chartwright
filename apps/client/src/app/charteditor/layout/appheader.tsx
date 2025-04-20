@@ -34,9 +34,9 @@ function AppHeader() {
           <CWButton
             primary
             label={
-              <span className="flex items-center gap-1">
-                Sign out <LogOut className="size-4" aria-hidden={true} />
-              </span>
+              <>
+                <LogOut className="size-4" aria-hidden={true} /> Sign out
+              </>
             }
             onClick={logout}
           />
@@ -44,9 +44,9 @@ function AppHeader() {
           <CWButton
             primary
             label={
-              <span className="flex items-center gap-1">
-                Sign in <LogIn className="size-4" aria-hidden={true} />
-              </span>
+              <>
+                <LogIn className="size-4" aria-hidden={true} /> Sign in
+              </>
             }
             onClick={redirectToLoginPage}
           />

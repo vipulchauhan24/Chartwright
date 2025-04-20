@@ -58,6 +58,22 @@ export class ChartService {
     }
   }
 
+  async getAllUserCharts(user_id: string) {
+    try {
+      const items = await this.db.execute(
+        `SELECT id, title, chart_type, created_Date FROM ${TABLE_NAME.CHARTS} WHERE created_by = '${user_id}';`
+      );
+
+      return items;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async saveChart(params: {
     id?: string;
     title: string;

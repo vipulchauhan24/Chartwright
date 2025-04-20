@@ -18,10 +18,11 @@ import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
 import { isExportDisabled } from '../../store/app';
-import { ChartPie, FolderDown, Save } from 'lucide-react';
+import { ChartArea, ChartPie, FolderDown, Save } from 'lucide-react';
 import { useAuth } from 'react-oidc-context';
 import SaveChart from './containers/saveChart';
 import { useParams } from 'react-router-dom';
+import ViewMyCharts from './containers/viewMyCharts';
 
 function ChartEditor() {
   const { id } = useParams();
@@ -35,6 +36,7 @@ function ChartEditor() {
   const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
   const [showChartGallery, setShowChartGallery] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
+  const [showMyCharts, setShowMyCharts] = useState(false);
   const [chartSelectedIndx, setChartSelectedIndx] = useState(0);
 
   useEffect(() => {
@@ -68,6 +70,10 @@ function ChartEditor() {
 
   const openChartGallery = useCallback(() => {
     setShowChartGallery(true);
+  }, []);
+
+  const viewMyCharts = useCallback(() => {
+    setShowMyCharts(true);
   }, []);
 
   const openSaveChartModal = useCallback(() => {
@@ -133,8 +139,19 @@ function ChartEditor() {
                   <CWButton
                     label={
                       <>
+                        <ChartArea className="size-4" aria-hidden={true} />
+                        My Charts
+                      </>
+                    }
+                    onClick={viewMyCharts}
+                  />
+                )}
+                {auth.isAuthenticated && (
+                  <CWButton
+                    label={
+                      <>
                         <Save className="size-4" aria-hidden={true} />
-                        Save Changes
+                        Save
                       </>
                     }
                     onClick={openSaveChartModal}
@@ -166,6 +183,7 @@ function ChartEditor() {
           isOpen={showSaveChartModal}
           setIsOpen={setShowSaveChartModal}
         />
+        <ViewMyCharts isOpen={showMyCharts} setIsOpen={setShowMyCharts} />
       </>
     </AppShell>
   );

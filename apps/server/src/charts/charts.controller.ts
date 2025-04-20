@@ -32,6 +32,11 @@ export class ChartsController {
     return this.chartService.getChartById(id);
   }
 
+  @Get('my-charts/:user_id')
+  getAllUserCharts(@Param('user_id') user_id: string) {
+    return this.chartService.getAllUserCharts(user_id);
+  }
+
   @Post('save-chart')
   @UsePipes(ValidationPipe)
   saveChart(@Body() saveChartReqBody: SaveChartDTO) {

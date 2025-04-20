@@ -7,6 +7,7 @@ import {
   currentChartConfigStore,
   currentChartGlobalConfig,
   loadingChartConfig,
+  myCharts,
 } from '../store/charts';
 
 export const fetchChartGallery = atom(null, async (get, set) => {
@@ -93,5 +94,14 @@ export const fetchChartConfig = atom(null, async (get, set, chartId) => {
     set(chartTitle, 'chartTitle');
   } finally {
     set(loadingChartConfig, false);
+  }
+});
+
+export const fetchMyCharts = atom(null, async (get, set, userId) => {
+  try {
+    const response = await axios.get(`api/my-charts/${userId}`);
+    set(myCharts, response.data);
+  } catch {
+    set(myCharts, []);
   }
 });

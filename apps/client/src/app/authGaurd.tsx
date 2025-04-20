@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import Spinner from './components/spinner';
 import CWButton from './components/button';
+import { userLogin } from '../service/userAPI';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -9,14 +10,34 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const login = async (loginPayload: {
+    email: string | undefined;
+    cognito_id: string | undefined;
+    created_date: string;
+  }) => {
+    await userLogin(loginPayload);
+  };
+
   useEffect(() => {
     setIsUserAuthenticated(auth.isAuthenticated);
+    if (auth.isAuthenticated) {
+      sessionStorage.removeItem('isGuestUser');
+      if (!localStorage.getItem('user_id')) {
+        const loginPayload = {
+          email: auth.user?.profile.email,
+          cognito_id: auth.user?.profile.sub,
+          created_date: new Date().toISOString(),
+        };
+        login(loginPayload);
+      }
+    }
     const isGuestUser = sessionStorage.getItem('isGuestUser');
     if (isGuestUser === 'true') {
       setIsUserAuthenticated(true);
+      localStorage.removeItem('user_id');
     }
     setIsLoading(false);
-  }, [auth.isAuthenticated]);
+  }, [auth.isAuthenticated, auth.user?.profile.email, auth.user?.profile.sub]);
 
   useEffect(() => {
     setIsLoading(auth.isLoading);

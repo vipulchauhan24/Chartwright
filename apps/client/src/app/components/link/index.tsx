@@ -13,7 +13,7 @@ function CWLink(props: ICWLink) {
     <Link
       to={href}
       className={clsx(
-        'text-primary-text transition duration-200 ease-in-out',
+        'text-primary-text transition duration-200 ease-in-out flex items-center gap-1',
         !nohover &&
           'hover:border-b-primary-border hover:border-b hover:text-primary-main'
       )}

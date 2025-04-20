@@ -9,7 +9,6 @@ import {
   base64ImageToBase64PDF,
   changeBaseStringImageType,
 } from '../../utils/lib';
-import clsx from 'clsx';
 import { isExportDisabled } from '../../../../store/app';
 import { ChartNoAxesCombined } from 'lucide-react';
 
@@ -128,20 +127,25 @@ function ChartRenderer() {
     };
   }, [onImageFileTypeUpdate, onPdfFileTypeUpdate]);
 
-  const onChartMounted = () => {
+  const onChartMounted = useCallback(() => {
     setIsChartRendered(true);
+  }, []);
+
+  const onChartAnimationEnded = useCallback(() => {
     setIsExportChartDisabled(false);
-  };
+  }, [setIsExportChartDisabled]);
 
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     if (chartDataConfig && chartRef.current) {
+      setIsExportChartDisabled(true);
       timeoutRef.current = setTimeout(() => {
         destroy();
         chartDataConfig.options.chart['events'] = {
           mounted: onChartMounted,
+          animationEnd: onChartAnimationEnded,
         };
         const chart = new ApexCharts(chartRef.current, chartDataConfig.options);
         chart.render();
