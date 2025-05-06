@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { storeInLocalStorage } from '../app/charteditor/utils/lib';
+import { LOCAL_STORAGE_KEYS } from '../app/charteditor/utils/constants';
 
 export const userLogin = async (loginPayload: {
   email: string | undefined;
@@ -7,5 +9,5 @@ export const userLogin = async (loginPayload: {
 }) => {
   const response = await axios.post('/api/user-signin', loginPayload);
   const userId = response.data.id;
-  localStorage.setItem('user_id', userId);
+  storeInLocalStorage(LOCAL_STORAGE_KEYS.USER_ID, userId);
 };

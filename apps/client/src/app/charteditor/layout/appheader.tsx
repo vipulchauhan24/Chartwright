@@ -2,6 +2,8 @@ import { useAuth } from 'react-oidc-context';
 import CWLink from '../../components/link';
 import CWButton from '../../components/button';
 import { LogIn, LogOut } from 'lucide-react';
+import { removeFromLocalStorage } from '../utils/lib';
+import { LOCAL_STORAGE_KEYS } from '../utils/constants';
 
 const { VITE_CLIENT_ID } = import.meta.env;
 
@@ -13,7 +15,7 @@ function AppHeader() {
   };
 
   const logout = async () => {
-    localStorage.removeItem('user_id');
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
     await auth.signoutRedirect({
       extraQueryParams: {
         client_id: VITE_CLIENT_ID,

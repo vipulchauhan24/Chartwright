@@ -1,13 +1,14 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import CWModal from '../../../components/modal';
 import { ExternalLink } from 'lucide-react';
-import CWLinkButton from '../../../components/linkButton';
 import { myCharts } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import Spinner from '../../../components/spinner';
 import { fetchMyCharts } from '../../../../service/chartsApi';
 import { useNavigate } from 'react-router-dom';
 import CWButton from '../../../components/button';
+import { fetchFromLocalStorage } from '../../utils/lib';
+import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 
 interface IViewMyCharts {
   isOpen: boolean;
@@ -21,7 +22,7 @@ function ViewMyCharts(props: IViewMyCharts) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = localStorage.getItem('user_id');
+    const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
     if (userId) {
       fetchCharts(userId);
     }

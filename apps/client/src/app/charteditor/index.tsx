@@ -13,7 +13,7 @@ import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import ChartDataEditor from './containers/chartDataEditor';
 import CWDropdown from '../components/dropdown';
-import { simpleChartTypes } from './utils/constants';
+import { SESSION_STORAGE_KEYS, simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
@@ -21,8 +21,9 @@ import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderDown, Save } from 'lucide-react';
 import { useAuth } from 'react-oidc-context';
 import SaveChart from './containers/saveChart';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ViewMyCharts from './containers/viewMyCharts';
+import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 
 function ChartEditor() {
   const { id } = useParams();
@@ -38,6 +39,7 @@ function ChartEditor() {
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
   const [showMyCharts, setShowMyCharts] = useState(false);
   const [chartSelectedIndx, setChartSelectedIndx] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchChartGalleryData(); // Fetch data on mount
@@ -45,7 +47,16 @@ function ChartEditor() {
 
   useEffect(() => {
     if (chartGalleryData.length && !isLoading && !id) {
-      getDefaultChartConfig('simple-bar-chart');
+      const chartKey =
+        fetchFromSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID) ||
+        'simple-bar-chart';
+      getDefaultChartConfig(chartKey);
+      for (const indx in simpleChartTypes) {
+        if (simpleChartTypes[indx].value === chartKey) {
+          setChartSelectedIndx(Number(indx));
+          break;
+        }
+      }
     } else if (chartGalleryData.length && !isLoading && id) {
       fetchDefaultChartConfig(id);
     }
@@ -89,8 +100,12 @@ function ChartEditor() {
           break;
         }
       }
+      storeInSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID, value);
+      if (id) {
+        navigate(`/chart`);
+      }
     },
-    [getDefaultChartConfig]
+    [getDefaultChartConfig, navigate, id]
   );
 
   if (isLoading) {

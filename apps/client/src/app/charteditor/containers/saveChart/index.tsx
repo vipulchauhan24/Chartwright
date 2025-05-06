@@ -7,6 +7,9 @@ import axios from 'axios';
 import CWButton from '../../../components/button';
 import Spinner from '../../../components/spinner';
 import { useNavigate, useParams } from 'react-router-dom';
+import { fetchFromLocalStorage } from '../../utils/lib';
+import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { fetchMyCharts } from '../../../../service/chartsApi';
 
 interface ISaveChart {
   isOpen: boolean;
@@ -16,6 +19,7 @@ interface ISaveChart {
 function SaveChart(props: ISaveChart) {
   const { id } = useParams();
   const { isOpen, setIsOpen } = props;
+  const [, fetchCharts] = useAtom(fetchMyCharts);
   const [chartDataConfig] = useAtom(currentChartConfigStore);
   const [chrtTitle, setChrtTitle] = useAtom(chartTitle);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,7 +32,7 @@ function SaveChart(props: ISaveChart) {
   const saveChartChanges = useCallback(async () => {
     try {
       setIsSaving(true);
-      const userId = localStorage.getItem('user_id');
+      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
       if (!userId) {
         throw new Error('User not logged in.');
       }
@@ -52,6 +56,7 @@ function SaveChart(props: ISaveChart) {
         };
       }
       const response = await axios.post('/api/save-chart', saveChartPayload);
+      fetchCharts(userId);
       closeModal();
       if (!id) {
         navigate(`/chart/${response.data.id}`);
@@ -61,7 +66,7 @@ function SaveChart(props: ISaveChart) {
     } finally {
       setIsSaving(false);
     }
-  }, [chartDataConfig, chrtTitle, closeModal, navigate, id]);
+  }, [id, fetchCharts, closeModal, chrtTitle, chartDataConfig, navigate]);
 
   const onChartTitleUpdate = (e: any) => {
     setChrtTitle(e.target.value || 'Chart Title');

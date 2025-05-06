@@ -3,6 +3,17 @@ import { useAuth } from 'react-oidc-context';
 import Spinner from './components/spinner';
 import CWButton from './components/button';
 import { userLogin } from '../service/userAPI';
+import {
+  fetchFromLocalStorage,
+  fetchFromSessionStorage,
+  removeFromLocalStorage,
+  removeFromSessionStorage,
+  storeInSessionStorage,
+} from './charteditor/utils/lib';
+import {
+  LOCAL_STORAGE_KEYS,
+  SESSION_STORAGE_KEYS,
+} from './charteditor/utils/constants';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -21,8 +32,8 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setIsUserAuthenticated(auth.isAuthenticated);
     if (auth.isAuthenticated) {
-      sessionStorage.removeItem('isGuestUser');
-      if (!localStorage.getItem('user_id')) {
+      removeFromSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER);
+      if (!fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID)) {
         const loginPayload = {
           email: auth.user?.profile.email,
           cognito_id: auth.user?.profile.sub,
@@ -31,10 +42,12 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
         login(loginPayload);
       }
     }
-    const isGuestUser = sessionStorage.getItem('isGuestUser');
+    const isGuestUser = fetchFromSessionStorage(
+      SESSION_STORAGE_KEYS.IS_GHOST_USER
+    );
     if (isGuestUser === 'true') {
       setIsUserAuthenticated(true);
-      localStorage.removeItem('user_id');
+      removeFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
     }
     setIsLoading(false);
   }, [auth.isAuthenticated, auth.user?.profile.email, auth.user?.profile.sub]);
@@ -54,7 +67,7 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
   if (!isUserAuthenticated) {
     const continueAsGuest = () => {
       setIsUserAuthenticated(true);
-      sessionStorage.setItem('isGuestUser', 'true');
+      storeInSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER, 'true');
     };
 
     const continueAsUser = () => {
