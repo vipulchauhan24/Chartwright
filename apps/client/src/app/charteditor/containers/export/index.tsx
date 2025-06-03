@@ -101,7 +101,7 @@ function ExportChart(props: IExportChart) {
                 <img
                   src={imageURI}
                   alt="Preview"
-                  className="w-auto h-60 border mx-auto border-primary-border rounded-lg p-2"
+                  className="w-auto h-60 border mx-auto border-border rounded-lg p-2"
                 />
               )}
             </div>
@@ -144,11 +144,11 @@ function ExportChart(props: IExportChart) {
             onTabChange(index);
           }}
         >
-          <TabList className="flex gap-1 border-b border-primary-main">
+          <TabList className="flex gap-1 border-b border-primary">
             {tabList.map(({ title }) => (
               <Tab
                 key={title}
-                className="py-2 px-1 text-sm/6 font-semibold focus:outline-none data-[selected]:border-b-2 data-[hover]:border-primary-main data-[selected]:text-primary-main data-[hover]:text-primary-main"
+                className="py-2 px-1 text-sm/6 font-semibold focus:outline-none data-[selected]:border-b-2 data-[hover]:border-primary data-[selected]:text-primary data-[hover]:text-primary"
               >
                 {title}
               </Tab>

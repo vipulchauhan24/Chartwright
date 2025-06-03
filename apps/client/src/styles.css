@@ -25,9 +25,9 @@ body,
     height: 12px;
     cursor: ew-resize;
     background: #ffffff;
-    box-shadow: -405px 0 0 400px theme('colors.primary.main');
+    box-shadow: -405px 0 0 400px theme('colors.primary');
     border-radius: 50%;
-    border: 2px solid theme('colors.primary.main');
+    border: 2px solid theme('colors.primary');
   }
 }
 

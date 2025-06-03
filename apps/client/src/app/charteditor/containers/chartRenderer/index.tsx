@@ -161,9 +161,9 @@ function ChartRenderer() {
   return (
     <div className="w-full h-[calc(100%_-_58px)] p-3 relative">
       {!isChartRendered && (
-        <div className="h-full w-full flex items-center justify-center animate-pulse bg-primary-background rounded-xl">
+        <div className="h-full w-full flex items-center justify-center animate-pulse bg-background rounded-xl">
           <ChartNoAxesCombined
-            className="size-10 stroke-primary-border"
+            className="size-10 stroke-border"
             aria-hidden={true}
           />
         </div>

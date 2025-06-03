@@ -20,7 +20,7 @@ function CWAccordian(props: ICWAccordian) {
     <div id={id} className="mx-auto w-full rounded-xl">
       <Disclosure
         as="div"
-        className="border border-primary-border rounded-xl"
+        className="border border-border rounded-xl"
         defaultOpen={defaultOpen}
       >
         <DisclosureButton className="group flex w-full items-center justify-between p-4">

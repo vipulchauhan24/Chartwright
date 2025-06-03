@@ -22,7 +22,7 @@ function CWCheckbox(props: ICWCheckbox) {
         {label && (
           <Label
             htmlFor={id}
-            className="text-base font-normal text-primary-text select-none"
+            className="text-base font-normal text-text-main select-none"
           >
             {label}
           </Label>
@@ -37,10 +37,10 @@ function CWCheckbox(props: ICWCheckbox) {
         id={id}
         checked={checked}
         onChange={onChange}
-        className="group cursor-pointer size-6 rounded-md p-1 ring-1 ring-primary-border data-[checked]:ring-primary-main ring-inset data-[checked]:bg-primary-main"
+        className="group cursor-pointer size-6 rounded-md p-1 ring-1 ring-border data-[checked]:ring-primary ring-inset data-[checked]:bg-primary"
       >
         <Check
-          className="hidden size-4 stroke-primary-background group-data-[checked]:block"
+          className="hidden size-4 stroke-background group-data-[checked]:block"
           aria-hidden={true}
         />
       </Checkbox>

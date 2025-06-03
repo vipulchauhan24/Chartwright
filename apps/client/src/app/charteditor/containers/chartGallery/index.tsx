@@ -19,7 +19,7 @@ function ChartGallery(props: IChartGallery) {
         {charts.map((chart) => {
           return (
             <Button
-              className="w-full h-40 max-w-full rounded-lg border border-primary-border p-2 relative"
+              className="w-full h-40 max-w-full rounded-lg border border-border p-2 relative"
               onClick={() => {
                 onSetChartViaGalleryOptions(
                   String(chart['title']).toLowerCase().split(' ').join('-')

@@ -48,17 +48,17 @@ function CWNumberInput(props: ICWNumberInput) {
       {label && (
         <Label
           htmlFor={id}
-          className="text-base font-normal text-primary-text select-none"
+          className="text-base font-normal text-text-main select-none"
         >
           {label}
         </Label>
       )}
-      <div className="border border-primary-border rounded-lg flex items-center gap-1 pr-2">
+      <div className="border border-border rounded-lg flex items-center gap-1 pr-2">
         <Input
           id={id}
           value={defaultValue}
           onChange={validateNumberInputChange}
-          className="text-primary-text w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-text-main w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         <IconButton
           icon={<Minus className="size-4" aria-hidden={true} />}

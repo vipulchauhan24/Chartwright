@@ -16,7 +16,7 @@ function CWColorInput(props: ICWColorInput) {
         <div className="flex items-center justify-between gap-1">
           <Label
             htmlFor={id}
-            className="text-base font-normal text-primary-text select-none"
+            className="text-base font-normal text-text-main select-none"
           >
             {label}
           </Label>
@@ -26,7 +26,7 @@ function CWColorInput(props: ICWColorInput) {
           type="color"
           value={defaultValue}
           onChange={onChange}
-          className="text-primary-text border border-primary-border px-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-text-main border border-border px-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
       </div>
     </Field>

@@ -25,7 +25,7 @@ function AppHeader() {
   };
 
   return (
-    <header className="h-[4.5rem] border-b border-primary-border py-2 px-4 flex items-center justify-between">
+    <header className="h-[4.5rem] border-b border-border py-2 px-4 flex items-center justify-between">
       <CWLink
         href="/"
         nohover

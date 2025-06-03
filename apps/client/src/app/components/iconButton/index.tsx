@@ -15,7 +15,7 @@ function IconButton(props: IIconButton) {
     return (
       <Button
         onClick={onClick}
-        className="bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
+        className="bg-background p-1 hover:bg-primary hover:text-background rounded-sm"
       >
         {icon}
       </Button>

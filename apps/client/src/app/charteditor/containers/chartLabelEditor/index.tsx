@@ -64,7 +64,7 @@ function ChartLabelEditor() {
             <span
               onClick={toggleLabelsEditable}
               role="button"
-              className="cursor-pointer bg-primary-background p-1 hover:bg-primary-main hover:text-primary-background rounded-sm"
+              className="cursor-pointer bg-background p-1 hover:bg-primary hover:text-background rounded-sm"
             >
               <Pencil className="size-4" aria-hidden={true} />
             </span>

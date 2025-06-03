@@ -10,7 +10,7 @@ function CWLinkButton(props: ICWLinkButton) {
   return (
     <Link
       to={href}
-      className="rounded-lg relative py-2 px-3 transition duration-200 ease-in-out text-primary-background hover:text-primary-text border border-primary-main hover:border-primary-border  bg-primary-main hover:bg-primary-background flex items-center gap-1"
+      className="rounded-lg relative py-2 px-3 transition duration-200 ease-in-out text-background hover:text-text-main border border-primary hover:border-border  bg-primary hover:bg-background flex items-center gap-1"
     >
       {label}
     </Link>

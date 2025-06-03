@@ -1,5 +1,6 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
+const { text } = require('stream/consumers');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -14,19 +15,17 @@ module.exports = {
     colors: {
       white: '#FFFFFF',
       black: '#000000',
-      primary: {
-        main: '#FF715B',
-        background: '#F2FDFF',
-        success: '#16DB65',
-        error: '#d90429',
-        border: '#B0BEC5',
-        text: '#071013',
+      primary: '#4F46E5',
+      secondary: '#14B8A6',
+      background: '#F9FAFB',
+      border: '#B0BEC5',
+      text: {
+        main: '#1F2937',
+        secondary: '#6B7280',
       },
-      secondary: {
-        main: '#4062BB',
-        background: '#F8F9FA',
-        text: '#0E0F19',
-      },
+      success: '#84CC16',
+      warning: '#F59E0B',
+      hover: '#4338CA',
     },
     fontFamily: {
       sans: ['Plus Jakarta Sans', 'Helvetica', 'Arial', 'sans-serif'],

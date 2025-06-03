@@ -120,7 +120,7 @@ function ChartEditor() {
     <AppShell>
       <>
         <div className="flex items-start justify-between h-full">
-          <aside className="w-1/5 min-w-80 h-full border-r border-primary-border flex flex-col items-center">
+          <aside className="w-1/5 min-w-80 h-full border-r border-border flex flex-col items-center">
             <div className="w-full h-full overflow-y-auto">
               <GlobalOptionsEditor />
             </div>
@@ -181,7 +181,7 @@ function ChartEditor() {
             </div>
             <ChartRenderer />
           </div>
-          <aside className="w-1/5 min-w-80 h-full border-l border-primary-border overflow-y-auto">
+          <aside className="w-1/5 min-w-80 h-full border-l border-border overflow-y-auto">
             <ChartDataEditor />
           </aside>
         </div>

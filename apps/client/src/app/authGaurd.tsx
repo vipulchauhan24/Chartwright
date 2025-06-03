@@ -75,7 +75,7 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     };
 
     return (
-      <div className="h-full w-full flex items-center justify-center bg-primary-background">
+      <div className="h-full w-full flex items-center justify-center bg-background">
         <div className="flex gap-2">
           <CWButton label="Continue as guest" onClick={continueAsGuest} />
           <CWButton label="Continue as user" onClick={continueAsUser} />

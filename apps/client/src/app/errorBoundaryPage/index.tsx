@@ -3,7 +3,7 @@ import CWLink from '../components/link';
 
 function ErrorBoundaryPage() {
   return (
-    <main className="grid min-h-full place-items-center bg-primary-background text-primary-text">
+    <main className="grid min-h-full place-items-center bg-background text-text-main">
       <div className="text-center">
         <p className="text-base font-semibold">500</p>
         <h1 className="mt-4 text-5xl font-semibold">

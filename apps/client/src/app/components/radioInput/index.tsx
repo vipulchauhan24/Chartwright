@@ -38,13 +38,13 @@ function CWRadioInput(props: ICWRadioInput) {
           id={item.id}
           key={item.id}
           value={item}
-          className="group relative flex cursor-pointer rounded-lg p-2 border border-primary-border data-[checked]:border-primary-main"
+          className="group relative flex cursor-pointer rounded-lg p-2 border border-border data-[checked]:border-primary"
         >
           <div className="flex w-full items-center gap-2">
-            <p className="font-semibold text-sm text-primary-text select-none">
+            <p className="font-semibold text-sm text-text-main select-none">
               {item.label}
             </p>
-            <CircleCheck className="size-6 stroke-primary-border group-data-[checked]:stroke-primary-main" />
+            <CircleCheck className="size-6 stroke-border group-data-[checked]:stroke-primary" />
           </div>
         </Radio>
       ))}

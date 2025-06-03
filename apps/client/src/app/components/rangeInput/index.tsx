@@ -35,7 +35,7 @@ function CWRangeInput(props: ICWRangeInput) {
         {label && (
           <Label
             htmlFor={id}
-            className="text-base font-normal text-primary-text select-none"
+            className="text-base font-normal text-text-main select-none"
           >
             {label}
           </Label>
@@ -54,7 +54,7 @@ function CWRangeInput(props: ICWRangeInput) {
       >
         <input
           ref={range}
-          className="rounded-lg overflow-hidden appearance-none bg-primary-background border border-primary-border h-3 w-128"
+          className="rounded-lg overflow-hidden appearance-none bg-background border border-border h-3 w-128"
           type="range"
           min={min}
           max={max}
@@ -67,7 +67,7 @@ function CWRangeInput(props: ICWRangeInput) {
           style={{
             left: `calc(${(Number(value.current) / 100) * 100}% - 24px)`,
           }}
-          className="bg-primary-background border-2 border-primary-main rounded-full absolute -top-6 px-1"
+          className="bg-background border-2 border-primary rounded-full absolute -top-6 px-1"
           htmlFor={id}
         >
           {value.current}%

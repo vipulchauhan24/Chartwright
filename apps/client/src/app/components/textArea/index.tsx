@@ -23,7 +23,7 @@ function CWTextArea(props: ICWTextArea) {
       {label && (
         <Label
           htmlFor={id}
-          className="text-base font-normal text-primary-text select-none"
+          className="text-base font-normal text-text-main select-none"
         >
           {label}
         </Label>
@@ -32,7 +32,7 @@ function CWTextArea(props: ICWTextArea) {
         id={id}
         value={value.current}
         onChange={update}
-        className="text-primary-text border w-full border-primary-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+        className="text-text-main border w-full border-border py-2 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         rows={3}
       />
     </Field>

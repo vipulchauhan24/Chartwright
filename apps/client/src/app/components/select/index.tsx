@@ -23,7 +23,7 @@ function CWSelect(props: ICWSelect) {
     <Field className="flex items-center justify-between">
       <Label
         htmlFor={id}
-        className="text-base font-normal text-primary-text select-none"
+        className="text-base font-normal text-text-main select-none"
       >
         {label}
       </Label>
@@ -34,7 +34,7 @@ function CWSelect(props: ICWSelect) {
           onChange={onChange}
           defaultValue={defaultValue}
           className={clsx(
-            'text-primary-text w-full border border-primary-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none',
+            'text-text-main w-full border border-border py-2 pl-3 pr-8 rounded-lg truncate focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none',
             disabled && 'pointer-events-none opacity-50'
           )}
         >
@@ -47,7 +47,7 @@ function CWSelect(props: ICWSelect) {
           })}
         </Select>
         <ChevronDown
-          className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-primary-text"
+          className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-text-main"
           aria-hidden="true"
         />
       </div>

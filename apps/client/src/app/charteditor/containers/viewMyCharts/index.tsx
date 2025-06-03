@@ -41,8 +41,8 @@ function ViewMyCharts(props: IViewMyCharts) {
         </div>
       ) : (
         <div className=" mt-4 relative overflow-x-auto">
-          <table className="w-full text-sm text-left text-primary-text">
-            <thead className="text-xs uppercase bg-primary-background">
+          <table className="w-full text-sm text-left text-text-main">
+            <thead className="text-xs uppercase bg-background">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   Chart Title
@@ -61,7 +61,7 @@ function ViewMyCharts(props: IViewMyCharts) {
                 return (
                   <tr
                     key={`${chart['title']}-${indx}`}
-                    className="bg-white border-b border-primary-border"
+                    className="bg-white border-b border-border"
                   >
                     <th
                       scope="row"

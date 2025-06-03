@@ -30,7 +30,7 @@ function CWTextInput(props: ICWTextInput) {
         {label && (
           <Label
             htmlFor={id}
-            className="text-base font-normal text-primary-text select-none"
+            className="text-base font-normal text-text-main select-none"
           >
             {label}
           </Label>
@@ -49,7 +49,7 @@ function CWTextInput(props: ICWTextInput) {
           title={defaultValue ? '' : placeholder}
           placeholder={placeholder}
           onChange={update}
-          className="text-primary-text border w-full border-primary-border py-2 px-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-text-main border w-full border-border py-2 px-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
       </div>
     </Field>
