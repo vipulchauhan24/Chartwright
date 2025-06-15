@@ -18,12 +18,13 @@ import CWButton from '../components/button';
 import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
 import { isExportDisabled } from '../../store/app';
-import { ChartArea, ChartPie, FolderDown, Save } from 'lucide-react';
+import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
 import { useAuth } from 'react-oidc-context';
 import SaveChart from './containers/saveChart';
 import { useNavigate, useParams } from 'react-router-dom';
 import ViewMyCharts from './containers/viewMyCharts';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
+import Tippy from '@tippyjs/react';
 
 function ChartEditor() {
   const { id } = useParams();
@@ -129,27 +130,29 @@ function ChartEditor() {
             </div>
           </aside>
           <div className="h-full w-full px-4 pb-4 overflow-auto">
-            <div className="flex items-center justify-between pt-4 bg-white top-0 sticky z-50">
+            <div className="flex items-center justify-between pt-4 bg-background top-0 sticky z-50">
               <div className="flex items-center gap-2">
-                <CWButton
-                  label={
-                    <>
-                      <ChartPie className="size-4" aria-hidden={true} />
-                      View Gallery
-                    </>
-                  }
-                  onClick={openChartGallery}
-                />
-                <CWButton
-                  disabled={exportDisabled}
-                  label={
-                    <>
-                      <FolderDown className="size-4" aria-hidden={true} />
-                      <span>Export</span>
-                    </>
-                  }
-                  onClick={exportChart}
-                />
+                <Tippy content="View Gallery">
+                  <span
+                    onClick={openChartGallery}
+                    role="button"
+                    className="text-text-main border-border hover:bg-primary hover:text-background hover:border-primary transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative flex items-center gap-2"
+                  >
+                    <ChartPie className="size-4" aria-hidden={true} />
+                  </span>
+                </Tippy>
+
+                {!exportDisabled && (
+                  <Tippy content="Export">
+                    <span
+                      onClick={exportChart}
+                      role="button"
+                      className="text-text-main border-border hover:bg-primary hover:text-background hover:border-primary transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative flex items-center gap-2"
+                    >
+                      <Share2 className="size-4" aria-hidden={true} />
+                    </span>
+                  </Tippy>
+                )}
                 {auth.isAuthenticated && (
                   <CWButton
                     label={

@@ -5,10 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import { Handler } from 'mitt';
-import {
-  base64ImageToBase64PDF,
-  changeBaseStringImageType,
-} from '../../utils/lib';
+import { base64ImageToBase64PDF, fileDownload } from '../../utils/lib';
 import { isExportDisabled } from '../../../../store/app';
 import { ChartNoAxesCombined } from 'lucide-react';
 
@@ -27,105 +24,31 @@ function ChartRenderer() {
     }
   };
 
-  const generateSvg = () => {
-    try {
-      const svgElem = apexRef.current.el.getElementsByTagName('svg');
-      svgElem[0].getElementsByTagName(
-        'foreignObject'
-      )[0].innerHTML += `<style type="text/css">
-      .apexcharts-tooltip, .apexcharts-toolbar, .apexcharts-xaxistooltip,
-      .apexcharts-yaxistooltip, .apexcharts-xcrosshairs, .apexcharts-ycrosshairs,
-      .apexcharts-zoom-rect, .apexcharts-selection-rect {
-      display: none;
-      }
-    </style>`;
-      const div = document.createElement('div');
-      div.appendChild(svgElem[0].cloneNode(true));
-      const b64 = 'data:image/svg+xml;base64,' + window.btoa(div.innerHTML);
-      emitter.emit(EVENTS.PREVIEW_IMAGE, {
-        imgURI: b64,
-      });
-    } catch (error) {
-      console.error('Conversion error:', error);
-    }
-  };
-
-  const generatePng = () => {
-    apexRef.current.dataURI().then((props: any) => {
-      emitter.emit(EVENTS.PREVIEW_IMAGE, {
-        imgURI: props.imgURI,
-      });
+  const exportToImage = () => {
+    apexRef.current.dataURI().then(({ imgURI }: { imgURI: unknown }) => {
+      fileDownload(`${imgURI}`, 'chart');
     });
   };
 
-  const generateJpg = () => {
-    apexRef.current.dataURI().then((props: any) => {
-      changeBaseStringImageType(props.imgURI, 'image/jpeg')
-        .then((jpgBase64) => {
-          emitter.emit(EVENTS.PREVIEW_IMAGE, {
-            imgURI: jpgBase64,
-          });
-        })
-        .catch((err) => console.error(err));
-    });
-  };
-
-  const generateWebp = () => {
-    apexRef.current.dataURI().then((props: any) => {
-      changeBaseStringImageType(props.imgURI, 'image/webp')
-        .then((webpBase64) => {
-          emitter.emit(EVENTS.PREVIEW_IMAGE, {
-            imgURI: webpBase64,
-          });
-        })
-        .catch((err) => console.error(err));
-    });
-  };
-
-  const onImageFileTypeUpdate: Handler<unknown> = useCallback((event: any) => {
-    switch (event.type) {
-      case 'svg':
-        generateSvg();
-        break;
-      case 'png':
-        generatePng();
-        break;
-      case 'jpeg':
-        generateJpg();
-        break;
-      case 'webp':
-        generateWebp();
-        break;
-      default:
-        break;
-    }
-  }, []);
-
-  const generatePdf = () => {
-    apexRef.current.dataURI().then((props: any) => {
-      base64ImageToBase64PDF(props.imgURI)
+  const exportToPDF: Handler<unknown> = useCallback(() => {
+    apexRef.current.dataURI().then(({ imgURI }: { imgURI: unknown }) => {
+      base64ImageToBase64PDF(`${imgURI}`)
         .then((pdfBase64) => {
-          emitter.emit(EVENTS.PREVIEW_IMAGE, {
-            imgURI: pdfBase64,
-          });
+          fileDownload(`${pdfBase64}`, 'chart');
         })
         .catch((err) => console.error(err));
     });
-  };
-
-  const onPdfFileTypeUpdate: Handler<unknown> = useCallback(() => {
-    generatePdf();
   }, []);
 
   useEffect(() => {
-    emitter.on(EVENTS.ON_IMAGE_FILE_TYPE_UPDATE, onImageFileTypeUpdate);
-    emitter.on(EVENTS.ON_PDF_FILE_TYPE_UPDATE, onPdfFileTypeUpdate);
+    emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
+    emitter.on(EVENTS.EXPORT_TO_IMAGE, exportToImage);
 
     return () => {
-      emitter.off(EVENTS.ON_IMAGE_FILE_TYPE_UPDATE, onImageFileTypeUpdate);
-      emitter.off(EVENTS.ON_PDF_FILE_TYPE_UPDATE, onPdfFileTypeUpdate);
+      emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
+      emitter.off(EVENTS.EXPORT_TO_IMAGE, exportToImage);
     };
-  }, [onImageFileTypeUpdate, onPdfFileTypeUpdate]);
+  }, [exportToPDF]);
 
   const onChartMounted = useCallback(() => {
     setIsChartRendered(true);

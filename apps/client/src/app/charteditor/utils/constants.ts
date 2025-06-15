@@ -218,33 +218,6 @@ export const borderRadiusApplications: Array<{
   },
 ];
 
-export const exportImageTypes: Array<{
-  id: string;
-  label: string;
-  value: string;
-}> = [
-  {
-    id: 'export-png',
-    label: 'Png',
-    value: 'png',
-  },
-  {
-    id: 'export-svg',
-    label: 'Svg',
-    value: 'svg',
-  },
-  {
-    id: 'export-jpeg',
-    label: 'Jpeg',
-    value: 'jpeg',
-  },
-  {
-    id: 'export-webp',
-    label: 'Webp',
-    value: 'webp',
-  },
-];
-
 export enum LOCAL_STORAGE_KEYS {
   USER_ID = 'user_id',
 }

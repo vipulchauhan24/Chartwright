@@ -1,12 +1,10 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import CWRadioInput from '../../../components/radioInput';
 import CWButton from '../../../components/button';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
-import { exportImageTypes } from '../../utils/constants';
 import CWModal from '../../../components/modal';
-import CWTextInput from '../../../components/textInput';
+import { ChevronsLeftRightEllipsis, Download } from 'lucide-react';
 
 interface IExportChart {
   isOpen: boolean;
@@ -15,155 +13,126 @@ interface IExportChart {
 
 function ExportChart(props: IExportChart) {
   const { isOpen, setIsOpen } = props;
-  const [imageURI, setImageURI] = useState<string>();
-  const [fileName, setFileName] = useState<string>('chart');
 
   const closeModal = () => {
     setIsOpen(false);
   };
 
-  const updatePreviewImage: any = ({ imgURI }: { imgURI: string }) => {
-    setImageURI(imgURI);
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      emitter.on(EVENTS.PREVIEW_IMAGE, updatePreviewImage);
-      onExportAsImageFileTypeUpdate('png');
-    }
-
-    return () => {
-      emitter.off(EVENTS.PREVIEW_IMAGE, updatePreviewImage);
-    };
-  }, [isOpen]);
-
-  const onExportAsImageFileTypeUpdate = (value: string) => {
-    emitter.emit(EVENTS.ON_IMAGE_FILE_TYPE_UPDATE, { type: value });
-  };
-
-  const onExportAsPDFFileTypeUpdate = () => {
-    emitter.emit(EVENTS.ON_PDF_FILE_TYPE_UPDATE);
-  };
-
-  const saveChart = useCallback(() => {
-    try {
-      const a = document.createElement('a'); //Create <a>
-      a.href = `${imageURI}`; //Image Base64 Goes here
-      a.download = fileName; //File name Here
-      a.click();
-    } catch (error) {
-      console.error('Not able to save file at the moment.', error);
-    }
-  }, [fileName, imageURI]);
-
-  const onFileNameInputUpdate = (event: any) => {
-    setFileName(event.target.value);
-  };
-
-  const tabList = useMemo(() => {
+  const downloadItems = useMemo(() => {
     return [
       {
-        title: 'Image',
-        items: exportImageTypes,
-        onChange: onExportAsImageFileTypeUpdate,
+        label: 'Export To Image',
+        icon: <img src="/png.png" alt="Export To" className="h-6" />,
+        onClick: () => {
+          emitter.emit(EVENTS.EXPORT_TO_IMAGE);
+        },
       },
       {
-        title: 'Pdf',
-        onChange: onExportAsPDFFileTypeUpdate,
+        label: 'Export To PDF',
+        icon: <img src="/pdf.png" alt="Export To PDF" className="h-6" />,
+        onClick: () => {
+          emitter.emit(EVENTS.EXPORT_TO_PDF);
+        },
       },
     ];
   }, []);
 
+  const tabList = useMemo(() => {
+    return [
+      {
+        title: 'Download',
+        icon: <Download className="size-4" aria-hidden={true} />,
+        items: downloadItems,
+      },
+      {
+        title: 'Embed',
+        icon: (
+          <ChevronsLeftRightEllipsis className="size-4" aria-hidden={true} />
+        ),
+        items: downloadItems,
+      },
+    ];
+  }, [downloadItems]);
+
   const getTabPanel = (
     title: string,
-    items: any,
-    onChange: (value: string) => void
+    items: Array<{ onClick: () => void; label: string; icon: React.ReactNode }>
   ) => {
     switch (title) {
-      case 'Image':
+      case 'Download':
         return (
-          <TabPanel className="py-4 min-h-[412px] min-w-[376px]">
-            <ul>
-              <CWRadioInput items={items} onChange={onChange} />
-            </ul>
-            <div className="mt-2">
-              <CWTextInput
-                id="export-file-name"
-                label="Filename:"
-                placeholder="Type file name here..."
-                defaultValue={fileName}
-                onChange={onFileNameInputUpdate}
-              />
-              <h4 className="text-base font-normal pb-2 mt-4">
-                Image Preview:
-              </h4>
-              {imageURI && (
-                <img
-                  src={imageURI}
-                  alt="Preview"
-                  className="w-auto h-60 border mx-auto border-border rounded-lg p-2"
-                />
+          <TabPanel className="py-4">
+            <div>
+              {items.map(
+                (item: {
+                  onClick: () => void;
+                  label: string;
+                  icon: React.ReactNode;
+                }) => {
+                  return (
+                    <div className="flex items-center justify-between bg-background py-6 px-4 rounded-md mb-4 border border-border">
+                      <div className="flex items-center gap-4">
+                        {item.icon}
+                        <p className="font-semibold">{item.label}</p>
+                      </div>
+                      <CWButton
+                        label={
+                          <Download className="size-6" aria-hidden={true} />
+                        }
+                        tertiary
+                        onClick={item.onClick}
+                      />
+                    </div>
+                  );
+                }
               )}
             </div>
           </TabPanel>
         );
-      case 'Pdf':
-        return (
-          <TabPanel className="py-4 min-h-[412px] min-w-[376px]">
-            <div>
-              <CWTextInput
-                id="export-file-name"
-                label="Filename:"
-                placeholder="Type file name here..."
-                defaultValue={fileName}
-                onChange={onFileNameInputUpdate}
-              />
-            </div>
-          </TabPanel>
-        );
+      // case 'Pdf':
+      //   return (
+      //     <TabPanel className="py-4 min-h-[412px] min-w-[376px]">
+      //       <div>
+      //         <CWTextInput
+      //           id="export-file-name"
+      //           label="Filename:"
+      //           placeholder="Type file name here..."
+      //           defaultValue={fileName}
+      //           onChange={onFileNameInputUpdate}
+      //         />
+      //       </div>
+      //     </TabPanel>
+      //   );
 
       default:
         return null;
     }
   };
 
-  const onTabChange = (index: number) => {
-    if (index === 0) {
-      onExportAsImageFileTypeUpdate('png');
-    } else {
-      onExportAsPDFFileTypeUpdate();
-    }
-  };
-
   return (
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Export">
-      <div>
-        <TabGroup
-          className="mt-2"
-          onChange={(index) => {
-            onTabChange(index);
-          }}
-        >
-          <TabList className="flex gap-1 border-b border-primary">
-            {tabList.map(({ title }) => (
+      <div className="w-96">
+        <TabGroup className="mt-2">
+          <TabList className="flex gap-1 bg-background rounded-md px-2 py-1">
+            {tabList.map(({ title, icon }) => (
               <Tab
                 key={title}
-                className="py-2 px-1 text-sm/6 font-semibold focus:outline-none data-[selected]:border-b-2 data-[hover]:border-primary data-[selected]:text-primary data-[hover]:text-primary"
+                className="text-sm font-semibold data-[selected]:bg-white py-1 px-2 rounded-md flex items-center gap-1"
               >
+                {icon}
                 {title}
               </Tab>
             ))}
           </TabList>
           <TabPanels className="mt-3">
-            {tabList.map(({ title, items, onChange }) => {
-              return getTabPanel(title, items, onChange);
+            {tabList.map(({ title, items }) => {
+              return getTabPanel(title, items);
             })}
           </TabPanels>
         </TabGroup>
 
         <div className="mt-2 flex items-center justify-end gap-2">
-          <CWButton label="Cancel" onClick={closeModal} />
-          <CWButton primary label="Save" onClick={saveChart} />
+          <CWButton primary label="Done" onClick={closeModal} />
         </div>
       </div>
     </CWModal>

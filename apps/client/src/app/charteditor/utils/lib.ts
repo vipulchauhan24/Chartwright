@@ -98,3 +98,14 @@ export const fetchFromSessionStorage = (key: SESSION_STORAGE_KEYS) => {
 export const removeFromSessionStorage = (key: SESSION_STORAGE_KEYS) => {
   sessionStorage.removeItem(key);
 };
+
+export const fileDownload = (uri: string, name: string) => {
+  try {
+    const a = document.createElement('a'); //Create <a>
+    a.href = uri; //Image Base64 Goes here
+    a.download = name; //File name Here
+    a.click();
+  } catch (error) {
+    console.error('Not able to save file at the moment.', error);
+  }
+};

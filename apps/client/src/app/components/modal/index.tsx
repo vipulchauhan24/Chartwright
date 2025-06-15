@@ -27,7 +27,7 @@ function CWModal(props: ICWModal) {
         <div className="flex min-h-full items-center justify-center p-4">
           <DialogPanel
             transition
-            className="rounded-xl bg-white border border-border p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+            className="rounded-md bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
           >
             <div className="flex items-center justify-between">
               <DialogTitle
