@@ -117,7 +117,7 @@ function ExportChart(props: IExportChart) {
             {tabList.map(({ title, icon }) => (
               <Tab
                 key={title}
-                className="text-sm font-semibold data-[selected]:bg-white py-1 px-2 rounded-md flex items-center gap-1"
+                className="text-sm font-semibold data-[selected]:bg-white data-[selected]:text-primary py-1 px-2 rounded-md flex items-center gap-1"
               >
                 {icon}
                 {title}

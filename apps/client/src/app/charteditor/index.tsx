@@ -130,7 +130,7 @@ function ChartEditor() {
             </div>
           </aside>
           <div className="h-full w-full px-4 pb-4 overflow-auto">
-            <div className="flex items-center justify-between pt-4 bg-background top-0 sticky z-50">
+            <div className="flex items-center justify-between pt-4 top-0 sticky z-50">
               <div className="flex items-center gap-2">
                 <Tippy content="View Gallery">
                   <span

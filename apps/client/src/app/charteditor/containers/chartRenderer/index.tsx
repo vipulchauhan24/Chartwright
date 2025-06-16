@@ -79,7 +79,12 @@ function ChartRenderer() {
     return () => {
       clearTimeout(timeoutRef.current);
     };
-  }, [chartDataConfig, onChartMounted]);
+  }, [
+    chartDataConfig,
+    onChartAnimationEnded,
+    onChartMounted,
+    setIsExportChartDisabled,
+  ]);
 
   return (
     <div className="w-full h-[calc(100%_-_58px)] p-3 relative">
