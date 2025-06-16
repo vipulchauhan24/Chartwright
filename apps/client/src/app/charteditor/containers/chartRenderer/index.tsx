@@ -8,6 +8,9 @@ import { Handler } from 'mitt';
 import { base64ImageToBase64PDF, fileDownload } from '../../utils/lib';
 import { isExportDisabled } from '../../../../store/app';
 import { ChartNoAxesCombined } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
@@ -24,31 +27,83 @@ function ChartRenderer() {
     }
   };
 
-  const exportToImage = () => {
-    apexRef.current.dataURI().then(({ imgURI }: { imgURI: unknown }) => {
-      fileDownload(`${imgURI}`, 'chart');
-    });
+  const generateImage = async (): Promise<string> => {
+    const { imgURI }: { imgURI: unknown } = await apexRef.current.dataURI();
+    return `${imgURI}`;
   };
 
+  const exportToImage = useCallback(async () => {
+    toast.promise(
+      async () => {
+        try {
+          const imgURI = await generateImage();
+          fileDownload(`${imgURI}`, 'chart');
+        } catch (err) {
+          console.error('Failed to download image:', err);
+          throw err;
+        }
+      },
+      {
+        loading: 'Downloading...',
+        success: <b>Image downloaded successfully!</b>,
+        error: <b>{EXPORT_ERROR_MSG}</b>,
+      }
+    );
+  }, []);
+
+  const copyToClipboard = useCallback(async () => {
+    toast.promise(
+      async () => {
+        try {
+          const imgURI = await generateImage();
+          const res = await fetch(imgURI); // Convert base64 to blob
+          const blob = await res.blob();
+          const clipboardItem = new ClipboardItem({ [blob.type]: blob });
+          await navigator.clipboard.write([clipboardItem]);
+        } catch (err) {
+          console.error('Failed to copy image:', err);
+          throw err;
+        }
+      },
+      {
+        loading: 'Copying...',
+        success: <b>Copied to clipboard!</b>,
+        error: <b>{EXPORT_ERROR_MSG}</b>,
+      }
+    );
+  }, []);
+
   const exportToPDF: Handler<unknown> = useCallback(() => {
-    apexRef.current.dataURI().then(({ imgURI }: { imgURI: unknown }) => {
-      base64ImageToBase64PDF(`${imgURI}`)
-        .then((pdfBase64) => {
+    toast.promise(
+      async () => {
+        try {
+          const imgURI = await generateImage();
+          const pdfBase64 = await base64ImageToBase64PDF(`${imgURI}`);
           fileDownload(`${pdfBase64}`, 'chart');
-        })
-        .catch((err) => console.error(err));
-    });
+        } catch (err) {
+          console.error('Failed to download pdf:', err);
+          throw err;
+        }
+      },
+      {
+        loading: 'Downloading...',
+        success: <b>PDF downloaded successfully!</b>,
+        error: <b>{EXPORT_ERROR_MSG}</b>,
+      }
+    );
   }, []);
 
   useEffect(() => {
     emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
+    emitter.on(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
     emitter.on(EVENTS.EXPORT_TO_IMAGE, exportToImage);
 
     return () => {
       emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
+      emitter.off(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
       emitter.off(EVENTS.EXPORT_TO_IMAGE, exportToImage);
     };
-  }, [exportToPDF]);
+  }, [copyToClipboard, exportToImage, exportToPDF]);
 
   const onChartMounted = useCallback(() => {
     setIsChartRendered(true);

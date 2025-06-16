@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import CWModal from '../../../components/modal';
-import { ChevronsLeftRightEllipsis, Download } from 'lucide-react';
+import { ChevronsLeftRightEllipsis, Copy, Download } from 'lucide-react';
 
 interface IExportChart {
   isOpen: boolean;
@@ -21,15 +21,27 @@ function ExportChart(props: IExportChart) {
   const downloadItems = useMemo(() => {
     return [
       {
+        label: 'Copy To Clipboard',
+        icon: <Copy className="size-6" aria-hidden={true} />,
+        image: (
+          <img src="/clipboard.png" alt="Copy To Clipboard" className="h-6" />
+        ),
+        onClick: () => {
+          emitter.emit(EVENTS.COPY_TO_CLIPBAORD);
+        },
+      },
+      {
         label: 'Export To Image',
-        icon: <img src="/png.png" alt="Export To" className="h-6" />,
+        icon: <Download className="size-6" aria-hidden={true} />,
+        image: <img src="/png.png" alt="Export To" className="h-6" />,
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_IMAGE);
         },
       },
       {
         label: 'Export To PDF',
-        icon: <img src="/pdf.png" alt="Export To PDF" className="h-6" />,
+        icon: <Download className="size-6" aria-hidden={true} />,
+        image: <img src="/pdf.png" alt="Export To PDF" className="h-6" />,
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_PDF);
         },
@@ -56,7 +68,12 @@ function ExportChart(props: IExportChart) {
 
   const getTabPanel = (
     title: string,
-    items: Array<{ onClick: () => void; label: string; icon: React.ReactNode }>
+    items: Array<{
+      onClick: () => void;
+      label: string;
+      icon: React.ReactNode;
+      image: React.ReactNode;
+    }>
   ) => {
     switch (title) {
       case 'Download':
@@ -68,17 +85,16 @@ function ExportChart(props: IExportChart) {
                   onClick: () => void;
                   label: string;
                   icon: React.ReactNode;
+                  image: React.ReactNode;
                 }) => {
                   return (
                     <div className="flex items-center justify-between bg-background py-6 px-4 rounded-md mb-4 border border-border">
                       <div className="flex items-center gap-4">
-                        {item.icon}
+                        {item.image}
                         <p className="font-semibold">{item.label}</p>
                       </div>
                       <CWButton
-                        label={
-                          <Download className="size-6" aria-hidden={true} />
-                        }
+                        label={item.icon}
                         tertiary
                         onClick={item.onClick}
                       />

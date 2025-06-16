@@ -9,6 +9,7 @@ import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
 import PageNotFound from './pageNotFound';
 import { userLogin } from '../service/userAPI';
+import { Toaster } from 'react-hot-toast';
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
@@ -66,6 +67,7 @@ export function App() {
   return (
     <AuthProvider {...cognitoAuthConfig}>
       <DevTools />
+      <Toaster position="bottom-center" reverseOrder={false} />
       <ChartRoutes />
     </AuthProvider>
   );

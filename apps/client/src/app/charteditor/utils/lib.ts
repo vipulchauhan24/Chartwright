@@ -107,5 +107,6 @@ export const fileDownload = (uri: string, name: string) => {
     a.click();
   } catch (error) {
     console.error('Not able to save file at the moment.', error);
+    throw error;
   }
 };

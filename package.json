@@ -76,6 +76,7 @@
     "oidc-client-ts": "^3.2.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-oidc-context": "^3.2.0",
     "react-router-dom": "6.11.2",
     "reflect-metadata": "^0.1.13",
