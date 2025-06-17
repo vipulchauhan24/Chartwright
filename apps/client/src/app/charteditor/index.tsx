@@ -132,47 +132,34 @@ function ChartEditor() {
           <div className="h-full w-full px-4 pb-4 overflow-auto">
             <div className="flex items-center justify-between pt-4 top-0 sticky z-50">
               <div className="flex items-center gap-2">
-                <Tippy content="View Gallery">
-                  <span
-                    onClick={openChartGallery}
-                    role="button"
-                    className="text-text-main border-border hover:bg-primary hover:text-background hover:border-primary transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative flex items-center gap-2"
-                  >
-                    <ChartPie className="size-4" aria-hidden={true} />
-                  </span>
-                </Tippy>
-
-                {!exportDisabled && (
-                  <Tippy content="Export">
-                    <span
-                      onClick={exportChart}
-                      role="button"
-                      className="text-text-main border-border hover:bg-primary hover:text-background hover:border-primary transition duration-200 ease-in-out py-2 px-3 border rounded-lg relative flex items-center gap-2"
-                    >
-                      <Share2 className="size-4" aria-hidden={true} />
-                    </span>
-                  </Tippy>
-                )}
+                <CWButton
+                  additionalCssClasses="py-2 px-3"
+                  tooltip="Open Chart Gallery"
+                  label={<ChartPie className="size-4" aria-hidden={true} />}
+                  onClick={openChartGallery}
+                />
                 {isAuthenticated && (
                   <CWButton
-                    label={
-                      <>
-                        <ChartArea className="size-4" aria-hidden={true} />
-                        My Charts
-                      </>
-                    }
+                    additionalCssClasses="py-2 px-3"
+                    tooltip="Saved Charts"
+                    label={<ChartArea className="size-4" aria-hidden={true} />}
                     onClick={viewMyCharts}
                   />
                 )}
                 {isAuthenticated && (
                   <CWButton
-                    label={
-                      <>
-                        <Save className="size-4" aria-hidden={true} />
-                        Save
-                      </>
-                    }
+                    additionalCssClasses="py-2 px-3"
+                    tooltip="Saved Changes"
+                    label={<Save className="size-4" aria-hidden={true} />}
                     onClick={openSaveChartModal}
+                  />
+                )}
+                {!exportDisabled && (
+                  <CWButton
+                    additionalCssClasses="py-2 px-3"
+                    tooltip="Export"
+                    label={<Share2 className="size-4" aria-hidden={true} />}
+                    onClick={exportChart}
                   />
                 )}
               </div>
