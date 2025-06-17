@@ -110,3 +110,15 @@ export const fileDownload = (uri: string, name: string) => {
     throw error;
   }
 };
+
+export const copyToMemory = async (
+  data: Record<string, string | Blob | PromiseLike<string | Blob>>
+) => {
+  try {
+    const clipboardItem = new ClipboardItem(data);
+    await navigator.clipboard.write([clipboardItem]);
+  } catch (error) {
+    console.error('Unable to copy.', error);
+    throw error;
+  }
+};

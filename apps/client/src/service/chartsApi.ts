@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   chartGallery,
   chartGlobalConfigs,
+  chartId,
   chartTitle,
   currentChartConfigStore,
   currentChartGlobalConfig,
@@ -14,7 +15,7 @@ export const fetchChartGallery = atom(null, async (get, set) => {
   try {
     const chartGalleryResponse = await axios.get('api/chart-gallery');
     const chartGlobalConfigsResponse = await axios.get(
-      'api/chart-global-configs'
+      '/api/chart-global-configs'
     );
     set(chartGallery, chartGalleryResponse.data);
     set(chartGlobalConfigs, chartGlobalConfigsResponse.data);
@@ -55,6 +56,7 @@ export const setDefaultChartConfig = atom(
             JSON.parse(availableDefaultCharts[indx]['config'])
           );
           set(chartTitle, availableDefaultCharts[indx]['title']);
+          set(chartId, availableDefaultCharts[indx]['id']);
           break;
         }
       }
@@ -63,15 +65,16 @@ export const setDefaultChartConfig = atom(
       set(currentChartGlobalConfig, null);
       set(currentChartConfigStore, null);
       set(chartTitle, '');
+      set(chartId, '');
     } finally {
       set(loadingChartConfig, false);
     }
   }
 );
 
-export const fetchChartConfig = atom(null, async (get, set, chartId) => {
+export const fetchChartConfig = atom(null, async (get, set, chart_id) => {
   try {
-    const response = await axios.get(`api/chart/${chartId}`);
+    const response = await axios.get(`/api/chart/${chart_id}`);
     const chartConfig = response.data;
     const availableChartGlobalConfigs = get(chartGlobalConfigs);
     for (const idx in availableChartGlobalConfigs) {
@@ -88,10 +91,12 @@ export const fetchChartConfig = atom(null, async (get, set, chartId) => {
 
     set(currentChartConfigStore, JSON.parse(chartConfig['config']));
     set(chartTitle, chartConfig['title']);
+    set(chartId, chartConfig['id']);
   } catch {
     set(currentChartGlobalConfig, null);
     set(currentChartConfigStore, null);
-    set(chartTitle, 'chartTitle');
+    set(chartTitle, '');
+    set(chartId, '');
   } finally {
     set(loadingChartConfig, false);
   }
@@ -99,7 +104,7 @@ export const fetchChartConfig = atom(null, async (get, set, chartId) => {
 
 export const fetchMyCharts = atom(null, async (get, set, userId) => {
   try {
-    const response = await axios.get(`api/my-charts/${userId}`);
+    const response = await axios.get(`/api/my-charts/${userId}`);
     set(myCharts, response.data);
   } catch {
     set(myCharts, []);

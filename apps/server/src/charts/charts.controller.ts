@@ -8,10 +8,12 @@ import {
   UsePipes,
   ValidationPipe,
   Res,
+  Query,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
 import { type Response } from 'express';
+import { EmbedChartDTO } from './validations/embedChart.dto';
 
 @Controller()
 export class ChartsController {
@@ -68,5 +70,25 @@ export class ChartsController {
     res.setHeader('Content-Type', `${type}`);
     imageStream.pipe(res);
     return imageStream;
+  }
+
+  @Post('embed')
+  @UsePipes(ValidationPipe)
+  async embedChart(@Body() embedChartReqBody: EmbedChartDTO) {
+    return this.chartService.embedChart(embedChartReqBody);
+  }
+
+  @Get('embed')
+  async getEmbedChartURL(@Query() query: EmbedChartDTO) {
+    return this.chartService.getEmbedChartURL({
+      chart_id: query.chart_id,
+      user_id: query.user_id,
+      type: query.type,
+    });
+  }
+
+  @Delete('embed/:id')
+  async deleteEmbedChartURL(@Param('id') id: string) {
+    return this.chartService.deleteEmbedChartURL(id);
   }
 }

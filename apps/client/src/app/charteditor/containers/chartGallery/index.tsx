@@ -29,7 +29,7 @@ function ChartGallery(props: IChartGallery) {
             >
               <img
                 className="w-full h-full rounded-lg object-contain object-center"
-                src={`api/chart/image/${chart['thumbnail']}`}
+                src={`/api/chart/image/${chart['thumbnail']}`}
                 alt={chart['title']}
                 loading="lazy"
               />

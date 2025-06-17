@@ -50,6 +50,14 @@ export class AuthService {
       );
 
       if (user.length) {
+        let billingDetails = await this.db.execute(
+          `SELECT * FROM ${TABLE_NAME.BILLING} WHERE user_id = '${user[0].id}';`
+        );
+        if (!billingDetails || !billingDetails.length) {
+          billingDetails = await this.db.execute(
+            `INSERT INTO ${TABLE_NAME.BILLING} (user_id, plan, status, created_date) VALUES ('${user[0].id}', 'free', 'active', '${created_date}');`
+          );
+        }
         return user[0];
       }
 

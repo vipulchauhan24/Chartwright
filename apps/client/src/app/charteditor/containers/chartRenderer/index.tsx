@@ -1,20 +1,28 @@
 import { useAtom } from 'jotai';
-import { currentChartConfigStore } from '../../../../store/charts';
+import { chartId, currentChartConfigStore } from '../../../../store/charts';
 import ApexCharts from 'apexcharts';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import { Handler } from 'mitt';
-import { base64ImageToBase64PDF, fileDownload } from '../../utils/lib';
+import {
+  base64ImageToBase64PDF,
+  copyToMemory,
+  fetchFromLocalStorage,
+  fileDownload,
+} from '../../utils/lib';
 import { isExportDisabled } from '../../../../store/app';
 import { ChartNoAxesCombined } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
+  const [chrtId] = useAtom(chartId);
 
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
@@ -29,7 +37,13 @@ function ChartRenderer() {
 
   const generateImage = async (): Promise<string> => {
     const { imgURI }: { imgURI: unknown } = await apexRef.current.dataURI();
+
     return `${imgURI}`;
+  };
+
+  const generateSVG = async (): Promise<string> => {
+    const svgString = await apexRef.current.getSvgString();
+    return `${svgString}`;
   };
 
   const exportToImage = useCallback(async () => {
@@ -58,8 +72,7 @@ function ChartRenderer() {
           const imgURI = await generateImage();
           const res = await fetch(imgURI); // Convert base64 to blob
           const blob = await res.blob();
-          const clipboardItem = new ClipboardItem({ [blob.type]: blob });
-          await navigator.clipboard.write([clipboardItem]);
+          await copyToMemory({ [blob.type]: blob });
         } catch (err) {
           console.error('Failed to copy image:', err);
           throw err;
@@ -93,17 +106,84 @@ function ChartRenderer() {
     );
   }, []);
 
+  const exportToSVG = useCallback(async () => {
+    toast.promise(
+      async () => {
+        try {
+          const svgString = await generateSVG();
+          const blob = new Blob([svgString], { type: 'image/svg+xml' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'chart.svg';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // Free up memory
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error('Failed to download SVG:', err);
+          throw err;
+        }
+      },
+      {
+        loading: 'Downloading...',
+        success: <b>SVG downloaded successfully!</b>,
+        error: <b>{EXPORT_ERROR_MSG}</b>,
+      }
+    );
+  }, []);
+
+  const embedToImageLink = useCallback(() => {
+    toast.promise(
+      async () => {
+        try {
+          const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+          if (!userId) {
+            throw new Error('User not logged in.');
+          }
+          const response = await axios.post('/api/embed', {
+            type: 'image',
+            chart_id: chrtId,
+            user_id: userId,
+            created_date: new Date().toISOString(),
+          });
+          console.log(response);
+        } catch (err) {
+          console.error('Failed to embed image:', err);
+          throw err;
+        }
+      },
+      {
+        loading: 'Generating Link...',
+        success: <b>Link Generated!</b>,
+        error: <b>{EXPORT_ERROR_MSG}</b>,
+      }
+    );
+  }, [chrtId]);
+
   useEffect(() => {
     emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
     emitter.on(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
     emitter.on(EVENTS.EXPORT_TO_IMAGE, exportToImage);
+    emitter.on(EVENTS.EXPORT_TO_SVG, exportToSVG);
+    emitter.on(EVENTS.EMBED_TO_IMAGE_LINK, embedToImageLink);
 
     return () => {
       emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
       emitter.off(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
       emitter.off(EVENTS.EXPORT_TO_IMAGE, exportToImage);
+      emitter.off(EVENTS.EXPORT_TO_SVG, exportToSVG);
+      emitter.off(EVENTS.EMBED_TO_IMAGE_LINK, embedToImageLink);
     };
-  }, [copyToClipboard, exportToImage, exportToPDF]);
+  }, [
+    copyToClipboard,
+    exportToImage,
+    exportToPDF,
+    exportToSVG,
+    embedToImageLink,
+  ]);
 
   const onChartMounted = useCallback(() => {
     setIsChartRendered(true);

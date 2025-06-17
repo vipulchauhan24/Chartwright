@@ -19,16 +19,16 @@ import ExportChart from './containers/export';
 import ChartGallery from './containers/chartGallery';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
-import { useAuth } from 'react-oidc-context';
 import SaveChart from './containers/saveChart';
 import { useNavigate, useParams } from 'react-router-dom';
 import ViewMyCharts from './containers/viewMyCharts';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import Tippy from '@tippyjs/react';
+import useAuthentication from './hooks/useAuthentication';
 
 function ChartEditor() {
   const { id } = useParams();
-  const auth = useAuth();
+  const { isAuthenticated } = useAuthentication();
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
   const [exportDisabled] = useAtom(isExportDisabled);
   const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
@@ -153,7 +153,7 @@ function ChartEditor() {
                     </span>
                   </Tippy>
                 )}
-                {auth.isAuthenticated && (
+                {isAuthenticated && (
                   <CWButton
                     label={
                       <>
@@ -164,7 +164,7 @@ function ChartEditor() {
                     onClick={viewMyCharts}
                   />
                 )}
-                {auth.isAuthenticated && (
+                {isAuthenticated && (
                   <CWButton
                     label={
                       <>
