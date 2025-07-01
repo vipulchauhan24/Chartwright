@@ -24,6 +24,11 @@ export class ChartsController {
     return this.chartService.getChartGlobalConfigs();
   }
 
+  @Get('chart-global-configs/:type')
+  getChartGlobalConfigsByType(@Param('type') type: string) {
+    return this.chartService.getChartGlobalConfigsByType(type);
+  }
+
   @Get('chart-gallery')
   getChartGalleryData() {
     return this.chartService.getChartGalleryData();
@@ -90,5 +95,10 @@ export class ChartsController {
   @Delete('embed/:id')
   async deleteEmbedChartURL(@Param('id') id: string) {
     return this.chartService.deleteEmbedChartURL(id);
+  }
+
+  @Get('embed-config/:id')
+  async getEmbedChartConfig(@Param('id') id: string) {
+    return this.chartService.getEmbedChartConfig(id);
   }
 }

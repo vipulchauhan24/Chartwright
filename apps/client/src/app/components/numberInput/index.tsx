@@ -56,6 +56,7 @@ function CWNumberInput(props: ICWNumberInput) {
       <div className="border border-border rounded-lg flex items-center gap-1 pr-2">
         <Input
           id={id}
+          type="number"
           value={defaultValue}
           onChange={validateNumberInputChange}
           className="text-text-main w-10 py-2 pl-2 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"

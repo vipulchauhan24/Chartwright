@@ -122,3 +122,25 @@ export const copyToMemory = async (
     throw error;
   }
 };
+
+export const isArray = (data: unknown) => {
+  return Array.isArray(data);
+};
+
+export const getNestedValue = (obj: any, path: string) => {
+  return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+};
+
+export function setByPath(
+  obj: any,
+  path: string,
+  value: string | string[] | boolean | number | number[]
+) {
+  const keys = path.split('.');
+  let current = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!(keys[i] in current)) current[keys[i]] = {};
+    current = current[keys[i]];
+  }
+  current[keys[keys.length - 1]] = value;
+}

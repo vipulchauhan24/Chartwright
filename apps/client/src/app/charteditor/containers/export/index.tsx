@@ -48,33 +48,49 @@ function ExportChart(props: IExportChart) {
   const [chrtId] = useAtom(chartId);
   const [imageURL, setImageURL] = useState<string>('');
   const [imageURLLoading, setImageURLLoading] = useState<boolean>(true);
+  const [iframeURL, setIframeURL] = useState<string>('');
+  const [iframeURLLoading, setIframeURLLoading] = useState<boolean>(true);
 
   const closeModal = () => {
     setIsOpen(false);
   };
 
-  const fetchEmbedURL = useCallback(async (chrtId: string) => {
-    try {
-      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-      if (!userId) {
-        throw new Error('User not logged in.');
+  const fetchEmbedURL = useCallback(
+    async (chrtId: string, type: 'image' | 'iframe') => {
+      try {
+        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+        if (!userId) {
+          // throw new Error('User not logged in.');
+          return;
+        }
+        const response = await axios.get(
+          `/api/embed?chart_id=${chrtId}&user_id=${userId}&type=${type}`
+        );
+        if (type === 'image' && response.data.length) {
+          setImageURL(`${window.location.host}${response.data}`);
+        } else if (type === 'image' && !response.data.length) {
+          setImageURL('');
+        }
+
+        if (type === 'iframe' && response.data.length) {
+          setIframeURL(`${window.location.host}${response.data}`);
+        } else if (type === 'iframe' && !response.data.length) {
+          setIframeURL('');
+        }
+      } catch (err) {
+        console.error('Failed to embed image:', err);
+      } finally {
+        setImageURLLoading(false);
+        setIframeURLLoading(false);
       }
-      const response = await axios.get(
-        `/api/embed?chart_id=${chrtId}&user_id=${userId}&type=image`
-      );
-      response.data.length
-        ? setImageURL(`${window.location.host}${response.data}`)
-        : setImageURL('');
-    } catch (err) {
-      console.error('Failed to embed image:', err);
-    } finally {
-      setImageURLLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
     if (chrtId) {
-      fetchEmbedURL(chrtId);
+      fetchEmbedURL(chrtId, 'image');
+      fetchEmbedURL(chrtId, 'iframe');
     }
   }, [chrtId, fetchEmbedURL]);
 
@@ -117,6 +133,37 @@ function ExportChart(props: IExportChart) {
     ];
   }, []);
 
+  const embedToLink = useCallback(
+    (type: 'image' | 'iframe') => {
+      toast.promise(
+        async () => {
+          try {
+            const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+            if (!userId) {
+              throw new Error('User not logged in.');
+            }
+            await axios.post('/api/embed', {
+              type: type,
+              chart_id: chrtId,
+              user_id: userId,
+              created_date: new Date().toISOString(),
+            });
+            fetchEmbedURL(chrtId, type);
+          } catch (err) {
+            console.error('Failed to embed image:', err);
+            throw err;
+          }
+        },
+        {
+          loading: 'Generating...',
+          success: <b>Link Generated!</b>,
+          error: <b>{EXPORT_ERROR_MSG}</b>,
+        }
+      );
+    },
+    [chrtId]
+  );
+
   const embedItems: Array<IExportItem> = useMemo(() => {
     return [
       {
@@ -124,14 +171,31 @@ function ExportChart(props: IExportChart) {
         icon: <CloudCog className="size-6" aria-hidden={true} />,
         image: <img src="/url.png" alt="Generate Link" className="h-6" />,
         onClick: () => {
-          emitter.emit(EVENTS.EMBED_TO_IMAGE_LINK);
+          embedToLink('image');
         },
         userLoginCheck: true,
         url: imageURL,
         loading: imageURLLoading,
       },
+      {
+        label: 'Generate Interactive Frame',
+        icon: <CloudCog className="size-6" aria-hidden={true} />,
+        image: (
+          <img
+            src="/interaction.png"
+            alt="Generate Interactive Frame"
+            className="h-6"
+          />
+        ),
+        onClick: () => {
+          embedToLink('iframe');
+        },
+        userLoginCheck: true,
+        url: iframeURL,
+        loading: iframeURLLoading,
+      },
     ];
-  }, [imageURL, imageURLLoading]);
+  }, [imageURL, imageURLLoading, iframeURL, iframeURLLoading, embedToLink]);
 
   const tabList = useMemo(() => {
     return [

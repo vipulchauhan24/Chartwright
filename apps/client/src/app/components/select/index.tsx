@@ -1,6 +1,7 @@
 import { Field, Label, Select } from '@headlessui/react';
+import Tippy from '@tippyjs/react';
 import clsx from 'clsx';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 
 interface ISelectOptions {
   id: string;
@@ -15,18 +16,28 @@ interface ICWSelect {
   onChange: (e: any) => void;
   options?: Array<ISelectOptions>;
   disabled?: boolean;
+  hint?: string;
 }
 
 function CWSelect(props: ICWSelect) {
-  const { id, label, options, defaultValue, onChange, disabled } = props;
+  const { id, label, options, defaultValue, onChange, disabled, hint } = props;
   return (
     <Field className="flex items-center justify-between">
-      <Label
-        htmlFor={id}
-        className="text-base font-normal text-text-main select-none"
-      >
-        {label}
-      </Label>
+      <div className="flex items-center justify-between gap-1">
+        {label && (
+          <Label
+            htmlFor={id}
+            className="text-base font-normal text-text-main select-none"
+          >
+            {label}
+          </Label>
+        )}
+        {hint && (
+          <Tippy content={hint}>
+            <Info className="size-4 opacity-80" aria-hidden={true} />
+          </Tippy>
+        )}
+      </div>
       <div className="relative">
         <Select
           id={id}

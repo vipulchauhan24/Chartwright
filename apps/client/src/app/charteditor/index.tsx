@@ -1,17 +1,15 @@
 import { useAtom } from 'jotai';
-import AppShell from './layout/appshell';
 import {
   fetchChartConfig,
   fetchChartGallery,
   setDefaultChartConfig,
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
-import { useCallback, useEffect, useState } from 'react';
-import ChartRenderer from './containers/chartRenderer';
+import { lazy, useCallback, useEffect, useState } from 'react';
+// import ChartRenderer from './containers/chartRenderer';
 import GlobalOptionsEditor from './containers/globalOptionsEditor';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
-import ChartDataEditor from './containers/chartDataEditor';
 import CWDropdown from '../components/dropdown';
 import { SESSION_STORAGE_KEYS, simpleChartTypes } from './utils/constants';
 import CWButton from '../components/button';
@@ -23,8 +21,11 @@ import SaveChart from './containers/saveChart';
 import { useNavigate, useParams } from 'react-router-dom';
 import ViewMyCharts from './containers/viewMyCharts';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
-import Tippy from '@tippyjs/react';
 import useAuthentication from './hooks/useAuthentication';
+
+const AppShell = lazy(() => import('./layout/appshell'));
+const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
+const EChartRenderer = lazy(() => import('./containers/eChartRenderer'));
 
 function ChartEditor() {
   const { id } = useParams();
@@ -169,7 +170,8 @@ function ChartEditor() {
                 selectedIndex={chartSelectedIndx}
               />
             </div>
-            <ChartRenderer />
+            {/* <ChartRenderer /> */}
+            <EChartRenderer />
           </div>
           <aside className="w-1/5 min-w-80 h-full border-l border-border overflow-y-auto">
             <ChartDataEditor />

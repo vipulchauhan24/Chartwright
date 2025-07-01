@@ -1,9 +1,10 @@
 import { BrowserRouter } from 'react-router-dom';
 import * as ReactDOM from 'react-dom/client';
-import App from './app/app';
 import 'tippy.js/dist/tippy.css';
 import { ErrorBoundary } from 'react-error-boundary';
-import ErrorBoundaryPage from './app/errorBoundaryPage';
+import { lazy } from 'react';
+const ErrorBoundaryPage = lazy(() => import('./app/errorBoundaryPage'));
+const App = lazy(() => import('./app/app'));
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

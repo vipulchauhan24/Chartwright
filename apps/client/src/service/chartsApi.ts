@@ -110,3 +110,15 @@ export const fetchMyCharts = atom(null, async (get, set, userId) => {
     set(myCharts, []);
   }
 });
+
+export const fetchEmbedChartConfig = atom(null, async (get, set, embedId) => {
+  try {
+    const response = await axios.get(`/api/embed-config/${embedId}`);
+    const chartConfig = response.data;
+    // set(currentChartConfigStore, JSON.parse(chartConfig['config']));
+  } catch {
+    set(currentChartConfigStore, null);
+  } finally {
+    set(loadingChartConfig, false);
+  }
+});

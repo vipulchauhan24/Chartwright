@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { chartId, currentChartConfigStore } from '../../../../store/charts';
+import { currentChartConfigStore } from '../../../../store/charts';
 import ApexCharts from 'apexcharts';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
@@ -8,21 +8,17 @@ import { Handler } from 'mitt';
 import {
   base64ImageToBase64PDF,
   copyToMemory,
-  fetchFromLocalStorage,
   fileDownload,
 } from '../../utils/lib';
 import { isExportDisabled } from '../../../../store/app';
 import { ChartNoAxesCombined } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
 function ChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
-  const [chrtId] = useAtom(chartId);
 
   const chartRef = useRef<any>(null);
   const apexRef = useRef<any>(null);
@@ -135,55 +131,19 @@ function ChartRenderer() {
     );
   }, []);
 
-  const embedToImageLink = useCallback(() => {
-    toast.promise(
-      async () => {
-        try {
-          const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-          if (!userId) {
-            throw new Error('User not logged in.');
-          }
-          const response = await axios.post('/api/embed', {
-            type: 'image',
-            chart_id: chrtId,
-            user_id: userId,
-            created_date: new Date().toISOString(),
-          });
-          console.log(response);
-        } catch (err) {
-          console.error('Failed to embed image:', err);
-          throw err;
-        }
-      },
-      {
-        loading: 'Generating Link...',
-        success: <b>Link Generated!</b>,
-        error: <b>{EXPORT_ERROR_MSG}</b>,
-      }
-    );
-  }, [chrtId]);
-
   useEffect(() => {
     emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
     emitter.on(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
     emitter.on(EVENTS.EXPORT_TO_IMAGE, exportToImage);
     emitter.on(EVENTS.EXPORT_TO_SVG, exportToSVG);
-    emitter.on(EVENTS.EMBED_TO_IMAGE_LINK, embedToImageLink);
 
     return () => {
       emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
       emitter.off(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
       emitter.off(EVENTS.EXPORT_TO_IMAGE, exportToImage);
       emitter.off(EVENTS.EXPORT_TO_SVG, exportToSVG);
-      emitter.off(EVENTS.EMBED_TO_IMAGE_LINK, embedToImageLink);
     };
-  }, [
-    copyToClipboard,
-    exportToImage,
-    exportToPDF,
-    exportToSVG,
-    embedToImageLink,
-  ]);
+  }, [copyToClipboard, exportToImage, exportToPDF, exportToSVG]);
 
   const onChartMounted = useCallback(() => {
     setIsChartRendered(true);

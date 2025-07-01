@@ -15,10 +15,8 @@ interface ICWTextInput {
 
 function CWTextInput(props: ICWTextInput) {
   const { id, label, defaultValue, onChange, hint, placeholder } = props;
-  const value = useRef(defaultValue);
 
   const update = (e: any) => {
-    value.current = e.target.value;
     onChange(e);
   };
 

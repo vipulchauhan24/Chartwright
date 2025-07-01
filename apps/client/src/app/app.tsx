@@ -1,15 +1,19 @@
+import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import ChartEditor from './charteditor';
-import RenderChart from './renderChart';
 import { AuthProvider } from 'react-oidc-context';
-import Home from './home';
-import AuthGaurd from './authGaurd';
 import { User } from 'oidc-client-ts';
 import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
-import PageNotFound from './pageNotFound';
-import { userLogin } from '../service/userAPI';
-import { Toaster } from 'react-hot-toast';
+
+const ChartEditor = lazy(() => import('./charteditor'));
+const EmbededChart = lazy(() => import('./embededChart'));
+const Home = lazy(() => import('./home'));
+const PageNotFound = lazy(() => import('./pageNotFound'));
+const AuthGaurd = lazy(() => import('./authGaurd'));
+const Toaster = lazy(() =>
+  import('react-hot-toast').then((mod) => ({ default: mod.Toaster }))
+);
+
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
@@ -20,6 +24,7 @@ export function App() {
         cognito_id: user.profile.sub,
         created_date: new Date().toISOString(),
       };
+      const { userLogin } = await import('../service/userAPI');
       await userLogin(loginPayload);
     } catch (error) {
       console.error(error);
@@ -58,7 +63,7 @@ export function App() {
             </AuthGaurd>
           }
         />
-        <Route path="/chart/render/:id" element={<RenderChart />} />
+        <Route path="/render/:id" element={<EmbededChart />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     );

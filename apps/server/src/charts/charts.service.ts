@@ -27,6 +27,22 @@ export class ChartService {
     }
   }
 
+  async getChartGlobalConfigsByType(type: string) {
+    try {
+      const items = await this.db.execute(
+        `SELECT config FROM ${TABLE_NAME.CHART_FEATURE} where type='${type}';`
+      );
+
+      return items[0];
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async getChartGalleryData() {
     try {
       const items = await this.db.execute(
@@ -199,6 +215,25 @@ export class ChartService {
       );
     } catch (error) {
       console.error('Error in deleting link: ', error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getEmbedChartConfig(id: string) {
+    try {
+      const items = await this.db.execute(
+        `SELECT chart_id FROM ${TABLE_NAME.EMBED} WHERE id = '${id}';`
+      );
+
+      if (!items || !items.length) {
+        return {};
+      }
+      return await this.getChartById(items[0]['chart_id']);
+    } catch (error) {
+      console.error(error);
       throw new HttpException(
         'Internal server error.',
         HttpStatus.INTERNAL_SERVER_ERROR

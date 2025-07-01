@@ -1,0 +1,714 @@
+{
+  "globalOptions": {
+    "Animation": [
+      {
+        "label": "Enabled",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "animation"
+      }
+    ],
+    "Title": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "title.show"
+      },
+      {
+        "label": "Text",
+        "fieldType": "text",
+        "dataType": "string",
+        "configPath": "title.text"
+      },
+      {
+        "label": "Text Align",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "left",
+        "reference": "textAlignment",
+        "configPath": "title.textAlign",
+        "hint": "Aligns title and subtitle together."
+      },
+      {
+        "label": "Horizontal Align",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "left",
+        "reference": "horizontalAlignment",
+        "configPath": "title.left",
+        "hint": "Aligns title and subtitle together."
+      },
+      {
+        "label": "Vertical Align",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "top",
+        "reference": "verticalAlignment",
+        "configPath": "title.top",
+        "hint": "Aligns title and subtitle together."
+      },
+      {
+        "label": "Background Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "transparent",
+        "configPath": "title.backgroundColor"
+      },
+      {
+        "label": "External Link",
+        "fieldType": "text",
+        "dataType": "string",
+        "default": "",
+        "configPath": "title.link"
+      },
+      {
+        "label": "Link Target",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "blank",
+        "reference": "externalLinkTarget",
+        "configPath": "title.target",
+        "hint": "Open link in current tab or new tab."
+      },
+      {
+        "subGroup": true,
+        "Text Style": [
+          {
+            "label": "Font Size",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "In Pixels, max upto 100px.",
+            "configPath": "title.textStyle.fontSize"
+          },
+          {
+            "label": "Font Weight",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "bold",
+            "reference": "fontWeight",
+            "configPath": "title.textStyle.fontWeight"
+          },
+          {
+            "label": "Font Family",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "Helvetica",
+            "reference": "fontFamily",
+            "configPath": "title.textStyle.fontFamily"
+          },
+          {
+            "label": "Text Color",
+            "fieldType": "color",
+            "dataType": "string",
+            "default": "#071013",
+            "configPath": "title.textStyle.color"
+          },
+          {
+            "label": "Line Height",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "Max upto 100.",
+            "configPath": "title.textStyle.lineHeight"
+          },
+          {
+            "label": "Font Style",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "normal",
+            "reference": "fontStyle",
+            "configPath": "title.textStyle.fontStyle"
+          }
+        ]
+      },
+      {
+        "subGroup": true,
+        "Subtitle": [
+          {
+            "label": "Text",
+            "fieldType": "text",
+            "dataType": "string",
+            "configPath": "title.subtext",
+            "hint": "Empty the field to hide subtitle."
+          },
+          {
+            "label": "External Link",
+            "fieldType": "text",
+            "dataType": "string",
+            "default": "",
+            "configPath": "title.sublink"
+          },
+          {
+            "label": "Link Target",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "blank",
+            "reference": "externalLinkTarget",
+            "hint": "Open link in current tab or new tab.",
+            "configPath": "title.subtarget"
+          },
+          {
+            "subGroup": true,
+            "SubText Style": [
+              {
+                "label": "Font Size",
+                "fieldType": "number",
+                "dataType": "number",
+                "default": 24,
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "hint": "In Pixels, max upto 100px.",
+                "configPath": "title.subText Style.fontSize"
+              },
+              {
+                "label": "Font Weight",
+                "fieldType": "lookup",
+                "dataType": "string",
+                "default": "bold",
+                "reference": "fontWeight",
+                "configPath": "title.subText Style.fontWeight"
+              },
+              {
+                "label": "Font Family",
+                "fieldType": "lookup",
+                "dataType": "string",
+                "default": "Helvetica",
+                "reference": "fontFamily",
+                "configPath": "title.subText Style.fontFamily"
+              },
+              {
+                "label": "Text Color",
+                "fieldType": "color",
+                "dataType": "string",
+                "default": "#071013",
+                "configPath": "title.subText Style.color"
+              },
+              {
+                "label": "Line Height",
+                "fieldType": "number",
+                "dataType": "number",
+                "default": 24,
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "hint": "Max upto 100.",
+                "configPath": "title.subText Style.lineHeight"
+              },
+              {
+                "label": "Font Style",
+                "fieldType": "lookup",
+                "dataType": "string",
+                "default": "normal",
+                "reference": "fontStyle",
+                "configPath": "title.subText Style.fontStyle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Legend": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "legend.show"
+      },
+      {
+        "label": "Type",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "plain",
+        "configPath": "legend.type",
+        "reference": "legendType",
+        "hint": "Choose scroll when many legends / series."
+      },
+      {
+        "label": "Vertical Align",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "top",
+        "reference": "verticalAlignment",
+        "configPath": "legend.top"
+      },
+      {
+        "label": "Horizontal Align",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "left",
+        "reference": "horizontalAlignment",
+        "configPath": "legend.left"
+      },
+      {
+        "label": "Orientation",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "horizontal",
+        "reference": "legendOrient",
+        "configPath": "legend.orient"
+      },
+      {
+        "label": "Icon",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "roundRect",
+        "reference": "legendIcons",
+        "configPath": "legend.icon"
+      },
+      {
+        "label": "Background Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "transparent",
+        "configPath": "legend.backgroundColor"
+      },
+      {
+        "subGroup": true,
+        "Text Style": [
+          {
+            "label": "Font Size",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "In Pixels, max upto 100px.",
+            "configPath": "legend.textStyle.fontSize"
+          },
+          {
+            "label": "Font Weight",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "bold",
+            "reference": "fontWeight",
+            "configPath": "legend.textStyle.fontWeight"
+          },
+          {
+            "label": "Font Family",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "Helvetica",
+            "reference": "fontFamily",
+            "configPath": "legend.textStyle.fontFamily"
+          },
+          {
+            "label": "Text Color",
+            "fieldType": "color",
+            "dataType": "string",
+            "default": "#071013",
+            "configPath": "legend.textStyle.color"
+          },
+          {
+            "label": "Line Height",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "Max upto 100.",
+            "configPath": "legend.textStyle.lineHeight"
+          },
+          {
+            "label": "Font Style",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "normal",
+            "reference": "fontStyle",
+            "configPath": "legend.textStyle.fontStyle"
+          }
+        ]
+      }
+    ],
+    "Grid": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "grid.show"
+      },
+      {
+        "label": "Top",
+        "fieldType": "number",
+        "dataType": "number",
+        "default": 80,
+        "min": 0,
+        "step": 1,
+        "configPath": "grid.top"
+      },
+      {
+        "label": "Background Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "transparent",
+        "configPath": "grid.backgroundColor"
+      },
+      {
+        "label": "Border Width",
+        "fieldType": "number",
+        "dataType": "number",
+        "default": 1,
+        "min": 0,
+        "max": 12,
+        "step": 1,
+        "configPath": "grid.borderWidth"
+      },
+      {
+        "label": "Border Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "transparent",
+        "configPath": "grid.borderColor"
+      }
+    ],
+    "Tooltip": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "tooltip.show"
+      },
+      {
+        "label": "Always show content",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": false,
+        "configPath": "tooltip.alwaysShowContent"
+      },
+      {
+        "label": "Background Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "#FFFFFF",
+        "configPath": "tooltip.backgroundColor"
+      },
+      {
+        "label": "Border Color",
+        "fieldType": "color",
+        "dataType": "string",
+        "default": "#CCCCCC",
+        "configPath": "tooltip.borderColor"
+      },
+      {
+        "label": "Border Width",
+        "fieldType": "number",
+        "dataType": "number",
+        "default": 1,
+        "min": 0,
+        "max": 12,
+        "step": 1,
+        "configPath": "tooltip.borderWidth"
+      },
+      {
+        "subGroup": true,
+        "Text Style": [
+          {
+            "label": "Font Size",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "In Pixels, max upto 100px.",
+            "configPath": "tooltip.textStyle.fontSize"
+          },
+          {
+            "label": "Font Weight",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "bold",
+            "reference": "fontWeight",
+            "configPath": "tooltip.textStyle.fontWeight"
+          },
+          {
+            "label": "Font Family",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "Helvetica",
+            "reference": "fontFamily",
+            "configPath": "tooltip.textStyle.fontFamily"
+          },
+          {
+            "label": "Text Color",
+            "fieldType": "color",
+            "dataType": "string",
+            "default": "#071013",
+            "configPath": "tooltip.textStyle.color"
+          },
+          {
+            "label": "Line Height",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "Max upto 100.",
+            "configPath": "tooltip.textStyle.lineHeight"
+          },
+          {
+            "label": "Font Style",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "normal",
+            "reference": "fontStyle",
+            "configPath": "tooltip.textStyle.fontStyle"
+          }
+        ]
+      }
+    ]
+  },
+  "chartEditOptions": {
+    "X-Axis": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "xAxis.show"
+      },
+      {
+        "label": "Data",
+        "fieldType": "textArea",
+        "default": [],
+        "dataType": "array",
+        "configPath": "xAxis.data"
+      },
+      {
+        "label": "Position",
+        "fieldType": "lookup",
+        "dataType": "string",
+        "default": "bottom",
+        "configPath": "xAxis.position",
+        "reference": "xAxisPosition"
+      },
+      {
+        "subGroup": true,
+        "Tooltip": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "xAxis.tooltip.show"
+          }
+        ]
+      },
+      {
+        "subGroup": true,
+        "Axis Line": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "xAxis.axisLine.show"
+          },
+          {
+            "subGroup": true,
+            "Line Style": [
+              {
+                "label": "Color",
+                "fieldType": "color",
+                "dataType": "string",
+                "default": "#333333",
+                "configPath": "xAxis.axisLine.lineStyle.Color"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "subGroup": true,
+        "Split Line": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "xAxis.splitLine.show"
+          },
+          {
+            "subGroup": true,
+            "Line Style": [
+              {
+                "label": "Color",
+                "fieldType": "color",
+                "dataType": "string",
+                "default": "#333333",
+                "configPath": "xAxis.splitLine.lineStyle.color"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Y-Axis": [
+      {
+        "label": "Show",
+        "fieldType": "switch",
+        "dataType": "boolean",
+        "default": true,
+        "configPath": "yAxis.show"
+      },
+      {
+        "subGroup": true,
+        "Tooltip": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "yAxis.tooltip.show"
+          }
+        ]
+      },
+      {
+        "subGroup": true,
+        "Axis Line": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "yAxis.axisLine.show"
+          },
+          {
+            "subGroup": true,
+            "Line Style": [
+              {
+                "label": "Color",
+                "fieldType": "color",
+                "dataType": "string",
+                "default": "#333333",
+                "configPath": "yAxis.axisLine.lineStyle.Color"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "subGroup": true,
+        "Split Line": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "yAxis.splitLine.show"
+          },
+          {
+            "subGroup": true,
+            "Line Style": [
+              {
+                "label": "Color",
+                "fieldType": "color",
+                "dataType": "string",
+                "default": "#333333",
+                "configPath": "yAxis.splitLine.lineStyle.color"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ChartEditSeries": {
+    "Series": [
+      {
+        "label": "Name",
+        "fieldType": "text",
+        "dataType": "string",
+        "configPath": "name"
+      },
+      {
+        "label": "Data",
+        "fieldType": "textArea",
+        "default": [],
+        "dataType": "array",
+        "configPath": "data"
+      },
+      {
+        "subGroup": true,
+        "Data Lables": [
+          {
+            "label": "Show",
+            "fieldType": "switch",
+            "dataType": "boolean",
+            "default": true,
+            "configPath": "label.show"
+          },
+          {
+            "label": "Font Size",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "In Pixels, max upto 100px.",
+            "configPath": "label.fontSize"
+          },
+          {
+            "label": "Font Weight",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "bold",
+            "reference": "fontWeight",
+            "configPath": "label.fontWeight"
+          },
+          {
+            "label": "Font Family",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "Helvetica",
+            "reference": "fontFamily",
+            "configPath": "label.fontFamily"
+          },
+          {
+            "label": "Text Color",
+            "fieldType": "color",
+            "dataType": "string",
+            "default": "#071013",
+            "configPath": "label.color"
+          },
+          {
+            "label": "Line Height",
+            "fieldType": "number",
+            "dataType": "number",
+            "default": 24,
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "hint": "Max upto 100.",
+            "configPath": "label.lineHeight"
+          },
+          {
+            "label": "Font Style",
+            "fieldType": "lookup",
+            "dataType": "string",
+            "default": "normal",
+            "reference": "fontStyle",
+            "configPath": "label.fontStyle"
+          }
+        ]
+      }
+    ]
+  }
+}
