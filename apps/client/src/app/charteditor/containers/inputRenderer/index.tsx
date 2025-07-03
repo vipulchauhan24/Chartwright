@@ -5,6 +5,7 @@ import CWNumberInput from '../../../components/numberInput';
 import CWSelect from '../../../components/select';
 import CWTextArea from '../../../components/textArea';
 import CWTextInput from '../../../components/textInput';
+import { isArray } from '../../utils/lib';
 
 interface IInputRenderer {
   id: string;
@@ -20,6 +21,7 @@ interface IInputRenderer {
   hint?: string;
   reference?: string;
   disabled?: boolean;
+  configPathPrefix?: string;
 }
 
 const REFERENCE_TABLE: any = {
@@ -272,16 +274,19 @@ function InputRenderer(props: IInputRenderer) {
     disabled,
     configPath,
     updateChartDataConfig,
+    configPathPrefix,
   } = props;
 
   const onChange = useCallback(
     (event: any) => {
       updateChartDataConfig(
-        configPath,
-        typeof event === 'object' ? event.target.value : event
+        configPathPrefix ? configPathPrefix + configPath : configPath,
+        typeof event === 'object' && !isArray(event)
+          ? event.target.value
+          : event
       );
     },
-    [configPath, updateChartDataConfig]
+    [configPathPrefix, configPath, updateChartDataConfig]
   );
 
   const inputProps = useMemo(() => {
@@ -337,4 +342,4 @@ function InputRenderer(props: IInputRenderer) {
   }
 }
 
-export default InputRenderer;
+export default React.memo(InputRenderer);

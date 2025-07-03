@@ -629,7 +629,7 @@
       }
     ]
   },
-  "ChartEditSeries": {
+  "chartEditSeries": {
     "Series": [
       {
         "label": "Name",

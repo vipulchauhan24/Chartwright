@@ -12,8 +12,16 @@ function ChartEditPanel(props: {
   ) => void;
   title?: string;
   id?: string;
+  configPathPrefix?: string;
 }) {
-  const { options, chartDataConfig, title, id, updateChartDataConfig } = props;
+  const {
+    options,
+    chartDataConfig,
+    title,
+    id,
+    updateChartDataConfig,
+    configPathPrefix,
+  } = props;
 
   if (isArray(options)) {
     return (
@@ -32,6 +40,7 @@ function ChartEditPanel(props: {
                   id={`${key}-${indx}`}
                   chartDataConfig={chartDataConfig}
                   updateChartDataConfig={updateChartDataConfig}
+                  configPathPrefix={configPathPrefix}
                 />
               </div>
             );
@@ -39,7 +48,9 @@ function ChartEditPanel(props: {
           const inputValue = () => {
             const value = getNestedValue(
               chartDataConfig.options,
-              inputProps['configPath']
+              configPathPrefix
+                ? configPathPrefix + inputProps['configPath']
+                : inputProps['configPath']
             );
             if (typeof value === 'boolean') {
               return value;
@@ -53,6 +64,7 @@ function ChartEditPanel(props: {
                 {...inputProps}
                 value={inputValue()}
                 updateChartDataConfig={updateChartDataConfig}
+                configPathPrefix={configPathPrefix}
               />
             </div>
           );

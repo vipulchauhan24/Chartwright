@@ -14,7 +14,7 @@ function CWTextArea(props: ICWTextArea) {
 
   const update = (e: any) => {
     value.current = e.target.value;
-    onChange(e);
+    onChange(value.current.split(','));
   };
   return (
     <Field
