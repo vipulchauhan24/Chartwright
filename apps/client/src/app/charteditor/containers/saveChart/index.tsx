@@ -42,7 +42,7 @@ function SaveChart(props: ISaveChart) {
           id: id,
           title: chrtTitle,
           config: JSON.stringify(chartDataConfig),
-          chart_type: `${chartDataConfig.options.chart.type}Chart`,
+          chart_type: `${chartDataConfig.chart.type}Chart`,
           updated_by: userId,
           updated_date: new Date().toISOString(),
         };
@@ -50,7 +50,7 @@ function SaveChart(props: ISaveChart) {
         saveChartPayload = {
           title: chrtTitle,
           config: JSON.stringify(chartDataConfig),
-          chart_type: `${chartDataConfig.options.chart.type}Chart`,
+          chart_type: `${chartDataConfig.chart.type}Chart`,
           created_by: userId,
           created_date: new Date().toISOString(),
         };

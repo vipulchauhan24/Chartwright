@@ -47,7 +47,7 @@ function ChartEditPanel(props: {
           }
           const inputValue = () => {
             const value = getNestedValue(
-              chartDataConfig.options,
+              chartDataConfig,
               configPathPrefix
                 ? configPathPrefix + inputProps['configPath']
                 : inputProps['configPath']

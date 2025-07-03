@@ -18,12 +18,12 @@ function ChartDataEditor() {
     value: string | string[] | boolean | number | number[]
   ) => {
     const config = JSON.parse(JSON.stringify(chartDataConfig));
-    setByPath(config.options, path, value);
+    setByPath(config, path, value);
     setChartDataConfig(config);
   };
 
   if (
-    !chartDataConfig?.options?.series ||
+    !chartDataConfig?.series ||
     !chartEditableFeatures?.chartEditOptions ||
     !chartEditableFeatures?.chartEditSeries
   ) {
@@ -48,7 +48,7 @@ function ChartDataEditor() {
         }
       )}
       <div className="mt-2">
-        {chartDataConfig.options.series.map((_items: any, index: number) => {
+        {chartDataConfig.series.map((_items: any, index: number) => {
           return Object.keys(chartEditableFeatures.chartEditSeries).map(
             (key: string, indx: number) => {
               return (

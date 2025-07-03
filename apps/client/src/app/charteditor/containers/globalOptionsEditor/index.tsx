@@ -18,11 +18,11 @@ function GlobalOptionsEditor() {
     value: string | string[] | boolean | number | number[]
   ) => {
     const config = JSON.parse(JSON.stringify(chartDataConfig));
-    setByPath(config.options, path, value);
+    setByPath(config, path, value);
     setChartDataConfig(config);
   };
 
-  if (!chartDataConfig?.options || !chartEditableFeatures?.globalOptions) {
+  if (!chartDataConfig || !chartEditableFeatures?.globalOptions) {
     return null;
   }
 

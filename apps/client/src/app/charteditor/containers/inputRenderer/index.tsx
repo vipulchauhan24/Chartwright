@@ -39,11 +39,6 @@ const REFERENCE_TABLE: any = {
   ],
   textAlignment: [
     {
-      id: 'textAlignment-auto',
-      label: 'Auto',
-      value: 'auto',
-    },
-    {
       id: 'textAlignment-left',
       label: 'Left',
       value: 'left',
@@ -248,6 +243,45 @@ const REFERENCE_TABLE: any = {
     },
     {
       id: 'xAxisPosition-bottom',
+      label: 'Bottom',
+      value: 'bottom',
+    },
+  ],
+  labelVerticalAlignment: [
+    {
+      id: 'labelVerticalAlignment-top',
+      label: 'Top',
+      value: 'top',
+    },
+    {
+      id: 'labelVerticalAlignment-middle',
+      label: 'Middle',
+      value: 'middle',
+    },
+    {
+      id: 'labelVerticalAlignment-bottom',
+      label: 'Bottom',
+      value: 'bottom',
+    },
+  ],
+  labelPosition: [
+    {
+      id: 'labelPosition-inside',
+      label: 'Inside',
+      value: 'inside',
+    },
+    {
+      id: 'labelPosition-left',
+      label: 'Left',
+      value: 'left',
+    },
+    {
+      id: 'labelPosition-right',
+      label: 'Right',
+      value: 'right',
+    },
+    {
+      id: 'labelPosition-bottom',
       label: 'Bottom',
       value: 'bottom',
     },

@@ -6,26 +6,26 @@ import {
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
 import { lazy, useCallback, useEffect, useState } from 'react';
-// import ChartRenderer from './containers/chartRenderer';
-import GlobalOptionsEditor from './containers/globalOptionsEditor';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
-import CWDropdown from '../components/dropdown';
-import { SESSION_STORAGE_KEYS, simpleChartTypes } from './utils/constants';
+import { SESSION_STORAGE_KEYS } from './utils/constants';
 import CWButton from '../components/button';
-import ExportChart from './containers/export';
-import ChartGallery from './containers/chartGallery';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
-import SaveChart from './containers/saveChart';
 import { useNavigate, useParams } from 'react-router-dom';
-import ViewMyCharts from './containers/viewMyCharts';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
 const EChartRenderer = lazy(() => import('./containers/eChartRenderer'));
+const GlobalOptionsEditor = lazy(
+  () => import('./containers/globalOptionsEditor')
+);
+const ViewMyCharts = lazy(() => import('./containers/viewMyCharts'));
+const SaveChart = lazy(() => import('./containers/saveChart'));
+const ChartGallery = lazy(() => import('./containers/chartGallery'));
+const ExportChart = lazy(() => import('./containers/export'));
 
 function ChartEditor() {
   const { id } = useParams();
@@ -40,7 +40,6 @@ function ChartEditor() {
   const [showChartGallery, setShowChartGallery] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
   const [showMyCharts, setShowMyCharts] = useState(false);
-  const [chartSelectedIndx, setChartSelectedIndx] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,12 +52,6 @@ function ChartEditor() {
         fetchFromSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID) ||
         'simple-bar-chart';
       getDefaultChartConfig(chartKey);
-      for (const indx in simpleChartTypes) {
-        if (simpleChartTypes[indx].value === chartKey) {
-          setChartSelectedIndx(Number(indx));
-          break;
-        }
-      }
     } else if (chartGalleryData.length && !isLoading && id) {
       fetchDefaultChartConfig(id);
     }
@@ -69,13 +62,6 @@ function ChartEditor() {
     id,
     fetchDefaultChartConfig,
   ]);
-
-  const onChangeChartRequest = useCallback(
-    (value: string) => {
-      getDefaultChartConfig(value);
-    },
-    [getDefaultChartConfig]
-  );
 
   const exportChart = useCallback(() => {
     setShowExportChartModal(true);
@@ -96,12 +82,6 @@ function ChartEditor() {
   const onSetChartViaGalleryOptions = useCallback(
     (value: string) => {
       getDefaultChartConfig(value);
-      for (const indx in simpleChartTypes) {
-        if (simpleChartTypes[indx].value === value) {
-          setChartSelectedIndx(Number(indx));
-          break;
-        }
-      }
       storeInSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID, value);
       if (id) {
         navigate(`/chart`);
@@ -164,11 +144,6 @@ function ChartEditor() {
                   />
                 )}
               </div>
-              <CWDropdown
-                items={simpleChartTypes}
-                onChange={onChangeChartRequest}
-                selectedIndex={chartSelectedIndx}
-              />
             </div>
             {/* <ChartRenderer /> */}
             <EChartRenderer />

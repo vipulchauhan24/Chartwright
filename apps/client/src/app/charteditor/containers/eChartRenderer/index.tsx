@@ -1,26 +1,37 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 import { useAtom } from 'jotai';
 import { currentChartConfigStore } from '../../../../store/charts';
+import { isExportDisabled } from '../../../../store/app';
 
 function EChartRenderer() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
-
   const chartRef = useRef(null);
+  const chartInstance = useRef<echarts.EChartsType | undefined>(undefined);
+  const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
+
+  const chartRenderFinished = useCallback(() => {
+    setIsExportChartDisabled(false);
+  }, [setIsExportChartDisabled]);
 
   useEffect(() => {
-    if (!chartDataConfig?.options) {
-      return;
-    }
-    const chart = echarts.init(chartRef.current);
-
-    chart.setOption({ ...chartDataConfig.options });
+    chartInstance.current = echarts.init(chartRef.current);
 
     // Clean up on unmount
     return () => {
-      chart.dispose();
+      chartInstance.current?.dispose();
     };
-  }, [chartDataConfig]);
+  }, []);
+
+  useEffect(() => {
+    if (!chartDataConfig) {
+      return;
+    }
+    chartInstance.current?.on('finished', function () {
+      chartRenderFinished();
+    });
+    chartInstance.current?.setOption({ ...chartDataConfig });
+  }, [chartDataConfig, chartRenderFinished]);
 
   return (
     <div className="w-full h-[calc(100%_-_58px)] p-3 relative">
