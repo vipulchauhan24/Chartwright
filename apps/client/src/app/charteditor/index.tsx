@@ -15,6 +15,7 @@ import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
+import { useAuth } from 'react-oidc-context';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -29,6 +30,7 @@ const ExportChart = lazy(() => import('./containers/export'));
 
 function ChartEditor() {
   const { id } = useParams();
+  const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
   const [exportDisabled] = useAtom(isExportDisabled);
@@ -90,6 +92,10 @@ function ChartEditor() {
     [getDefaultChartConfig, navigate, id]
   );
 
+  const redirectToLoginPage = useCallback(() => {
+    auth.signinRedirect();
+  }, [auth]);
+
   const chartUtitlityBtns = useMemo(() => {
     return [
       {
@@ -104,18 +110,14 @@ function ChartEditor() {
         disabled: exportDisabled,
       },
       {
-        tooltip: isAuthenticated
-          ? 'View saved charts'
-          : 'Login to view saved charts',
+        tooltip: 'View saved charts',
         label: <ChartArea className="size-4" aria-hidden={true} />,
-        onClick: viewMyCharts,
-        disabled: !isAuthenticated,
+        onClick: !isAuthenticated ? redirectToLoginPage : viewMyCharts,
       },
       {
-        tooltip: isAuthenticated ? 'Save changes' : 'Login to save charts',
+        tooltip: 'Save changes',
         label: <Save className="size-4" aria-hidden={true} />,
-        onClick: openSaveChartModal,
-        disabled: !isAuthenticated,
+        onClick: !isAuthenticated ? redirectToLoginPage : openSaveChartModal,
       },
     ];
   }, [
@@ -124,6 +126,7 @@ function ChartEditor() {
     isAuthenticated,
     openChartGallery,
     openSaveChartModal,
+    redirectToLoginPage,
     viewMyCharts,
   ]);
 
