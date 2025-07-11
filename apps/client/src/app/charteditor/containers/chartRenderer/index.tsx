@@ -134,13 +134,13 @@ function ChartRenderer() {
   useEffect(() => {
     emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
     emitter.on(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
-    emitter.on(EVENTS.EXPORT_TO_IMAGE, exportToImage);
+    emitter.on(EVENTS.EXPORT_TO_PNG, exportToImage);
     emitter.on(EVENTS.EXPORT_TO_SVG, exportToSVG);
 
     return () => {
       emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
       emitter.off(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
-      emitter.off(EVENTS.EXPORT_TO_IMAGE, exportToImage);
+      emitter.off(EVENTS.EXPORT_TO_PNG, exportToImage);
       emitter.off(EVENTS.EXPORT_TO_SVG, exportToSVG);
     };
   }, [copyToClipboard, exportToImage, exportToPDF, exportToSVG]);

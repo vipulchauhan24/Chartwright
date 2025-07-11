@@ -56,11 +56,6 @@ const REFERENCE_TABLE: any = {
   ],
   horizontalAlignment: [
     {
-      id: 'horizontalAlignment-auto',
-      label: 'Auto',
-      value: 'auto',
-    },
-    {
       id: 'horizontalAlignment-left',
       label: 'Left',
       value: 'left',
@@ -77,11 +72,6 @@ const REFERENCE_TABLE: any = {
     },
   ],
   verticalAlignment: [
-    {
-      id: 'verticalAlignment-auto',
-      label: 'Auto',
-      value: 'auto',
-    },
     {
       id: 'verticalAlignment-top',
       label: 'Top',
@@ -162,11 +152,6 @@ const REFERENCE_TABLE: any = {
       id: 'fontStyle-italic',
       label: 'Italic',
       value: 'italic',
-    },
-    {
-      id: 'fontStyle-oblique',
-      label: 'Oblique',
-      value: 'oblique',
     },
   ],
   legendType: [

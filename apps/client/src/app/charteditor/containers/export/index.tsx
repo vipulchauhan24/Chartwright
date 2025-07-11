@@ -111,15 +111,23 @@ function ExportChart(props: IExportChart) {
         icon: <Download className="size-6" aria-hidden={true} />,
         image: <img src="/png.png" alt="Export To" className="h-6" />,
         onClick: () => {
-          emitter.emit(EVENTS.EXPORT_TO_IMAGE);
+          emitter.emit(EVENTS.EXPORT_TO_PNG);
         },
       },
+      // {
+      //   label: 'Download SVG',
+      //   icon: <Download className="size-6" aria-hidden={true} />,
+      //   image: <img src="/svg.png" alt="Export To SVG" className="h-6" />,
+      //   onClick: () => {
+      //     emitter.emit(EVENTS.EXPORT_TO_SVG);
+      //   },
+      // },
       {
-        label: 'Download SVG',
+        label: 'Download JPG',
         icon: <Download className="size-6" aria-hidden={true} />,
-        image: <img src="/svg.png" alt="Export To SVG" className="h-6" />,
+        image: <img src="/jpg.png" alt="Export To JPG" className="h-6" />,
         onClick: () => {
-          emitter.emit(EVENTS.EXPORT_TO_SVG);
+          emitter.emit(EVENTS.EXPORT_TO_JPG);
         },
       },
       {

@@ -45,7 +45,11 @@ function CWButton(props: ICWButton) {
   };
 
   if (tooltip) {
-    return <Tippy content={tooltip}>{buttonJSX()}</Tippy>;
+    return (
+      <Tippy content={tooltip}>
+        <span>{buttonJSX()}</span>
+      </Tippy>
+    );
   } else {
     return <>{buttonJSX()}</>;
   }

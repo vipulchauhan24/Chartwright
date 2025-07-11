@@ -5,7 +5,7 @@ import {
   setDefaultChartConfig,
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
-import { lazy, useCallback, useEffect, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import { SESSION_STORAGE_KEYS } from './utils/constants';
@@ -18,7 +18,7 @@ import useAuthentication from './hooks/useAuthentication';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
-const EChartRenderer = lazy(() => import('./containers/eChartRenderer'));
+const ChartPreview = lazy(() => import('./containers/chartPreview'));
 const GlobalOptionsEditor = lazy(
   () => import('./containers/globalOptionsEditor')
 );
@@ -90,6 +90,43 @@ function ChartEditor() {
     [getDefaultChartConfig, navigate, id]
   );
 
+  const chartUtitlityBtns = useMemo(() => {
+    return [
+      {
+        tooltip: 'View chart templates',
+        label: <ChartPie className="size-4" aria-hidden={true} />,
+        onClick: openChartGallery,
+      },
+      {
+        tooltip: 'Export',
+        label: <Share2 className="size-4" aria-hidden={true} />,
+        onClick: exportChart,
+        disabled: exportDisabled,
+      },
+      {
+        tooltip: isAuthenticated
+          ? 'View saved charts'
+          : 'Login to view saved charts',
+        label: <ChartArea className="size-4" aria-hidden={true} />,
+        onClick: viewMyCharts,
+        disabled: !isAuthenticated,
+      },
+      {
+        tooltip: isAuthenticated ? 'Save changes' : 'Login to save charts',
+        label: <Save className="size-4" aria-hidden={true} />,
+        onClick: openSaveChartModal,
+        disabled: !isAuthenticated,
+      },
+    ];
+  }, [
+    exportChart,
+    exportDisabled,
+    isAuthenticated,
+    openChartGallery,
+    openSaveChartModal,
+    viewMyCharts,
+  ]);
+
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
@@ -113,40 +150,14 @@ function ChartEditor() {
           <div className="h-full w-full px-4 pb-4 overflow-auto">
             <div className="flex items-center justify-between pt-4 top-0 sticky z-50">
               <div className="flex items-center gap-2">
-                <CWButton
-                  additionalCssClasses="py-2 px-3"
-                  tooltip="Open Chart Gallery"
-                  label={<ChartPie className="size-4" aria-hidden={true} />}
-                  onClick={openChartGallery}
-                />
-                {isAuthenticated && (
-                  <CWButton
-                    additionalCssClasses="py-2 px-3"
-                    tooltip="Saved Charts"
-                    label={<ChartArea className="size-4" aria-hidden={true} />}
-                    onClick={viewMyCharts}
-                  />
-                )}
-                {isAuthenticated && (
-                  <CWButton
-                    additionalCssClasses="py-2 px-3"
-                    tooltip="Saved Changes"
-                    label={<Save className="size-4" aria-hidden={true} />}
-                    onClick={openSaveChartModal}
-                  />
-                )}
-                {!exportDisabled && (
-                  <CWButton
-                    additionalCssClasses="py-2 px-3"
-                    tooltip="Export"
-                    label={<Share2 className="size-4" aria-hidden={true} />}
-                    onClick={exportChart}
-                  />
-                )}
+                {chartUtitlityBtns.map((btnConfig) => {
+                  return (
+                    <CWButton additionalCssClasses="py-2 px-3" {...btnConfig} />
+                  );
+                })}
               </div>
             </div>
-            {/* <ChartRenderer /> */}
-            <EChartRenderer />
+            <ChartPreview />
           </div>
           <aside className="w-1/5 min-w-80 h-full border-l border-border overflow-y-auto">
             <ChartDataEditor />
