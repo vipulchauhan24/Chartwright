@@ -10,18 +10,23 @@ import {
   loadingChartConfig,
   myCharts,
 } from '../store/charts';
+import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
 
 export const fetchChartGallery = atom(null, async (get, set) => {
   try {
-    const chartGalleryResponse = await axios.get('api/chart-gallery');
-    const chartGlobalConfigsResponse = await axios.get(
-      '/api/chart-global-configs'
-    );
-    set(chartGallery, chartGalleryResponse.data);
-    set(chartGlobalConfigs, chartGlobalConfigsResponse.data);
+    const { data } = await axios.get(API_ENDPOINTS.CHART_GALLERY);
+    set(chartGallery, data);
   } catch (error) {
     console.error('Error in "fetchChartGallery":', error);
-    set(chartGallery, []);
+  }
+});
+
+export const fetchChartGlobalOptions = atom(null, async (get, set) => {
+  try {
+    const { data } = await axios.get(API_ENDPOINTS.CHART_GLOBAL_CONFIGS);
+    set(chartGlobalConfigs, data);
+  } catch (error) {
+    console.error('Error in "fetchChartGlobalOptions":', error);
   } finally {
     set(loadingChartConfig, false);
   }

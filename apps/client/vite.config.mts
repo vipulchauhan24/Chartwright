@@ -1,6 +1,7 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   root: __dirname,
@@ -17,6 +18,15 @@ export default defineConfig({
     host: 'localhost',
   },
   plugins: [
+    svgr({
+      svgrOptions: {
+        plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
+        svgoConfig: {
+          floatPrecision: 2,
+        },
+      },
+      include: '**/*.svg?react',
+    }),
     react({
       babel: {
         presets: ['jotai/babel/preset'],

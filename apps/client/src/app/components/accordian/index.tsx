@@ -16,6 +16,7 @@ interface ICWAccordian {
 function CWAccordian(props: ICWAccordian) {
   const { id, panelHeading, defaultOpen, panelComponent, panelHeadingButton } =
     props;
+
   return (
     <div id={id} className="mx-auto w-full rounded-xl">
       <Disclosure
@@ -38,7 +39,10 @@ function CWAccordian(props: ICWAccordian) {
             aria-hidden={true}
           />
         </DisclosureButton>
-        <DisclosurePanel className="mt-2 pb-4 px-4">
+        <DisclosurePanel
+          className="mt-2 pb-4 px-4"
+          data-headlessui-state="open"
+        >
           {panelComponent}
         </DisclosurePanel>
       </Disclosure>

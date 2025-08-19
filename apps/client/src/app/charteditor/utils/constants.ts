@@ -6,3 +6,8 @@ export enum SESSION_STORAGE_KEYS {
   IS_GHOST_USER = 'isGuestUser',
   GAL_CHART_ID = 'gal-chart-id',
 }
+
+export enum API_ENDPOINTS {
+  CHART_GALLERY = '/api/chart-gallery',
+  CHART_GLOBAL_CONFIGS = '/api/chart-global-configs',
+}

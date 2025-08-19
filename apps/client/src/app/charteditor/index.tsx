@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import {
   fetchChartConfig,
   fetchChartGallery,
+  fetchChartGlobalOptions,
   setDefaultChartConfig,
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
@@ -33,6 +34,7 @@ function ChartEditor() {
   const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
+  const [, fetchChartGlobalData] = useAtom(fetchChartGlobalOptions);
   const [exportDisabled] = useAtom(isExportDisabled);
   const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
   const [chartGalleryData] = useAtom(chartGallery);
@@ -47,6 +49,10 @@ function ChartEditor() {
   useEffect(() => {
     fetchChartGalleryData(); // Fetch data on mount
   }, [fetchChartGalleryData]);
+
+  useEffect(() => {
+    fetchChartGlobalData(); // Fetch data on mount
+  }, [fetchChartGlobalData]);
 
   useEffect(() => {
     if (chartGalleryData.length && !isLoading && !id) {
@@ -155,7 +161,11 @@ function ChartEditor() {
               <div className="flex items-center gap-2">
                 {chartUtitlityBtns.map((btnConfig) => {
                   return (
-                    <CWButton additionalCssClasses="py-2 px-3" {...btnConfig} />
+                    <CWButton
+                      additionalCssClasses="py-2 px-3"
+                      {...btnConfig}
+                      key={btnConfig.tooltip}
+                    />
                   );
                 })}
               </div>

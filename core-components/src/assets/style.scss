@@ -1,0 +1,6 @@
+.accordian-chevron {
+  transition: transform 300ms;
+}
+.accordian-trigger[data-state='open'] > .accordian-chevron {
+  transform: rotate(180deg);
+}

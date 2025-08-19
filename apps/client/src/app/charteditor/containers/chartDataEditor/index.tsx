@@ -3,24 +3,154 @@ import {
   currentChartConfigStore,
   currentChartGlobalConfig,
 } from '../../../../store/charts';
-import clsx from 'clsx';
-import { setByPath } from '../../utils/lib';
-import ChartEditPanel from '../chartEditPanel';
+import { getNestedValue, setByPath } from '../../utils/lib';
+import { useCallback, useMemo, useState } from 'react';
+import CWButton from '../../../components/button';
+import { CWAccordian, CWPopover } from '@chartwright/core-components';
+import InputRenderer from '../inputRenderer';
+import { LetterText, SquareDashedMousePointer } from 'lucide-react';
+
+import GridIcon from '../../../../assets/grid.svg?react';
+import XAxisEdgeIcon from '../../../../assets/x-axis-edge.svg?react';
+import YAxisEdgeIcon from '../../../../assets/y-axis-edge.svg?react';
 
 function ChartDataEditor() {
   const [chartEditableFeatures] = useAtom(currentChartGlobalConfig);
   const [chartDataConfig, setChartDataConfig] = useAtom(
     currentChartConfigStore
   );
+  const [allOptionsOpen, setAllOptionsOpen] = useState<boolean>(false);
 
-  const updateChartDataConfig = (
-    path: string,
-    value: string | string[] | boolean | number | number[]
-  ) => {
-    const config = JSON.parse(JSON.stringify(chartDataConfig));
-    setByPath(config, path, value);
-    setChartDataConfig(config);
-  };
+  const updateChartDataConfig = useCallback(
+    (path: string, value: string | string[] | boolean | number | number[]) => {
+      const config = JSON.parse(JSON.stringify(chartDataConfig));
+      setByPath(config, path, value);
+      setChartDataConfig(config);
+    },
+    [chartDataConfig, setChartDataConfig]
+  );
+
+  const getInputValue = useCallback(
+    (configPathPrefix: any, props: any) => {
+      const value = getNestedValue(
+        chartDataConfig,
+        configPathPrefix
+          ? configPathPrefix + props['configPath']
+          : props['configPath']
+      );
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      return value || props['default'];
+    },
+    [chartDataConfig]
+  );
+
+  const getInputRenderedComp = useCallback(
+    (option: any, indx: number) => {
+      return option.userInputs.map((props: any) => {
+        return (
+          <div className="mt-2">
+            <InputRenderer
+              key={props.configPath}
+              id={props.configPath}
+              {...props}
+              value={getInputValue(indx > -1 ? `series.${indx}.` : null, props)}
+              updateChartDataConfig={updateChartDataConfig}
+              configPathPrefix={indx > -1 ? `series.${indx}.` : ''}
+            />
+          </div>
+        );
+      });
+    },
+    [getInputValue, updateChartDataConfig]
+  );
+
+  const getPopoverIcon = useCallback((iconName: string) => {
+    switch (iconName) {
+      case 'text':
+        return <LetterText className="size-4" aria-hidden={true} />;
+      case 'tooltip':
+        return (
+          <SquareDashedMousePointer className="size-4" aria-hidden={true} />
+        );
+      case 'x-axis-edge':
+        return <XAxisEdgeIcon className="size-4" aria-hidden={true} />;
+      case 'y-axis-edge':
+        return <YAxisEdgeIcon className="size-4" aria-hidden={true} />;
+      case 'grid':
+        return <GridIcon className="size-4" aria-hidden={true} />;
+
+      default:
+        return null;
+    }
+  }, []);
+
+  const getChildrens = useCallback(
+    (option: any, indx: number) => {
+      return option.children
+        ? option.children.map((childComp: any) => {
+            switch (childComp.type) {
+              case 'popover':
+                return (
+                  <CWPopover
+                    content={getInputRenderedComp(childComp, indx)}
+                    title={childComp.title}
+                    icon={getPopoverIcon(childComp.iconName)}
+                    side="left"
+                  />
+                );
+              default:
+                return null;
+            }
+          })
+        : [];
+    },
+    [getInputRenderedComp, getPopoverIcon]
+  );
+
+  const chartEditOptions = useMemo(() => {
+    if (
+      !chartDataConfig ||
+      !chartEditableFeatures?.chartEditOptions ||
+      !chartEditableFeatures?.chartEditSeries
+    ) {
+      return [];
+    }
+
+    const options = [
+      ...chartEditableFeatures.chartEditOptions.map((option) => {
+        return {
+          title: option.title,
+          panelComponent: [
+            ...getInputRenderedComp(option, -1),
+            ...getChildrens(option, -1),
+          ],
+        };
+      }),
+    ];
+
+    chartDataConfig.series.forEach((_item: unknown, indx: number) => {
+      options.push(
+        ...chartEditableFeatures.chartEditSeries.map((option) => {
+          return {
+            title: `${option.title} ${indx + 1}`,
+            panelComponent: [
+              ...getInputRenderedComp(option, indx),
+              ...getChildrens(option, indx),
+            ],
+          };
+        })
+      );
+    });
+
+    return options;
+  }, [
+    chartDataConfig,
+    chartEditableFeatures,
+    getChildrens,
+    getInputRenderedComp,
+  ]);
 
   if (
     !chartDataConfig?.series ||
@@ -31,41 +161,20 @@ function ChartDataEditor() {
   }
 
   return (
-    <div className="p-4">
-      {Object.keys(chartEditableFeatures.chartEditOptions).map(
-        (key: string, indx: number) => {
-          return (
-            <div className={clsx(indx && 'mt-2')} key={key}>
-              <ChartEditPanel
-                options={chartEditableFeatures.chartEditOptions[key]}
-                title={key}
-                id={`${key}-${indx}`}
-                chartDataConfig={chartDataConfig}
-                updateChartDataConfig={updateChartDataConfig}
-              />
-            </div>
-          );
-        }
-      )}
-      <div className="mt-2">
-        {chartDataConfig.series.map((_items: any, index: number) => {
-          return Object.keys(chartEditableFeatures.chartEditSeries).map(
-            (key: string, indx: number) => {
-              return (
-                <div className={clsx(indx && 'mt-2')} key={key}>
-                  <ChartEditPanel
-                    options={chartEditableFeatures.chartEditSeries[key]}
-                    title={key}
-                    id={`${key}-${indx}`}
-                    chartDataConfig={chartDataConfig}
-                    updateChartDataConfig={updateChartDataConfig}
-                    configPathPrefix={`series.${index}.`}
-                  />
-                </div>
-              );
-            }
-          );
-        })}
+    <div className="p-4 flex flex-col items-end">
+      <CWButton
+        label={allOptionsOpen ? 'Collapse All' : 'Expand All'}
+        onClick={() => {
+          setAllOptionsOpen((prev) => !prev);
+        }}
+        tertiary
+      />
+      <div className="w-full mt-2">
+        <CWAccordian
+          items={chartEditOptions}
+          expandAll={allOptionsOpen}
+          areAllExpanded={setAllOptionsOpen}
+        />
       </div>
     </div>
   );
