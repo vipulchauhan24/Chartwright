@@ -1,5 +1,4 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import CWButton from '../../../components/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
@@ -23,6 +22,11 @@ import { chartId } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import axios from 'axios';
+import {
+  CWGhostButton,
+  CWIconButton,
+  CWSolidButton,
+} from '@chartwright/core-components';
 
 interface IExportChart {
   isOpen: boolean;
@@ -169,7 +173,7 @@ function ExportChart(props: IExportChart) {
         }
       );
     },
-    [chrtId]
+    [chrtId, fetchEmbedURL]
   );
 
   const embedItems: Array<IExportItem> = useMemo(() => {
@@ -233,12 +237,8 @@ function ExportChart(props: IExportChart) {
           <Asterisk className="size-4 text-white mb-3" aria-hidden={true} />
           <p className="font-semibold text-white">Login Required</p>
         </div>
-        <CWButton
-          tertiary
-          additionalCssClasses={
-            'text-white hover:text-white hover:scale-125 transition-all'
-          }
-          label={<LogIn className="size-6" aria-hidden={true} />}
+        <CWIconButton
+          icon={<LogIn className="size-6" aria-hidden={true} />}
           onClick={redirectToLoginPage}
         />
       </div>
@@ -293,9 +293,8 @@ function ExportChart(props: IExportChart) {
             {props.image}
             <p className="font-semibold">{props.label}</p>
           </div>
-          <CWButton
-            label={props.icon}
-            tertiary
+          <CWIconButton
+            icon={props.icon}
             onClick={props.onClick}
             disabled={!!props.url}
           />
@@ -368,7 +367,7 @@ function ExportChart(props: IExportChart) {
         </TabGroup>
 
         <div className="mt-2 flex items-center justify-end gap-2">
-          <CWButton primary label="Done" onClick={closeModal} />
+          <CWSolidButton label="Done" onClick={closeModal} />
         </div>
       </div>
     </CWModal>

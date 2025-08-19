@@ -3,12 +3,11 @@ import Tippy from '@tippyjs/react';
 
 interface ICWIconButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
-  onClick?: (e: any) => void;
   tooltip?: string;
 }
 
 export const CWIconButton = forwardRef<HTMLButtonElement, ICWIconButton>(
-  ({ icon, tooltip, children, ...props }, ref) => {
+  ({ icon, tooltip, ...props }, ref) => {
     const buttonJSX = useCallback(() => {
       return (
         <button

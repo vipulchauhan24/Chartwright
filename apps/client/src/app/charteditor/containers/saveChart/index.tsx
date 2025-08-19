@@ -4,12 +4,14 @@ import { chartTitle, currentChartConfigStore } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 import axios from 'axios';
-import CWButton from '../../../components/button';
-import Spinner from '../../../components/spinner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import { fetchMyCharts } from '../../../../service/chartsApi';
+import {
+  CWOutlineLoadingButton,
+  CWSolidButton,
+} from '@chartwright/core-components';
 
 interface ISaveChart {
   isOpen: boolean;
@@ -83,18 +85,11 @@ function SaveChart(props: ISaveChart) {
           onChange={onChartTitleUpdate}
         />
         <div className="mt-4 flex items-center justify-end gap-2">
-          <CWButton label="Cancel" onClick={closeModal} />
-          <CWButton
-            primary
-            label={
-              !isSaving ? (
-                'Save'
-              ) : (
-                <span className="flex items-center justify-center w-full">
-                  <Spinner />
-                </span>
-              )
-            }
+          <CWSolidButton label="Cancel" onClick={closeModal} />
+          <CWOutlineLoadingButton
+            label="Save"
+            loadingLabel="Saving"
+            loading={isSaving}
             onClick={saveChartChanges}
           />
         </div>

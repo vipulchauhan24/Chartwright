@@ -10,7 +10,7 @@ import { Fragment } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { removeFromLocalStorage } from '../../charteditor/utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../charteditor/utils/constants';
-import CWButton from '../button';
+import { CWSGhostIconButton } from '@chartwright/core-components';
 
 const { VITE_CLIENT_ID } = import.meta.env;
 
@@ -54,23 +54,15 @@ export default function ProfileDropdown() {
           <div className="py-2 flex flex-col items-center">
             <MenuItem>
               {auth.isAuthenticated ? (
-                <CWButton
-                  tertiary
-                  label={
-                    <>
-                      <LogOut className="size-4" aria-hidden={true} /> Sign out
-                    </>
-                  }
+                <CWSGhostIconButton
+                  icon={<LogOut className="size-4" aria-hidden={true} />}
+                  label="Sign out"
                   onClick={logout}
                 />
               ) : (
-                <CWButton
-                  tertiary
-                  label={
-                    <>
-                      <LogIn className="size-4" aria-hidden={true} /> Sign in
-                    </>
-                  }
+                <CWSGhostIconButton
+                  icon={<LogIn className="size-4" aria-hidden={true} />}
+                  label="Sign in"
                   onClick={redirectToLoginPage}
                 />
               )}

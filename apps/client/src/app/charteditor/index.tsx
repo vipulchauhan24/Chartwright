@@ -10,13 +10,13 @@ import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import { SESSION_STORAGE_KEYS } from './utils/constants';
-import CWButton from '../components/button';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
+import { CWIconOutlineButton } from '@chartwright/core-components';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -106,23 +106,23 @@ function ChartEditor() {
     return [
       {
         tooltip: 'View chart templates',
-        label: <ChartPie className="size-4" aria-hidden={true} />,
+        icon: <ChartPie className="size-4" aria-hidden={true} />,
         onClick: openChartGallery,
       },
       {
         tooltip: 'Export',
-        label: <Share2 className="size-4" aria-hidden={true} />,
+        icon: <Share2 className="size-4" aria-hidden={true} />,
         onClick: exportChart,
         disabled: exportDisabled,
       },
       {
         tooltip: 'View saved charts',
-        label: <ChartArea className="size-4" aria-hidden={true} />,
+        icon: <ChartArea className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated ? redirectToLoginPage : viewMyCharts,
       },
       {
         tooltip: 'Save changes',
-        label: <Save className="size-4" aria-hidden={true} />,
+        icon: <Save className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated ? redirectToLoginPage : openSaveChartModal,
       },
     ];
@@ -161,8 +161,7 @@ function ChartEditor() {
               <div className="flex items-center gap-2">
                 {chartUtitlityBtns.map((btnConfig) => {
                   return (
-                    <CWButton
-                      additionalCssClasses="py-2 px-3"
+                    <CWIconOutlineButton
                       {...btnConfig}
                       key={btnConfig.tooltip}
                     />

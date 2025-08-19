@@ -1,7 +1,7 @@
 import React from 'react';
 import { Popover } from 'radix-ui';
 import { X } from 'lucide-react';
-import { CWIconButton } from './iconBtn';
+import { CWIconButton } from '../Buttons/IconButton';
 import Tippy from '@tippyjs/react';
 
 interface ICWPopover {

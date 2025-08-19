@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import Spinner from './components/spinner';
-import CWButton from './components/button';
 import { userLogin } from '../service/userAPI';
 import {
   fetchFromLocalStorage,
@@ -14,6 +13,7 @@ import {
   LOCAL_STORAGE_KEYS,
   SESSION_STORAGE_KEYS,
 } from './charteditor/utils/constants';
+import { CWOutlineButton } from '@chartwright/core-components';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -77,8 +77,11 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-background">
         <div className="flex gap-2">
-          <CWButton label="Continue as guest" onClick={continueAsGuest} />
-          <CWButton label="Continue as user" onClick={continueAsUser} />
+          <CWOutlineButton
+            label="Continue as guest"
+            onClick={continueAsGuest}
+          />
+          <CWOutlineButton label="Continue as user" onClick={continueAsUser} />
         </div>
       </div>
     );

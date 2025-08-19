@@ -4,9 +4,12 @@ import {
   currentChartGlobalConfig,
 } from '../../../../store/charts';
 import { getNestedValue, setByPath } from '../../utils/lib';
-import CWButton from '../../../components/button';
 import { useCallback, useMemo, useState } from 'react';
-import { CWAccordian, CWPopover } from '@chartwright/core-components';
+import {
+  CWAccordian,
+  CWGhostButton,
+  CWPopover,
+} from '@chartwright/core-components';
 import InputRenderer from '../inputRenderer';
 import { LetterText, SquareDashedMousePointer } from 'lucide-react';
 
@@ -125,12 +128,11 @@ function GlobalOptionsEditor() {
 
   return (
     <div className="p-4 flex flex-col items-end">
-      <CWButton
+      <CWGhostButton
         label={allOptionsOpen ? 'Collapse All' : 'Expand All'}
         onClick={() => {
           setAllOptionsOpen((prev) => !prev);
         }}
-        tertiary
       />
       <div className="w-full mt-2">
         <CWAccordian

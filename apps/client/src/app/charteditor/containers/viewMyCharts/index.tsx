@@ -6,9 +6,9 @@ import { useAtom } from 'jotai';
 import Spinner from '../../../components/spinner';
 import { fetchMyCharts } from '../../../../service/chartsApi';
 import { useNavigate } from 'react-router-dom';
-import CWButton from '../../../components/button';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { CWSolidIconButton } from '@chartwright/core-components';
 
 interface IViewMyCharts {
   isOpen: boolean;
@@ -72,18 +72,13 @@ function ViewMyCharts(props: IViewMyCharts) {
                     <td className="px-6 py-4">{chart['chart_type']}</td>
                     <td className="px-6 py-4">{chart['created_date']}</td>
                     <td className="px-6 py-4">
-                      <CWButton
+                      <CWSolidIconButton
                         onClick={() => {
                           viewMyChart(chart['id']);
                         }}
-                        label={
-                          <>
-                            View
-                            <ExternalLink
-                              className="size-4"
-                              aria-hidden={true}
-                            />
-                          </>
+                        label="View"
+                        icon={
+                          <ExternalLink className="size-4" aria-hidden={true} />
                         }
                       />
                     </td>

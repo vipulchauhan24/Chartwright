@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Accordion } from 'radix-ui';
 import { ChevronDown } from 'lucide-react';
-import '../assets/style.scss';
+import '../../assets/style.scss';
 
 interface ICWAccordian {
   expandAll: boolean;

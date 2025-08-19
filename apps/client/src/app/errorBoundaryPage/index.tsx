@@ -1,4 +1,4 @@
-import CWButton from '../components/button';
+import { CWSolidButton } from '@chartwright/core-components';
 import CWLink from '../components/link';
 
 function ErrorBoundaryPage() {
@@ -10,7 +10,7 @@ function ErrorBoundaryPage() {
           Woops! Something went wrong.
         </h1>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <CWButton
+          <CWSolidButton
             onClick={() => {
               window.location.reload();
             }}
