@@ -6,6 +6,7 @@ interface ICWSelect {
   items: Array<{ id: string | number; value: string; label: string }>;
   onChange: (value: string) => void;
   defaultValue?: string;
+  disabled?: boolean;
 }
 
 export function CWSelect({
@@ -13,9 +14,14 @@ export function CWSelect({
   items,
   defaultValue,
   onChange,
+  disabled,
 }: ICWSelect) {
   return (
-    <Select.Root defaultValue={defaultValue} onValueChange={onChange}>
+    <Select.Root
+      defaultValue={defaultValue}
+      onValueChange={onChange}
+      disabled={disabled}
+    >
       <Select.Trigger className="flex border border-border rounded-md py-1 px-2 w-28">
         <div className="w-20 truncate text-left">
           <Select.Value placeholder={placeholder} className="" />

@@ -29,6 +29,21 @@ export class ChartsController {
     return this.chartService.getChartGlobalConfigsByType(type);
   }
 
+  /**
+   * Default Config Apis.
+   */
+  @Post('chart-default-config')
+  setChartDefaultConfig(
+    @Body() saveChartReqBody: { type: string; config: JSON }
+  ) {
+    return this.chartService.setChartDefaultConfig(saveChartReqBody);
+  }
+
+  @Get('chart-default-config/:type')
+  getChartDefaultConfigByType(@Param('type') type: string) {
+    return this.chartService.getChartDefaultConfigByType(type);
+  }
+
   @Get('chart-gallery')
   getChartGalleryData() {
     return this.chartService.getChartGalleryData();
@@ -57,7 +72,6 @@ export class ChartsController {
       chart_type: saveChartReqBody.chart_type,
       updated_by: saveChartReqBody.updated_by,
       updated_date: saveChartReqBody.updated_date,
-      is_for_gallery: saveChartReqBody.is_for_gallery,
     };
     return this.chartService.saveChart(params);
   }

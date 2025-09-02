@@ -9,6 +9,7 @@ import {
   CWOutlineButton,
   CWSelect,
   CWSolidButton,
+  CWSolidLoadingButton,
   CWSpinner,
   CWStepper,
   ICWStepper,
@@ -37,7 +38,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     Array<{ id: string; value: string; label: string }>
   >([]);
   const [xColumnName, setXColumnName] = useState<string>();
-  const { buildChartConfig } = useChartConfig();
+  const { isProcessing, buildChartConfig } = useChartConfig();
 
   const processUploadedFile = useCallback((file: Dropzone.DropzoneFile) => {
     try {
@@ -144,7 +145,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   }, [columnNames, uploadedFileData]);
 
   const generateChartConfig = useCallback(async () => {
-    await buildChartConfig(uploadedFileData, `${xColumnName}`, 'line');
+    await buildChartConfig(uploadedFileData, `${xColumnName}`, 'bar');
     toggleImportDataModal(false);
   }, [buildChartConfig, toggleImportDataModal, uploadedFileData, xColumnName]);
 
@@ -188,6 +189,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
               onChange={(value: string) => {
                 setXColumnName(value);
               }}
+              disabled={isProcessing}
             />
             <div className="flex gap-4 mt-2">
               <CWOutlineButton
@@ -195,8 +197,15 @@ function ImportData({ toggleImportDataModal }: IImportData) {
                 onClick={() => {
                   toggleImportDataModal(false);
                 }}
+                disabled={isProcessing}
               />
-              <CWSolidButton label="Confirm" onClick={generateChartConfig} />
+              <CWSolidLoadingButton
+                label="Generate"
+                onClick={generateChartConfig}
+                loadingLabel="Processing"
+                loading={isProcessing}
+                disabled={isProcessing}
+              />
             </div>
           </div>
         ),
@@ -209,6 +218,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     xColumnName,
     defaultSelectedColumn,
     columnNames,
+    isProcessing,
     generateChartConfig,
     toggleImportDataModal,
   ]);

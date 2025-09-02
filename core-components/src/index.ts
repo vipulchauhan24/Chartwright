@@ -10,5 +10,6 @@ export * from './lib/Buttons/GhostButton';
 export * from './lib/Buttons/GhostIconButton';
 export * from './lib/Buttons/SolidButton';
 export * from './lib/Buttons/SolidIconButton';
+export * from './lib/Buttons/SolidLoadingButton';
 export * from './lib/Buttons/OutlineButton';
 export * from './lib/Buttons/OutlineLoadingButton';

@@ -43,10 +43,68 @@ export class ChartService {
     }
   }
 
+  /**
+   * Default Config Apis.
+   */
+  async setChartDefaultConfig(params: { type: string; config: JSON }) {
+    try {
+      const { type, config } = params;
+      const query = `INSERT INTO ${
+        TABLE_NAME.CHART_DEFAULT_CONFIG
+      } (type, config) VALUES ('${type}', '${JSON.stringify(
+        config
+      )}') RETURNING *;`;
+
+      const result = await this.db.execute(query);
+      return result[0];
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getChartDefaultConfigByType(type: string) {
+    try {
+      const items = await this.db.execute(
+        `SELECT config FROM ${TABLE_NAME.CHART_DEFAULT_CONFIG} where type='${type}';`
+      );
+
+      return items.length ? items[0] : {};
+    } catch (error) {
+      console.error("Error in 'getChartTemplates': ", error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  /**
+   * CHART TEMPLATES APIs.
+   */
+  async getChartTemplates() {
+    try {
+      const items = await this.db.execute(
+        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.CHART_TEMPLATES};`
+      );
+
+      return items;
+    } catch (error) {
+      console.error("Error in 'getChartTemplates': ", error);
+      throw new HttpException(
+        'Internal server error.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async getChartGalleryData() {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.CHARTS} WHERE is_for_gallery = true;`
+        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.CHARTS};`
       );
 
       return items;
@@ -101,7 +159,6 @@ export class ChartService {
     created_date?: string;
     updated_by?: string;
     updated_date?: string;
-    is_for_gallery?: string;
   }) {
     try {
       const {
@@ -114,16 +171,13 @@ export class ChartService {
         created_date,
         updated_by,
         updated_date,
-        is_for_gallery,
       } = params;
 
       let query = `INSERT INTO ${
         TABLE_NAME.CHARTS
-      } (title, config, chart_type, thumbnail, created_by, created_date, is_for_gallery) VALUES ('${title}', '${JSON.stringify(
+      } (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${JSON.stringify(
         config
-      )}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}', ${
-        is_for_gallery ? true : false
-      }) RETURNING *;`;
+      )}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}') RETURNING *;`;
 
       if (id) {
         query = `UPDATE ${

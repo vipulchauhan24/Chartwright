@@ -32,17 +32,19 @@ export const fetchChartGlobalOptions = atom(null, async (get, set) => {
   }
 });
 
-// export const setCurrentChartConfig = atom(null, async (get, set, id) => {
-//   try {
-//     const basicChartConfigs = get(chartGallery);
-//   } catch (error) {
-//     console.error('Error in "setCurrentChartConfig":', error);
-//     set(currentChartGlobalConfig, undefined);
-//     set(currentChartConfigStore, null);
-//     set(chartTitle, '');
-//     set(chartId, '');
-//   }
-// });
+export const getChartDefaultConfigByType = atom(
+  null,
+  async (get, set, type) => {
+    try {
+      const { data } = await axios.get(
+        `${API_ENDPOINTS.CHART_DEFAULT_CONFIG}/${type}`
+      );
+      return data;
+    } catch (error) {
+      console.error('Error in "getChartDefaultConfigByType":', error);
+    }
+  }
+);
 
 export const setDefaultChartConfig = atom(
   null,

@@ -43,8 +43,4 @@ export class SaveChartDTO {
   @IsOptional()
   @IsDateString()
   updated_date?: string;
-
-  @IsOptional()
-  @IsBooleanString()
-  is_for_gallery?: string;
 }
