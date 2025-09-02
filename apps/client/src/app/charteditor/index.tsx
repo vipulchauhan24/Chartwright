@@ -6,17 +6,18 @@ import {
   setDefaultChartConfig,
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
-import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import { SESSION_STORAGE_KEYS } from './utils/constants';
 import { isExportDisabled } from '../../store/app';
-import { ChartArea, ChartPie, Save, Share2 } from 'lucide-react';
+import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
-import { CWIconOutlineButton } from '@chartwright/core-components';
+import { CWIconOutlineButton, CWModal } from '@chartwright/core-components';
+import ImportData from './containers/importData';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -44,6 +45,7 @@ function ChartEditor() {
   const [showChartGallery, setShowChartGallery] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
   const [showMyCharts, setShowMyCharts] = useState(false);
+  const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,6 +89,14 @@ function ChartEditor() {
     setShowSaveChartModal(true);
   }, []);
 
+  const toggleImportDataModal = useCallback((open: boolean) => {
+    setIsImportDialogVisible(open);
+  }, []);
+
+  const openImportDataModal = useCallback(() => {
+    setIsImportDialogVisible(true);
+  }, []);
+
   const onSetChartViaGalleryOptions = useCallback(
     (value: string) => {
       getDefaultChartConfig(value);
@@ -125,12 +135,18 @@ function ChartEditor() {
         icon: <Save className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated ? redirectToLoginPage : openSaveChartModal,
       },
+      {
+        tooltip: 'Import from file',
+        icon: <FolderInput className="size-4" aria-hidden={true} />,
+        onClick: openImportDataModal,
+      },
     ];
   }, [
     exportChart,
     exportDisabled,
     isAuthenticated,
     openChartGallery,
+    openImportDataModal,
     openSaveChartModal,
     redirectToLoginPage,
     viewMyCharts,
@@ -189,9 +205,15 @@ function ChartEditor() {
           setIsOpen={setShowSaveChartModal}
         />
         <ViewMyCharts isOpen={showMyCharts} setIsOpen={setShowMyCharts} />
+        <CWModal
+          open={isImportDialogVisible}
+          setOpen={toggleImportDataModal}
+          title="Import Data"
+          content={<ImportData toggleImportDataModal={toggleImportDataModal} />}
+        />
       </>
     </AppShell>
   );
 }
 
-export default ChartEditor;
+export default React.memo(ChartEditor);

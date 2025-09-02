@@ -1,6 +1,4 @@
-import React from 'react';
-
-function CWSpinner() {
+export function CWSpinner() {
   return (
     <svg
       className="size-5 animate-spin text-text-main"
@@ -22,5 +20,3 @@ function CWSpinner() {
     </svg>
   );
 }
-
-export default React.memo(CWSpinner);

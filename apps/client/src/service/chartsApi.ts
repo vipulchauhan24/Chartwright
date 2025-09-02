@@ -32,6 +32,18 @@ export const fetchChartGlobalOptions = atom(null, async (get, set) => {
   }
 });
 
+// export const setCurrentChartConfig = atom(null, async (get, set, id) => {
+//   try {
+//     const basicChartConfigs = get(chartGallery);
+//   } catch (error) {
+//     console.error('Error in "setCurrentChartConfig":', error);
+//     set(currentChartGlobalConfig, undefined);
+//     set(currentChartConfigStore, null);
+//     set(chartTitle, '');
+//     set(chartId, '');
+//   }
+// });
+
 export const setDefaultChartConfig = atom(
   null,
   async (get, set, chartMatchId) => {
@@ -67,7 +79,7 @@ export const setDefaultChartConfig = atom(
       }
     } catch (error) {
       console.error('Error in "setDefaultChartConfig":', error);
-      set(currentChartGlobalConfig, null);
+      set(currentChartGlobalConfig, undefined);
       set(currentChartConfigStore, null);
       set(chartTitle, '');
       set(chartId, '');
@@ -98,7 +110,7 @@ export const fetchChartConfig = atom(null, async (get, set, chart_id) => {
     set(chartTitle, chartConfig['title']);
     set(chartId, chartConfig['id']);
   } catch {
-    set(currentChartGlobalConfig, null);
+    set(currentChartGlobalConfig, undefined);
     set(currentChartConfigStore, null);
     set(chartTitle, '');
     set(chartId, '');

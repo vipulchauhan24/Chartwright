@@ -83,7 +83,6 @@ function ChartDataEditor() {
         return <YAxisEdgeIcon className="size-4" aria-hidden={true} />;
       case 'grid':
         return <GridIcon className="size-4" aria-hidden={true} />;
-
       default:
         return null;
     }
@@ -133,11 +132,11 @@ function ChartDataEditor() {
       }),
     ];
 
-    chartDataConfig.series.forEach((_item: unknown, indx: number) => {
+    chartDataConfig.series.forEach((item: { name: string }, indx: number) => {
       options.push(
         ...chartEditableFeatures.chartEditSeries.map((option) => {
           return {
-            title: `${option.title} ${indx + 1}`,
+            title: item.name || `${option.title} ${indx + 1}`,
             panelComponent: [
               ...getInputRenderedComp(option, indx),
               ...getChildrens(option, indx),

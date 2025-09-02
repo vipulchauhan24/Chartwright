@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import CWSpinner from '../../Spinner';
+import { CWSpinner } from '../../Spinner';
 import clsx from 'clsx';
 
 interface ICWOutlineLoadingButton
