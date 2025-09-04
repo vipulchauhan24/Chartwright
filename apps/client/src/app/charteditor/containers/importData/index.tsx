@@ -21,6 +21,8 @@ import Papa from 'papaparse';
 import { read, utils } from 'xlsx';
 import useChartConfig from '../../hooks/useChartConfig';
 
+type chart_types = 'bar' | 'line';
+
 interface IImportData {
   toggleImportDataModal: (open: boolean) => void;
 }
@@ -29,6 +31,24 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   const dropzoneRef = useRef<HTMLDivElement>(null);
   const dropzoneInstRef = useRef<Dropzone>(null);
   const stepperRef = useRef<ICWStepper>(null);
+  const chartTypes = useRef<
+    Array<{
+      id: string;
+      value: string;
+      label: string;
+    }>
+  >([
+    {
+      id: 'chart-types-bar',
+      value: 'bar',
+      label: 'Bar',
+    },
+    {
+      id: 'chart-types-line',
+      value: 'line',
+      label: 'Line',
+    },
+  ]);
 
   const [uploadedFileData, setUploadedFileData] = useState<Array<never>>([]);
   const [isFileProcessing, setIsFileProcessing] = useState<boolean>(false);
@@ -38,6 +58,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     Array<{ id: string; value: string; label: string }>
   >([]);
   const [xColumnName, setXColumnName] = useState<string>();
+  const [chartType, setChartType] = useState<chart_types>('bar');
   const { isProcessing, buildChartConfig } = useChartConfig();
 
   const processUploadedFile = useCallback((file: Dropzone.DropzoneFile) => {
@@ -145,14 +166,20 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   }, [columnNames, uploadedFileData]);
 
   const generateChartConfig = useCallback(async () => {
-    await buildChartConfig(uploadedFileData, `${xColumnName}`, 'bar');
+    await buildChartConfig(uploadedFileData, `${xColumnName}`, chartType);
     toggleImportDataModal(false);
-  }, [buildChartConfig, toggleImportDataModal, uploadedFileData, xColumnName]);
+  }, [
+    buildChartConfig,
+    chartType,
+    toggleImportDataModal,
+    uploadedFileData,
+    xColumnName,
+  ]);
 
   const steps = useMemo(() => {
     return [
       {
-        id: 'upload',
+        id: 'import-data-upload',
         label: 'Upload',
         description: 'Add your file.',
         render: () => (
@@ -177,21 +204,39 @@ function ImportData({ toggleImportDataModal }: IImportData) {
         ),
       },
       {
-        id: 'map',
-        label: 'Map Columns',
-        description: 'Select x axis data.',
+        id: 'import-data-map',
+        label: 'Chart data',
+        description: 'Select chart axis and type.',
         render: () => (
           <div className="flex flex-col items-center justify-center">
-            <CWSelect
-              placeholder="Select x axis"
-              defaultValue={xColumnName || defaultSelectedColumn}
-              items={columnNames}
-              onChange={(value: string) => {
-                setXColumnName(value);
-              }}
-              disabled={isProcessing}
-            />
-            <div className="flex gap-4 mt-2">
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2">
+                <span>X-Axis: </span>
+                <CWSelect
+                  placeholder="Select x axis"
+                  defaultValue={xColumnName || defaultSelectedColumn}
+                  items={columnNames}
+                  onChange={(value: string) => {
+                    setXColumnName(value);
+                  }}
+                  disabled={isProcessing}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span>Chart type: </span>
+                <CWSelect
+                  placeholder="Select chart type"
+                  defaultValue={chartType}
+                  items={chartTypes.current}
+                  onChange={(value: string) => {
+                    setChartType(value as chart_types);
+                  }}
+                  disabled={isProcessing}
+                />
+              </div>
+            </div>
+            <div className="flex gap-4 mt-6">
               <CWOutlineButton
                 label="Cancel"
                 onClick={() => {

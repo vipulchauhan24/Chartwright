@@ -4,6 +4,8 @@ import { currentChartConfigStore } from '../../../store/charts';
 import { getChartDefaultConfigByType } from '../../../service/chartsApi';
 import toast from 'react-hot-toast';
 
+type chart_types = 'bar' | 'line';
+
 function useChartConfig() {
   const [, setChartDataConfig] = useAtom(currentChartConfigStore);
   const [, getChartDefaultConfig] = useAtom(getChartDefaultConfigByType);
@@ -25,7 +27,7 @@ function useChartConfig() {
   );
 
   const buildChartConfig = useCallback(
-    async (data: Array<never>, xColumnName: string, type: 'bar' | 'line') => {
+    async (data: Array<never>, xColumnName: string, type: chart_types) => {
       try {
         setIsProcessing(true);
         let chartConfig = await getChartDefaultConfig(type);

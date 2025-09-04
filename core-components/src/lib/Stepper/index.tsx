@@ -69,7 +69,7 @@ export const CWStepper = forwardRef<ICWStepper, StepperProps>(
       <Tabs.Root
         value={currentId}
         onValueChange={setCurrentId}
-        className="w-full"
+        className="w-full pt-2"
       >
         <Tabs.List className="flex gap-6">
           {steps.map((step, i) => {
