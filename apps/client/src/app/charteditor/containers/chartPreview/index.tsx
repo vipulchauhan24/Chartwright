@@ -40,7 +40,11 @@ function ChartPreview() {
     chartInstance.current?.on('finished', function () {
       chartRenderFinished();
     });
-    chartInstance.current?.setOption({ ...chartDataConfig });
+    chartInstance.current?.setOption(chartDataConfig, {
+      notMerge: true,
+      lazyUpdate: true,
+      silent: true,
+    });
   }, [chartDataConfig, chartRenderFinished]);
 
   const generateImage = (

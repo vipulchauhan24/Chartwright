@@ -6,7 +6,6 @@ import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
 
 const ChartEditor = lazy(() => import('./charteditor'));
-const EmbededChart = lazy(() => import('./embededChart'));
 const Home = lazy(() => import('./home'));
 const PageNotFound = lazy(() => import('./pageNotFound'));
 const AuthGaurd = lazy(() => import('./authGaurd'));
@@ -63,7 +62,6 @@ export function App() {
             </AuthGaurd>
           }
         />
-        <Route path="/render/:id" element={<EmbededChart />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     );
