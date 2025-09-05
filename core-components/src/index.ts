@@ -3,6 +3,7 @@ export * from './lib/Popover';
 export * from './lib/Modal';
 export * from './lib/Stepper';
 export * from './lib/Spinner';
+export * from './lib/Switch';
 export * from './lib/Dropdowns/Select';
 export * from './lib/Buttons/IconButton';
 export * from './lib/Buttons/IconOutlineButton';

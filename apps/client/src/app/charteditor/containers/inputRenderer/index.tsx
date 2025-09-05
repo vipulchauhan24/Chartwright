@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
-import CWCheckbox from '../../../components/checkbox';
 import CWColorInput from '../../../components/colorInput';
 import CWNumberInput from '../../../components/numberInput';
 import CWSelect from '../../../components/select';
 import CWTextArea from '../../../components/textArea';
 import CWTextInput from '../../../components/textInput';
 import { isArray } from '../../utils/lib';
+import { CWSwitch } from '@chartwright/core-components';
 
 interface IInputRenderer {
   id: string;
@@ -318,9 +318,7 @@ function InputRenderer(props: IInputRenderer) {
 
   switch (fieldType) {
     case FIELD_TYPE.SWITCH:
-      return (
-        <CWCheckbox {...inputProps} checked={Boolean(value)} hint={hint} />
-      );
+      return <CWSwitch {...inputProps} checked={Boolean(value)} hint={hint} />;
     case FIELD_TYPE.TEXT:
       return (
         <CWTextInput
