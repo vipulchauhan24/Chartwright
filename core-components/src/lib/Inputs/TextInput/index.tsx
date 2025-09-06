@@ -33,7 +33,7 @@ export function CWTextInput(props: ICWTextInput) {
         <input
           id={id}
           type="text"
-          value={defaultValue}
+          value={defaultValue === 'undefined' ? '' : defaultValue}
           placeholder={placeholder}
           onChange={onChange}
           className="text-text-main border w-full border-border py-1 px-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
