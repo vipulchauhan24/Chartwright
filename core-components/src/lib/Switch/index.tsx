@@ -5,7 +5,7 @@ import { Switch } from 'radix-ui';
 
 interface ICWSwitch {
   id: string;
-  label: string;
+  label?: string;
   onChange: (checked: boolean) => void;
   checked: boolean;
   hint?: string;

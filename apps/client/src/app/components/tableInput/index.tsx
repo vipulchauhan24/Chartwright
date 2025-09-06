@@ -1,7 +1,6 @@
-import IconButton from '../iconButton';
-import CWTextInput from '../textInput';
 import { useEffect, useState } from 'react';
 import { Plus, Trash } from 'lucide-react';
+import { CWIconButton, CWTextInput } from '@chartwright/core-components';
 
 interface ICWTableInput {
   id: string;
@@ -107,14 +106,14 @@ function CWTableInput(props: ICWTableInput) {
                   </td>
                   <td>
                     <div className="flex gap-1">
-                      <IconButton
+                      <CWIconButton
                         icon={<Trash className="size-4" aria-hidden={true} />}
                         onClick={() => {
                           onDelete(indx);
                         }}
                       />
                       {indx === series.length - 1 && (
-                        <IconButton
+                        <CWIconButton
                           icon={<Plus className="size-4" aria-hidden={true} />}
                           onClick={onAdd}
                         />

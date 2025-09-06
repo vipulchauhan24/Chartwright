@@ -15,6 +15,7 @@ body,
 #root {
   min-width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -40,4 +41,22 @@ body,
       display: inline;
     }
   }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+textarea {
+  resize: vertical;
+  max-height: 150px; /* cap height */
+  min-height: 80px; /* optional minimum */
 }

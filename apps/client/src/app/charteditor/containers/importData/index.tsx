@@ -213,6 +213,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
               <div className="flex items-center gap-2">
                 <span>X-Axis: </span>
                 <CWSelect
+                  id="import-data-select-x-axis"
                   placeholder="Select x axis"
                   defaultValue={xColumnName || defaultSelectedColumn}
                   items={columnNames}
@@ -226,6 +227,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
               <div className="flex items-center gap-2">
                 <span>Chart type: </span>
                 <CWSelect
+                  id="import-data-select-chart-type"
                   placeholder="Select chart type"
                   defaultValue={chartType}
                   items={chartTypes.current}
@@ -264,6 +266,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     defaultSelectedColumn,
     columnNames,
     isProcessing,
+    chartType,
     generateChartConfig,
     toggleImportDataModal,
   ]);

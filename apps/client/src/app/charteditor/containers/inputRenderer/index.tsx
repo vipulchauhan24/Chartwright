@@ -1,11 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
-import CWColorInput from '../../../components/colorInput';
-import CWNumberInput from '../../../components/numberInput';
-import CWSelect from '../../../components/select';
-import CWTextArea from '../../../components/textArea';
-import CWTextInput from '../../../components/textInput';
 import { isArray } from '../../utils/lib';
-import { CWSwitch } from '@chartwright/core-components';
+import {
+  CWSwitch,
+  CWTextInput,
+  CWSelect,
+  CWColorInput,
+  CWNumberInput,
+  CWTextArea,
+} from '@chartwright/core-components';
 
 interface IInputRenderer {
   id: string;
@@ -297,7 +299,9 @@ function InputRenderer(props: IInputRenderer) {
   } = props;
 
   const onChange = useCallback(
-    (event: any) => {
+    (
+      event: React.ChangeEvent<HTMLInputElement> | string | string[] | boolean
+    ) => {
       updateChartDataConfig(
         configPathPrefix ? configPathPrefix + configPath : configPath,
         typeof event === 'object' && !isArray(event)
@@ -333,9 +337,10 @@ function InputRenderer(props: IInputRenderer) {
         <CWSelect
           {...inputProps}
           defaultValue={String(value)}
-          options={REFERENCE_TABLE[`${reference}`]}
+          items={REFERENCE_TABLE[`${reference}`]}
           disabled={disabled}
           hint={hint}
+          placeholder="Choose.."
         />
       );
     case FIELD_TYPE.COLOR:

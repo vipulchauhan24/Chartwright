@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import IconButton from '../iconButton';
 import { X } from 'lucide-react';
+import { CWIconButton } from '@chartwright/core-components';
 
 interface ICWModal {
   title: string;
@@ -36,7 +36,7 @@ function CWModal(props: ICWModal) {
               >
                 {title}
               </DialogTitle>
-              <IconButton
+              <CWIconButton
                 icon={<X className="size-4" aria-hidden={true} />}
                 onClick={toggleOpen}
                 tooltip="Close"

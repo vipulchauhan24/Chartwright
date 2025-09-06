@@ -1,5 +1,4 @@
 import CWModal from '../../../components/modal';
-import CWTextInput from '../../../components/textInput';
 import { chartTitle, currentChartConfigStore } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
@@ -11,6 +10,7 @@ import { fetchMyCharts } from '../../../../service/chartsApi';
 import {
   CWOutlineLoadingButton,
   CWSolidButton,
+  CWTextInput,
 } from '@chartwright/core-components';
 
 interface ISaveChart {

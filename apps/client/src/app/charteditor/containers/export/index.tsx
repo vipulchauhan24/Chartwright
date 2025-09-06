@@ -15,18 +15,13 @@ import {
 import useAuthentication from '../../hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import CWLink from '../../../components/link';
-import IconButton from '../../../components/iconButton';
 import { copyToMemory, fetchFromLocalStorage } from '../../utils/lib';
 import toast from 'react-hot-toast';
 import { chartId } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import axios from 'axios';
-import {
-  CWGhostButton,
-  CWIconButton,
-  CWSolidButton,
-} from '@chartwright/core-components';
+import { CWIconButton, CWSolidButton } from '@chartwright/core-components';
 
 interface IExportChart {
   isOpen: boolean;
@@ -314,14 +309,14 @@ function ExportChart(props: IExportChart) {
                 label={<span className="truncate w-56">{props.url}</span>}
               />
             </span>
-            <IconButton
+            <CWIconButton
               tooltip="Copy link"
               icon={<Copy className="size-4" aria-hidden={true} />}
               onClick={() => {
                 copyToClipboard(`${props.url}`);
               }}
             />
-            <IconButton
+            <CWIconButton
               tooltip="Delete link"
               icon={<Trash className="size-4" aria-hidden={true} />}
               onClick={async () => {
