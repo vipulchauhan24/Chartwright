@@ -1,4 +1,4 @@
-import CWLink from '../components/link';
+import { CWGhostLink } from '@chartwright/core-components';
 import CWLinkButton from '../components/linkButton';
 
 export default function PageNotFound() {
@@ -12,14 +12,14 @@ export default function PageNotFound() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <CWLinkButton href="/" label="Go back home" />
-          <CWLink
+          <CWGhostLink
             href="/"
             label={
               <p>
                 Contact support <span aria-hidden="true">&rarr;</span>
               </p>
             }
-          ></CWLink>
+          />
         </div>
       </div>
     </main>

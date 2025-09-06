@@ -1,5 +1,4 @@
-import { CWSolidButton } from '@chartwright/core-components';
-import CWLink from '../components/link';
+import { CWGhostLink, CWSolidButton } from '@chartwright/core-components';
 
 function ErrorBoundaryPage() {
   return (
@@ -16,14 +15,14 @@ function ErrorBoundaryPage() {
             }}
             label="Refresh"
           />
-          <CWLink
+          <CWGhostLink
             href="/"
             label={
               <p>
                 Contact support <span aria-hidden="true">&rarr;</span>
               </p>
             }
-          ></CWLink>
+          />
         </div>
       </div>
     </main>

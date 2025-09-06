@@ -7,7 +7,6 @@ import {
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import CWLink from '../components/link';
 import Spinner from '../components/spinner';
 import { SESSION_STORAGE_KEYS } from './utils/constants';
 import { isExportDisabled } from '../../store/app';
@@ -16,7 +15,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
-import { CWIconOutlineButton, CWModal } from '@chartwright/core-components';
+import {
+  CWGhostLink,
+  CWIconOutlineButton,
+  CWModal,
+} from '@chartwright/core-components';
 import ImportData from './containers/importData';
 
 const AppShell = lazy(() => import('./layout/appshell'));
@@ -169,7 +172,7 @@ function ChartEditor() {
               <GlobalOptionsEditor />
             </div>
             <div className="p-4">
-              <CWLink href="#" label="Need Help?" />
+              <CWGhostLink href="#" label="Need Help?" />
             </div>
           </aside>
           <div className="h-full w-full px-4 pb-4 overflow-auto">

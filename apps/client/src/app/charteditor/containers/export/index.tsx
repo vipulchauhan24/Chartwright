@@ -14,14 +14,17 @@ import {
 } from 'lucide-react';
 import useAuthentication from '../../hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
-import CWLink from '../../../components/link';
 import { copyToMemory, fetchFromLocalStorage } from '../../utils/lib';
 import toast from 'react-hot-toast';
 import { chartId } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import axios from 'axios';
-import { CWIconButton, CWSolidButton } from '@chartwright/core-components';
+import {
+  CWGhostLink,
+  CWIconButton,
+  CWSolidButton,
+} from '@chartwright/core-components';
 
 interface IExportChart {
   isOpen: boolean;
@@ -304,7 +307,7 @@ function ExportChart(props: IExportChart) {
           <div className="flex items-center gap-4 mt-4">
             <span className="flex items-center gap-1">
               <strong>Link: </strong>
-              <CWLink
+              <CWGhostLink
                 href={props.url}
                 label={<span className="truncate w-56">{props.url}</span>}
               />
