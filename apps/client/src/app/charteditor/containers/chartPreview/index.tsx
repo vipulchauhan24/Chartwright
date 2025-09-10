@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
 import { useAtom } from 'jotai';
 import { currentChartConfigStore } from '../../../../store/charts';
@@ -11,6 +11,7 @@ import {
   copyToMemory,
   fileDownload,
 } from '../../utils/lib';
+import { ChartNoAxesCombined } from 'lucide-react';
 
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
@@ -19,9 +20,11 @@ function ChartPreview() {
   const chartRef = useRef(null);
   const chartInstance = useRef<echarts.EChartsType | undefined>(undefined);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
+  const [isChartRendered, setIsChartRendered] = useState(false);
 
   const chartRenderFinished = useCallback(() => {
     setIsExportChartDisabled(false);
+    setIsChartRendered(true);
   }, [setIsExportChartDisabled]);
 
   useEffect(() => {
@@ -149,16 +152,19 @@ function ChartPreview() {
   }, [copyToClipboard, downloadImage, exportToPDF]);
 
   return (
-    <div className="w-full h-[calc(100%_-_58px)] p-3 relative">
-      {/* {!isChartRendered && (
-        <div className="h-full w-full flex items-center justify-center animate-pulse bg-background rounded-xl">
+    <div className="w-full h-[calc(100%_-_58px)] pt-3 relative">
+      {!isChartRendered && (
+        <div className="h-full w-full flex items-center justify-center z-10 bg-axis/50 absolute top-3 left-0 rounded-lg">
           <ChartNoAxesCombined
-            className="size-10 stroke-border"
+            className="size-10 stroke-border animate-pulse"
             aria-hidden={true}
           />
         </div>
-      )} */}
-      <div ref={chartRef} className="h-full"></div>
+      )}
+      <div
+        ref={chartRef}
+        className="h-full bg-surface p-4 rounded-lg overflow-hidden shadow-toolbar"
+      ></div>
     </div>
   );
 }

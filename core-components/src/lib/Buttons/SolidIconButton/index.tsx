@@ -19,8 +19,8 @@ export const CWSolidIconButton = forwardRef<
       {...props}
       className={clsx(
         disabled &&
-          'opacity-50 hover:text-text-main pointer-events-none select-none',
-        'transition duration-200 ease-in-out py-1 px-3 border rounded-lg relative',
+          'opacity-50 hover:text-body pointer-events-none select-none',
+        'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative',
         'text-white border-primary bg-primary hover:bg-white hover:text-primary flex items-center gap-2'
       )}
     >

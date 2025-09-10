@@ -58,14 +58,14 @@ function CWTableInput(props: ICWTableInput) {
       <table id={id} className="w-full text-left table-auto min-w-max">
         <thead>
           <tr>
-            <th className="border-b p-1 border-border">
-              <p className="text-sm font-medium text-text-main">X-Axis</p>
+            <th className="border-b p-1 border-default">
+              <p className="text-sm font-medium text-body">X-Axis</p>
             </th>
-            <th className="border-b p-1 border-border">
-              <p className="text-sm font-medium text-text-main">Y-Axis</p>
+            <th className="border-b p-1 border-default">
+              <p className="text-sm font-medium text-body">Y-Axis</p>
             </th>
-            <th className="border-b p-1 border-border">
-              <p className="text-sm font-medium text-text-main">Size</p>
+            <th className="border-b p-1 border-default">
+              <p className="text-sm font-medium text-body">Size</p>
             </th>
           </tr>
         </thead>

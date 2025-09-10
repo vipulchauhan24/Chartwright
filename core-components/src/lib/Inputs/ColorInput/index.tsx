@@ -32,7 +32,7 @@ export function CWColorInput(props: ICWColorInput) {
         <div className="min-w-[40%] max-w-[40%]">
           <label
             htmlFor={id}
-            className="text-base font-normal text-text-main select-none"
+            className="text-base font-normal text-body select-none"
           >
             {label}
           </label>
@@ -41,7 +41,6 @@ export function CWColorInput(props: ICWColorInput) {
       <div className="flex items-center">
         <Tippy content={defaultValue}>
           <div
-            role="img"
             style={{
               backgroundColor: defaultValue,
               boxShadow: 'inset 0 0 0 1px #0000001a',

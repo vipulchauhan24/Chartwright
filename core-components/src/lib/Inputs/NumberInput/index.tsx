@@ -65,19 +65,19 @@ export function CWNumberInput(props: ICWNumberInput) {
         <div className="min-w-[40%] max-w-[40%]">
           <label
             htmlFor={id}
-            className="text-base font-normal text-text-main select-none"
+            className="text-base font-normal text-body select-none"
           >
             {label}
           </label>
         </div>
       )}
-      <div className="border border-border rounded-lg flex items-center gap-1 pr-2 w-full">
+      <div className="border border-default rounded-md flex items-center gap-1 pr-2 w-full">
         <input
           id={id}
           type="number"
           value={defaultValue}
           onChange={updateValue}
-          className="text-text-main w-full py-1 pl-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-body w-full py-1 pl-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         <CWIconButton
           icon={<Minus className="size-4" aria-hidden={true} />}

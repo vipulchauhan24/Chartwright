@@ -53,7 +53,7 @@ function ChartDataEditor() {
     (option: any, indx: number) => {
       return option.userInputs.map((props: any) => {
         return (
-          <div className="mt-2">
+          <div className="mb-2">
             <InputRenderer
               key={props.configPath}
               id={props.configPath}
@@ -95,12 +95,14 @@ function ChartDataEditor() {
             switch (childComp.type) {
               case 'popover':
                 return (
-                  <CWPopover
-                    content={getInputRenderedComp(childComp, indx)}
-                    title={childComp.title}
-                    icon={getPopoverIcon(childComp.iconName)}
-                    side="left"
-                  />
+                  <span className="mr-2">
+                    <CWPopover
+                      content={getInputRenderedComp(childComp, indx)}
+                      title={childComp.title}
+                      icon={getPopoverIcon(childComp.iconName)}
+                      side="left"
+                    />
+                  </span>
                 );
               default:
                 return null;

@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   root: __dirname,
@@ -18,6 +19,7 @@ export default defineConfig({
     host: 'localhost',
   },
   plugins: [
+    tailwindcss(),
     svgr({
       svgrOptions: {
         plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],

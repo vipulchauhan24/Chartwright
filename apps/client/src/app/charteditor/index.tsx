@@ -7,7 +7,6 @@ import {
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import Spinner from '../components/spinner';
 import { SESSION_STORAGE_KEYS } from './utils/constants';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
@@ -19,6 +18,7 @@ import {
   CWGhostLink,
   CWIconOutlineButton,
   CWModal,
+  CWSpinner,
 } from '@chartwright/core-components';
 import ImportData from './containers/importData';
 
@@ -158,7 +158,7 @@ function ChartEditor() {
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-        <Spinner />
+        <CWSpinner />
       </div>
     );
   }
@@ -167,7 +167,7 @@ function ChartEditor() {
     <AppShell>
       <>
         <div className="flex items-start justify-between h-full">
-          <aside className="w-1/5 min-w-80 h-full border-r border-border flex flex-col items-center">
+          <aside className="w-1/5 min-w-80 h-full border-r border-default flex flex-col items-center">
             <div className="w-full h-full overflow-y-auto">
               <GlobalOptionsEditor />
             </div>
@@ -183,6 +183,7 @@ function ChartEditor() {
                     <CWIconOutlineButton
                       {...btnConfig}
                       key={btnConfig.tooltip}
+                      aria-label={btnConfig.tooltip}
                     />
                   );
                 })}
@@ -190,7 +191,7 @@ function ChartEditor() {
             </div>
             <ChartPreview />
           </div>
-          <aside className="w-1/5 min-w-80 h-full border-l border-border overflow-y-auto">
+          <aside className="w-1/5 min-w-80 h-full border-l border-default overflow-y-auto">
             <ChartDataEditor />
           </aside>
         </div>

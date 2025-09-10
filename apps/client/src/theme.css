@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+@source "../../../core-components/src/";
+
+/* Remove every default Tailwind color */
+@theme {
+  --color-*: initial;
+}
+
+/* Design tokens: Light mode */
+@theme {
+  /* Base surfaces */
+  --color-bg: #f8fafc; /* base background */
+  --color-surface: #ffffff; /* primary surface/cards */
+  --color-surface-2: #f1f5f9; /* secondary panels */
+
+  /* Text */
+  --color-text: #1f2937; /* body */
+  --color-heading: #111827; /* headings */
+  --color-muted: #6b7280; /* helper/secondary */
+
+  /* Accents */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6; /* primary */
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  --color-success-500: #10b981;
+  --color-warn-500: #f59e0b;
+
+  /* Chart/axis helpers */
+  --color-axis: #374151;
+  --color-grid: #e5e7eb;
+
+  /* Borders/dividers */
+  --color-border: #e5e7eb;
+  --color-disabled-border: #d1d5db;
+
+  /* State */
+  --color-focus: #3b82f6;
+  --color-hover: #93c5fd;
+
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.04);
+  --shadow-toolbar: 0 1px 0 rgba(17, 24, 39, 0.06);
+  --shadow-popover: 0px 0px 20px 4px rgba(0, 0, 0, 0.05);
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Semantic utilities */
+@utility bg-app {
+  background-color: var(--color-bg);
+}
+@utility surface {
+  background-color: var(--color-surface);
+}
+@utility surface-2 {
+  background-color: var(--color-surface-2);
+}
+
+@utility text-body {
+  color: var(--color-text);
+}
+@utility text-heading {
+  color: var(--color-heading);
+}
+@utility text-muted {
+  color: var(--color-muted);
+}
+
+@utility border-default {
+  border-color: var(--color-border);
+}
+@utility divide-default {
+  --tw-divide-opacity: 1;
+  --tw-divide-color: var(--color-border);
+}
+
+@utility ring-focus {
+  --tw-ring-color: var(--color-focus);
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+@utility shadow-toolbar {
+  box-shadow: var(--shadow-toolbar);
+}
+@utility shadow-popover {
+  box-shadow: var(--shadow-popover);
+}
+
+/* Chart helpers */
+@utility chart-axis {
+  color: var(--color-axis);
+}
+@utility chart-grid {
+  stroke: var(--color-grid);
+}
+
+/* Brand color shortcuts */
+@utility btn-primary {
+  background-color: var(--color-primary-500);
+  color: white;
+}
+@utility btn-primary-hover {
+  background-color: var(--color-primary-600);
+}
+@utility btn-primary-focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+@utility btn-disabled {
+  color: var(--color-muted);
+}
+
+@utility btn-disabled-border {
+  border: 1px solid var(--color-disabled-border);
+}

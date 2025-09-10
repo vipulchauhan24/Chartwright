@@ -33,7 +33,7 @@ export function CWSelect({
           <label
             htmlFor={id}
             title={label}
-            className="text-base font-normal text-text-main select-none"
+            className="text-base font-normal text-body select-none"
           >
             {label}
           </label>
@@ -46,18 +46,18 @@ export function CWSelect({
           disabled={disabled}
         >
           <Select.Trigger
-            className="flex border border-border rounded-md py-1 px-2 w-full"
+            className="flex border border-default rounded-md py-1 px-2 w-full cursor-pointer"
             id={id}
           >
             <div className="w-20 truncate text-left">
               <Select.Value placeholder={placeholder} />
             </div>
-            <Select.Icon className="text-text-main flex items-center justify-end ml-auto">
+            <Select.Icon className="text-body flex items-center justify-end ml-auto">
               <ChevronDown className="size-4" />
             </Select.Icon>
           </Select.Trigger>
           <Select.Portal>
-            <Select.Content className="z-50 bg-white rounded-md shadow-lg border border-border">
+            <Select.Content className="z-50 bg-surface rounded-md shadow-popover border border-default">
               <Select.ScrollUpButton className="flex h-[25px] cursor-default items-center justify-center bg-white text-primary rounded-md">
                 <ChevronUp className="size-4" />
               </Select.ScrollUpButton>
@@ -69,13 +69,13 @@ export function CWSelect({
                         id={`${item.id}`}
                         key={item.id}
                         value={item.value}
-                        className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer data-[highlighted]:bg-primary  data-[highlighted]:text-white"
+                        className="flex items-center justify-between px-2 py-1 rounded-md cursor-pointer data-[highlighted]:bg-primary-500  data-[highlighted]:text-surface"
                       >
                         <Select.ItemText className="truncate">
                           {item.label}
                         </Select.ItemText>
                         <Select.ItemIndicator className="ml-1">
-                          <Check className="size-4 text-primary" />
+                          <Check className="size-4" />
                         </Select.ItemIndicator>
                       </Select.Item>
                     );

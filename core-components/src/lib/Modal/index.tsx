@@ -22,21 +22,21 @@ export function CWModal({
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-[25px] shadow-[var(--shadow-6)] focus:outline-none z-50">
-          <Dialog.Title className="text-2xl font-bold text-text-main">
-            {title}
-          </Dialog.Title>
-          <Dialog.Description className="text-sm mb-2 font-normal text-text-main">
+        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md surface py-4 px-6 shadow-popover focus:outline-none z-50">
+          <div className="flex justify-between items-center">
+            <Dialog.Title className="text-2xl font-bold text-body">
+              {title}
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <CWIconButton
+                icon={<X className="size-5" aria-hidden={true} />}
+              />
+            </Dialog.Close>
+          </div>
+          <Dialog.Description className="text-sm mb-2 font-normal text-body">
             {description}
           </Dialog.Description>
           <div>{content}</div>
-          <Dialog.Close asChild>
-            <div className="absolute right-2.5 top-2.5">
-              <CWIconButton
-                icon={<X className="size-6" aria-hidden={true} />}
-              />
-            </div>
-          </Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

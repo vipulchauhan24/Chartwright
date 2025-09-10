@@ -3,12 +3,11 @@ import CWModal from '../../../components/modal';
 import { ExternalLink } from 'lucide-react';
 import { myCharts } from '../../../../store/charts';
 import { useAtom } from 'jotai';
-import Spinner from '../../../components/spinner';
 import { fetchMyCharts } from '../../../../service/chartsApi';
 import { useNavigate } from 'react-router-dom';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
-import { CWSolidIconButton } from '@chartwright/core-components';
+import { CWSolidIconButton, CWSpinner } from '@chartwright/core-components';
 
 interface IViewMyCharts {
   isOpen: boolean;
@@ -37,12 +36,12 @@ function ViewMyCharts(props: IViewMyCharts) {
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="My Charts">
       {!charts.length ? (
         <div className="py-10 px-40 flex items-center justify-center">
-          <Spinner />
+          <CWSpinner />
         </div>
       ) : (
         <div className=" mt-4 relative overflow-x-auto">
-          <table className="w-full text-sm text-left text-text-main">
-            <thead className="text-xs uppercase bg-background">
+          <table className="w-full text-sm text-left text-body">
+            <thead className="text-xs uppercase bg-app">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   Chart Title
@@ -61,7 +60,7 @@ function ViewMyCharts(props: IViewMyCharts) {
                 return (
                   <tr
                     key={`${chart['title']}-${indx}`}
-                    className="bg-white border-b border-border"
+                    className="bg-white border-b border-default"
                   >
                     <th
                       scope="row"

@@ -1,9 +1,8 @@
-import { CWGhostLink } from '@chartwright/core-components';
-import CWLinkButton from '../components/linkButton';
+import { CWGhostLink, CWSolidLink } from '@chartwright/core-components';
 
 export default function PageNotFound() {
   return (
-    <main className="grid min-h-full place-items-center bg-background text-text-main">
+    <main className="grid min-h-full place-items-center bg-app text-body">
       <div className="text-center">
         <p className="text-base font-semibold">404</p>
         <h1 className="mt-4 text-5xl font-semibold">Page not found</h1>
@@ -11,7 +10,7 @@ export default function PageNotFound() {
           Sorry, we couldn’t find the page you’re looking for.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <CWLinkButton href="/" label="Go back home" />
+          <CWSolidLink href="/" label="Go back home" />
           <CWGhostLink
             href="/"
             label={

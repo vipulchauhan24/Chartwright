@@ -13,7 +13,7 @@ export const CWIconButton = forwardRef<HTMLButtonElement, ICWIconButton>(
         <button
           ref={ref}
           {...props}
-          className="bg-background p-1 hover:bg-primary hover:text-background rounded-sm"
+          className="bg-surface p-1 hover:btn-primary-hover hover:text-surface rounded-sm cursor-pointer"
         >
           {icon}
         </button>

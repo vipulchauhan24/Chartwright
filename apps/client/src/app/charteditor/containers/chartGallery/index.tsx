@@ -19,7 +19,7 @@ function ChartGallery(props: IChartGallery) {
         {charts.map((chart) => {
           return (
             <Button
-              className="w-full h-40 max-w-full rounded-lg border border-border p-2 relative"
+              className="w-full h-40 max-w-full rounded-md border border-default p-2 relative"
               onClick={() => {
                 onSetChartViaGalleryOptions(
                   String(chart['title']).toLowerCase().split(' ').join('-')
@@ -28,12 +28,12 @@ function ChartGallery(props: IChartGallery) {
               }}
             >
               <img
-                className="w-full h-full rounded-lg object-contain object-center"
+                className="w-full h-full rounded-md object-contain object-center"
                 src={`/api/chart/image/${chart['thumbnail']}`}
                 alt={chart['title']}
                 loading="lazy"
               />
-              <div className="opacity-0 hover:opacity-100 absolute w-full h-full bg-black/50 top-0 left-0 flex items-center justify-center rounded-lg">
+              <div className="opacity-0 hover:opacity-100 absolute w-full h-full bg-black/50 top-0 left-0 flex items-center justify-center rounded-md">
                 <h4 className="text-xl text-center font-semibold text-white">
                   {chart['title']}
                 </h4>

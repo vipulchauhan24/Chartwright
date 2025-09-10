@@ -19,3 +19,4 @@ export * from './lib/Buttons/SolidLoadingButton';
 export * from './lib/Buttons/OutlineButton';
 export * from './lib/Buttons/OutlineLoadingButton';
 export * from './lib/Anchors/GhostLink';
+export * from './lib/Anchors/SolidLink';

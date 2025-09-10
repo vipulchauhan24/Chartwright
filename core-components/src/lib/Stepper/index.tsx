@@ -85,9 +85,9 @@ export const CWStepper = forwardRef<ICWStepper, StepperProps>(
               >
                 <span
                   className={clsx(
-                    'border border-border size-6 rounded-full flex items-center justify-center text-xs',
-                    active && 'bg-primary text-white',
-                    completed && 'bg-success text-white'
+                    'border border-default size-6 rounded-full flex items-center justify-center text-xs',
+                    active && 'bg-primary-500 text-surface',
+                    completed && 'bg-success-500 text-surface'
                   )}
                 >
                   {completed ? (
@@ -101,14 +101,14 @@ export const CWStepper = forwardRef<ICWStepper, StepperProps>(
                 <span className="flex flex-col text-left">
                   <span
                     className={clsx(
-                      active ? 'text-primary' : 'text-text-main',
+                      active ? 'text-primary' : 'text-body',
                       'truncate text-sm font-semibold '
                     )}
                   >
                     {step.label}
                   </span>
                   {step.description && (
-                    <span className="truncate text-xs text-text-main">
+                    <span className="truncate text-xs text-body">
                       {step.description}
                     </span>
                   )}

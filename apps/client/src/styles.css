@@ -1,13 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   scrollbar-width: thin; /* Width of scrollbar */
-  scrollbar-color: #b0bec5 transparent; /* Thumb color and track color */
+  scrollbar-color: #6b7280 transparent; /* Thumb color and track color */
 }
 
 html,
@@ -16,31 +11,6 @@ body,
   min-width: 100vw;
   height: 100vh;
   overflow: hidden;
-}
-
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  input[type='range']::-webkit-slider-thumb {
-    width: 12px;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 12px;
-    cursor: ew-resize;
-    background: #ffffff;
-    box-shadow: -405px 0 0 400px theme('colors.primary');
-    border-radius: 50%;
-    border: 2px solid theme('colors.primary');
-  }
-}
-
-.range-container {
-  output {
-    display: none;
-  }
-  &:hover {
-    output {
-      display: inline;
-    }
-  }
 }
 
 /* Chrome, Safari, Edge, Opera */

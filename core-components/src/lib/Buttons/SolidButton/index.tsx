@@ -14,10 +14,9 @@ export const CWSolidButton = forwardRef<HTMLButtonElement, ICWSolidButton>(
         ref={ref}
         {...props}
         className={clsx(
-          disabled &&
-            'opacity-50 hover:text-text-main pointer-events-none select-none',
-          'transition duration-200 ease-in-out py-1 px-3 border rounded-lg relative',
-          'text-white border-primary bg-primary hover:bg-white hover:text-primary'
+          disabled && 'btn-disabled pointer-events-none select-none',
+          'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative cursor-pointer',
+          'text-surface border-primary-600 bg-primary-600 hover:bg-transparent hover:text-primary-600 hover:border-primary-600'
         )}
       >
         {label}

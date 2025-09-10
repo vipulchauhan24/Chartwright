@@ -198,7 +198,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
 
             <div
               ref={dropzoneRef}
-              className="dropzone !border-dashed !rounded-xl !border-border"
+              className="dropzone !border-dashed !rounded-xl !border-default"
             ></div>
           </div>
         ),

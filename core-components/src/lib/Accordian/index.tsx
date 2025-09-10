@@ -60,12 +60,12 @@ export function CWAccordian(props: ICWAccordian) {
         const { title, panelHeadingButton, panelComponent } = item;
         return (
           <Accordion.Item
-            className="border border-border rounded-xl mt-2"
+            className="border border-default rounded-xl mt-2"
             value={title}
             key={`${title}-${indx}`}
           >
             <Accordion.Header>
-              <Accordion.Trigger className="accordian-trigger flex w-full items-center justify-between p-4">
+              <Accordion.Trigger className="accordian-trigger flex w-full items-center justify-between p-4 cursor-pointer">
                 <div className="flex items-center gap-1">
                   <span
                     title={title}

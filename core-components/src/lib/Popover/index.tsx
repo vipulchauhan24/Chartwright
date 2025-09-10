@@ -17,24 +17,22 @@ export function CWPopover(props: ICWPopover) {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <CWIconButton tooltip={title} icon={icon} />
+        <CWIconButton tooltip={title} icon={icon} aria-label={title} />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="bg-white pt-2 rounded-lg drop-shadow-xl z-50"
+          className="bg-surface pb-2 rounded-md shadow-popover z-50 max-w-72"
           side={side || 'right'}
           sideOffset={5}
           align="center"
         >
           <div className="w-full flex justify-end p-2">
-            <Tippy content="Close">
-              <Popover.Close
-                aria-label="Close"
-                className="bg-background p-1 hover:bg-primary hover:text-background rounded-sm"
-              >
-                <X className="size-4" aria-hidden={true} />
-              </Popover.Close>
-            </Tippy>
+            <Popover.Close
+              aria-label="Close"
+              className="bg-app p-1 hover:btn-primary-hover hover:text-surface rounded-sm cursor-pointer"
+            >
+              <X className="size-4" aria-hidden={true} />
+            </Popover.Close>
           </div>
           <div className="px-4 py-2">{content}</div>
         </Popover.Content>

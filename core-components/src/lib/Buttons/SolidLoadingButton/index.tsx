@@ -21,9 +21,9 @@ export const CWSolidLoadingButton = forwardRef<
       {...props}
       className={clsx(
         disabled &&
-          'opacity-50 hover:text-text-main pointer-events-none select-none',
-        'transition duration-200 ease-in-out py-1 px-3 border rounded-lg relative',
-        'text-white border-primary bg-primary hover:bg-white hover:text-primary flex items-center gap-2'
+          'btn-disabled btn-disabled-border pointer-events-none select-none',
+        'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative',
+        'border-primary-600 bg-primary-600 hover:bg-surface text-surface hover:text-primary-600 hover:border-primary-600 flex items-center gap-2 cursor-pointer'
       )}
     >
       {loading ? loadingLabel : label}

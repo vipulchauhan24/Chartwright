@@ -20,9 +20,8 @@ export const CWIconOutlineButton = forwardRef<
         {...props}
         disabled={disabled}
         className={clsx(
-          disabled &&
-            'opacity-50 hover:text-text-main pointer-events-none select-none',
-          'transition duration-200 ease-in-out border rounded-lg text-text-main border-border hover:bg-primary hover:text-background hover:border-primary py-2 px-3'
+          disabled && 'btn-disabled pointer-events-none select-none',
+          'transition duration-200 ease-in-out border rounded-md text-body border-default hover:btn-primary-hover hover:text-surface hover:border-primary-600 py-1 px-2 cursor-pointer'
         )}
       >
         {icon}

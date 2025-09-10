@@ -284,7 +284,7 @@ function ExportChart(props: IExportChart) {
 
   const Card = (props: IExportItem) => {
     return (
-      <div className="bg-background py-6 px-4 rounded-md mb-4 border border-border relative">
+      <div className="bg-app py-6 px-4 rounded-md mb-4 border border-default relative">
         {!isAuthenticated && props.userLoginCheck && <LoginRequiredComp />}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -346,7 +346,7 @@ function ExportChart(props: IExportChart) {
     <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Export">
       <div className="w-96">
         <TabGroup className="mt-2">
-          <TabList className="flex gap-1 bg-background rounded-md px-2 py-1">
+          <TabList className="flex gap-1 bg-app rounded-md px-2 py-1">
             {tabList.map(({ title, icon }) => (
               <Tab
                 key={title}

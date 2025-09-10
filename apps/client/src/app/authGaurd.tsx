@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
-import Spinner from './components/spinner';
 import { userLogin } from '../service/userAPI';
 import {
   fetchFromLocalStorage,
@@ -13,7 +12,11 @@ import {
   LOCAL_STORAGE_KEYS,
   SESSION_STORAGE_KEYS,
 } from './charteditor/utils/constants';
-import { CWOutlineButton } from '@chartwright/core-components';
+import {
+  CWOutlineButton,
+  CWSolidButton,
+  CWSpinner,
+} from '@chartwright/core-components';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -56,32 +59,29 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     setIsLoading(auth.isLoading);
   }, [auth.isLoading]);
 
+  const useLogin = useCallback(() => {
+    auth.signinRedirect();
+  }, [auth]);
+
+  const guestLogin = useCallback(() => {
+    setIsUserAuthenticated(true);
+    storeInSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER, 'true');
+  }, []);
+
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-        <Spinner />
+        <CWSpinner />
       </div>
     );
   }
 
   if (!isUserAuthenticated) {
-    const continueAsGuest = () => {
-      setIsUserAuthenticated(true);
-      storeInSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER, 'true');
-    };
-
-    const continueAsUser = () => {
-      auth.signinRedirect();
-    };
-
     return (
-      <div className="h-full w-full flex items-center justify-center bg-background">
-        <div className="flex gap-2">
-          <CWOutlineButton
-            label="Continue as guest"
-            onClick={continueAsGuest}
-          />
-          <CWOutlineButton label="Continue as user" onClick={continueAsUser} />
+      <div className="h-full w-full flex items-center justify-center bg-app">
+        <div className="flex gap-2 flex-col">
+          <CWSolidButton label="Guest login" onClick={guestLogin} />
+          <CWSolidButton label="User login" onClick={useLogin} />
         </div>
       </div>
     );

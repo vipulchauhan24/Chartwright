@@ -22,7 +22,7 @@ export function CWSwitch(props: ICWSwitch) {
           {label && (
             <label
               htmlFor={id}
-              className="text-base font-normal text-text-main select-none"
+              className="text-base font-normal text-body select-none"
             >
               {label}
             </label>
@@ -34,12 +34,12 @@ export function CWSwitch(props: ICWSwitch) {
           )}
         </div>
         <Switch.Root
-          className="relative h-5 w-8 cursor-pointer rounded-full bg-background outline-none data-[state=checked]:bg-primary border border-border"
+          className="relative h-5 w-8 cursor-pointer rounded-full bg-primary-200 outline-none data-[state=checked]:bg-primary-500 border border-default"
           id={id}
           checked={checked}
           onCheckedChange={onChange}
         >
-          <Switch.Thumb className="block size-4 translate-x-0.5 rounded-full bg-white border border-border transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-3" />
+          <Switch.Thumb className="block size-4 translate-x-0.5 rounded-full bg-surface border border-default transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-3" />
         </Switch.Root>
       </div>
     </form>

@@ -23,7 +23,7 @@ export function CWTextInput(props: ICWTextInput) {
         <div className="min-w-[40%] max-w-[40%]">
           <label
             htmlFor={id}
-            className="text-base font-normal text-text-main select-none"
+            className="text-base font-normal text-body select-none"
           >
             {label}
           </label>
@@ -36,7 +36,7 @@ export function CWTextInput(props: ICWTextInput) {
           value={defaultValue === 'undefined' ? '' : defaultValue}
           placeholder={placeholder}
           onChange={onChange}
-          className="text-text-main border w-full border-border py-1 px-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-body border w-full border-default py-1 px-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         {hint && (
           <Tippy content={hint}>

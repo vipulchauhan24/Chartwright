@@ -28,7 +28,7 @@ export function CWTextArea(props: ICWTextArea) {
         <div className="min-w-[40%] max-w-[40%]">
           <label
             htmlFor={id}
-            className="text-base font-normal text-text-main select-none"
+            className="text-base font-normal text-body select-none"
           >
             {label}
           </label>
@@ -40,7 +40,7 @@ export function CWTextArea(props: ICWTextArea) {
           id={id}
           value={value.current}
           onChange={update}
-          className="text-text-main border w-full border-border py-1 pl-3 rounded-lg focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
+          className="text-body border w-full border-default py-1 pl-3 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
           rows={3}
         />
         {hint && (

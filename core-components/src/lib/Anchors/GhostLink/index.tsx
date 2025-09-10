@@ -11,7 +11,7 @@ export function CWGhostLink(props: ICWGhostLink) {
   return (
     <Link
       to={href}
-      className="text-text-main transition duration-200 ease-in-out flex items-center gap-1 hover:text-primary"
+      className="text-body transition duration-200 ease-in-out flex items-center gap-1 hover:text-primary-500 cursor-pointer"
     >
       {label}
     </Link>

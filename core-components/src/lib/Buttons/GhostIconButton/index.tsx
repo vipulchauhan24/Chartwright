@@ -20,8 +20,8 @@ export const CWSGhostIconButton = forwardRef<
       {...props}
       className={clsx(
         disabled &&
-          'opacity-50 hover:text-text-main pointer-events-none select-none',
-        'transition duration-200 ease-in-out py-1 px-3 text-text-main hover:text-primary flex items-center gap-2'
+          'opacity-50 hover:text-body pointer-events-none select-none',
+        'transition duration-200 ease-in-out py-1 px-3 text-body hover:text-primary-500 flex items-center gap-2 cursor-pointer'
       )}
     >
       {iconLeft && <span>{icon}</span>}

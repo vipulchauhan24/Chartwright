@@ -32,7 +32,7 @@ function CWModal(props: ICWModal) {
             <div className="flex items-center justify-between">
               <DialogTitle
                 as="h3"
-                className="text-2xl font-semibold text-text-main"
+                className="text-2xl font-semibold text-heading"
               >
                 {title}
               </DialogTitle>

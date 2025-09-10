@@ -49,7 +49,7 @@ function GlobalOptionsEditor() {
     (option: any) => {
       return option.userInputs.map((props: any) => {
         return (
-          <div className="mt-2">
+          <div className="mb-2">
             <InputRenderer
               key={props.configPath}
               id={props.configPath}
@@ -86,11 +86,13 @@ function GlobalOptionsEditor() {
             switch (childComp.type) {
               case 'popover':
                 return (
-                  <CWPopover
-                    content={getInputRenderedComp(childComp)}
-                    title={childComp.title}
-                    icon={getPopoverIcon(childComp.iconName)}
-                  />
+                  <div className="mr-2">
+                    <CWPopover
+                      content={getInputRenderedComp(childComp)}
+                      title={childComp.title}
+                      icon={getPopoverIcon(childComp.iconName)}
+                    />
+                  </div>
                 );
               default:
                 return null;
