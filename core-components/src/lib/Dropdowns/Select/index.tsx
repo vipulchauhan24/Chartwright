@@ -58,7 +58,7 @@ export function CWSelect({
           </Select.Trigger>
           <Select.Portal>
             <Select.Content className="z-50 bg-surface rounded-md shadow-popover border border-default">
-              <Select.ScrollUpButton className="flex h-[25px] cursor-default items-center justify-center bg-white text-primary rounded-md">
+              <Select.ScrollUpButton className="flex h-[25px] cursor-default items-center justify-center bg-surface text-primary rounded-md">
                 <ChevronUp className="size-4" />
               </Select.ScrollUpButton>
               <Select.Viewport className="p-1">
@@ -82,7 +82,7 @@ export function CWSelect({
                   })}
                 </Select.Group>
               </Select.Viewport>
-              <Select.ScrollDownButton className="flex h-[25px] cursor-default items-center justify-center bg-white text-primary rounded-md">
+              <Select.ScrollDownButton className="flex h-[25px] cursor-default items-center justify-center bg-surface text-primary rounded-md">
                 <ChevronDown className="size-4" />
               </Select.ScrollDownButton>
             </Select.Content>

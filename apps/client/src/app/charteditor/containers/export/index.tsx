@@ -232,8 +232,8 @@ function ExportChart(props: IExportChart) {
     return (
       <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.7)] flex items-center justify-between px-4 z-10 opacity-0 hover:opacity-100">
         <div className="flex items-center gap-1">
-          <Asterisk className="size-4 text-white mb-3" aria-hidden={true} />
-          <p className="font-semibold text-white">Login Required</p>
+          <Asterisk className="size-4 text-surface mb-3" aria-hidden={true} />
+          <p className="font-semibold text-surface">Login Required</p>
         </div>
         <CWIconButton
           icon={<LogIn className="size-6" aria-hidden={true} />}
@@ -350,7 +350,7 @@ function ExportChart(props: IExportChart) {
             {tabList.map(({ title, icon }) => (
               <Tab
                 key={title}
-                className="text-sm font-semibold data-[selected]:bg-white data-[selected]:text-primary py-1 px-2 rounded-md flex items-center gap-1"
+                className="text-sm font-semibold data-[selected]:bg-surface data-[selected]:text-primary py-1 px-2 rounded-md flex items-center gap-1"
               >
                 {icon}
                 {title}

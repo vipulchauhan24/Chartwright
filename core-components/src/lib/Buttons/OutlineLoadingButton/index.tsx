@@ -21,7 +21,7 @@ export const CWOutlineLoadingButton = forwardRef<
       className={clsx(
         'py-1 px-3',
         loading
-          ? 'hover:text-body pointer-events-none select-none text-primary bg-white flex items-center gap-2'
+          ? 'hover:text-body pointer-events-none select-none text-primary bg-surface flex items-center gap-2'
           : 'transition duration-200 ease-in-out border rounded-md text-body border-default hover:btn-primary-hover hover:text-background hover:border-primary'
       )}
     >

@@ -10,6 +10,7 @@
 /* Design tokens: Light mode */
 @theme {
   /* Base surfaces */
+  --color-black: #000000; /* base background */
   --color-bg: #f8fafc; /* base background */
   --color-surface: #ffffff; /* primary surface/cards */
   --color-surface-2: #f1f5f9; /* secondary panels */

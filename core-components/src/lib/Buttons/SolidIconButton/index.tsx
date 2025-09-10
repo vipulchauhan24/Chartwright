@@ -21,7 +21,7 @@ export const CWSolidIconButton = forwardRef<
         disabled &&
           'opacity-50 hover:text-body pointer-events-none select-none',
         'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative',
-        'text-white border-primary bg-primary hover:bg-white hover:text-primary flex items-center gap-2'
+        'text-surface border-primary bg-primary hover:bg-surface hover:text-primary flex items-center gap-2'
       )}
     >
       <span>{icon}</span>

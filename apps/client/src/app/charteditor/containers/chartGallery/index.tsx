@@ -34,7 +34,7 @@ function ChartGallery(props: IChartGallery) {
                 loading="lazy"
               />
               <div className="opacity-0 hover:opacity-100 absolute w-full h-full bg-black/50 top-0 left-0 flex items-center justify-center rounded-md">
-                <h4 className="text-xl text-center font-semibold text-white">
+                <h4 className="text-xl text-center font-semibold text-surface">
                   {chart['title']}
                 </h4>
               </div>

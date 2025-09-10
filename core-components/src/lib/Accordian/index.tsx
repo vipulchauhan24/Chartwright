@@ -51,7 +51,7 @@ export function CWAccordian(props: ICWAccordian) {
 
   return (
     <Accordion.Root
-      className="mx- auto w-full rounded-xl"
+      className="mx- auto w-full rounded-xl bg-surface"
       type="multiple"
       value={openItems}
       onValueChange={updateOpenItems}
