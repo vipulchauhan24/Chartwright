@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { currentChartConfigStore } from '../../../store/charts';
 import { getChartDefaultConfigByType } from '../../../service/chartsApi';
 import toast from 'react-hot-toast';
+import { randomHexColor } from '../utils/lib';
 
 type chart_types = 'bar' | 'line';
 
@@ -26,16 +27,36 @@ function useChartConfig() {
     []
   );
 
+  const setRandomColorToSeries = useCallback(
+    (series: any, type: chart_types) => {
+      const color = randomHexColor();
+      switch (type) {
+        case 'line':
+          series['lineStyle']['color'] = color;
+          series['itemStyle']['color'] = color;
+          series['itemStyle']['borderColor'] = color;
+          break;
+        case 'bar':
+          series['itemStyle']['color'] = color;
+          series['itemStyle']['borderColor'] = color;
+          break;
+
+        default:
+          break;
+      }
+    },
+    []
+  );
+
   const buildChartConfig = useCallback(
     async (data: Array<never>, xColumnName: string, type: chart_types) => {
       try {
         setIsProcessing(true);
-        let chartConfig = await getChartDefaultConfig(type);
+        const chartConfig = await getChartDefaultConfig(type);
 
-        if (!chartConfig.config) {
+        if (!chartConfig) {
           throw new Error('Chart default config not found!');
         }
-        chartConfig = chartConfig.config;
         chartConfig.xAxis.data = getXAxisArray(xColumnName, data);
         let seriesIndx = 0;
         Object.keys(data[0]).forEach((colName) => {
@@ -62,6 +83,7 @@ function useChartConfig() {
             chartConfig.series[seriesIndx].data = getSeriesData(colName, data);
             chartConfig.series[seriesIndx].name =
               colName !== '__EMPTY' ? colName : `Series ${seriesIndx + 1}`;
+            setRandomColorToSeries(chartConfig.series[seriesIndx], type);
             seriesIndx++;
           }
         });
@@ -74,7 +96,13 @@ function useChartConfig() {
         setIsProcessing(false);
       }
     },
-    [getChartDefaultConfig, getSeriesData, getXAxisArray, setChartDataConfig]
+    [
+      getChartDefaultConfig,
+      getSeriesData,
+      getXAxisArray,
+      setChartDataConfig,
+      setRandomColorToSeries,
+    ]
   );
 
   return { isProcessing, buildChartConfig };

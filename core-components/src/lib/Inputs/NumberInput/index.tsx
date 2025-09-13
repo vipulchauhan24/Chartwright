@@ -8,10 +8,13 @@ interface ICWNumberInput {
   label?: string;
   defaultValue: number;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 export function CWNumberInput(props: ICWNumberInput) {
-  const { id, label, defaultValue, onChange } = props;
+  const { id, label, defaultValue, onChange, min, max, step } = props;
 
   const isNumberASCII = useCallback((str: string) => {
     if (!str) return false; // Check for empty string
@@ -28,33 +31,44 @@ export function CWNumberInput(props: ICWNumberInput) {
   const updateValue = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const input = e.target as HTMLInputElement;
+      if (max && Number(input.value) > max) {
+        input.value = `${max}`;
+      } else if (min && Number(input.value) < min) {
+        input.value = `${min}`;
+      }
       if (isNumberASCII(input.value)) {
         onChange(e);
       }
     },
-    [onChange, isNumberASCII]
+    [max, isNumberASCII, onChange, min]
   );
 
   const increase = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      if (defaultValue === max) {
+        return;
+      }
       const input = e.target as HTMLInputElement;
-      input.value = `${defaultValue + 1}`;
+      input.value = `${defaultValue + (step || 1)}`;
       onChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
     },
-    [defaultValue, onChange]
+    [defaultValue, onChange, max, step]
   );
 
   const decrease = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      if (defaultValue === min) {
+        return;
+      }
       const input = e.target as HTMLInputElement;
-      input.value = `${defaultValue - 1}`;
+      input.value = `${defaultValue - (step || 1)}`;
       onChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
     },
-    [defaultValue, onChange]
+    [defaultValue, onChange, min, step]
   );
 
   return (
@@ -77,17 +91,20 @@ export function CWNumberInput(props: ICWNumberInput) {
           type="number"
           value={defaultValue}
           onChange={updateValue}
+          min={min}
+          max={max}
+          step={step}
           className="text-body w-full py-1 pl-2 rounded-md focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 appearance-none"
         />
         <CWIconButton
           icon={<Minus className="size-4" aria-hidden={true} />}
           onClick={decrease}
-          tooltip="Decrease by 1"
+          disabled={defaultValue === min}
         />
         <CWIconButton
           icon={<Plus className="size-4" aria-hidden={true} />}
           onClick={increase}
-          tooltip="Increase by 1"
+          disabled={defaultValue === max}
         />
       </div>
     </form>

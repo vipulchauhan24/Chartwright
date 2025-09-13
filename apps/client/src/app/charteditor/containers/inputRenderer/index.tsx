@@ -24,6 +24,9 @@ interface IInputRenderer {
   reference?: string;
   disabled?: boolean;
   configPathPrefix?: string;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 const REFERENCE_TABLE: any = {
@@ -296,6 +299,9 @@ function InputRenderer(props: IInputRenderer) {
     configPath,
     updateChartDataConfig,
     configPathPrefix,
+    min,
+    max,
+    step,
   } = props;
 
   const onChange = useCallback(
@@ -349,7 +355,10 @@ function InputRenderer(props: IInputRenderer) {
       return (
         <CWNumberInput
           {...inputProps}
-          defaultValue={parseInt(String(value), 10)}
+          defaultValue={Number(Number(value).toFixed(1))}
+          min={min}
+          max={max}
+          step={step}
         />
       );
     case FIELD_TYPE.TEXT_AREA:

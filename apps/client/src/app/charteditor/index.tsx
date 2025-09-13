@@ -61,10 +61,10 @@ function ChartEditor() {
 
   useEffect(() => {
     if (chartGalleryData.length && !isLoading && !id) {
-      const chartKey =
-        fetchFromSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID) ||
-        'simple-bar-chart';
-      getDefaultChartConfig(chartKey);
+      // const chartKey =
+      //   fetchFromSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID) ||
+      //   'simple-bar-chart';
+      getDefaultChartConfig('simple-bar-chart');
     } else if (chartGalleryData.length && !isLoading && id) {
       fetchDefaultChartConfig(id);
     }
@@ -103,7 +103,7 @@ function ChartEditor() {
   const onSetChartViaGalleryOptions = useCallback(
     (value: string) => {
       getDefaultChartConfig(value);
-      storeInSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID, value);
+      // storeInSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID, value);
       if (id) {
         navigate(`/chart`);
       }

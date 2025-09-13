@@ -39,7 +39,7 @@ export const getChartDefaultConfigByType = atom(
       const { data } = await axios.get(
         `${API_ENDPOINTS.CHART_DEFAULT_CONFIG}/${type}`
       );
-      return data;
+      return JSON.parse(data.config);
     } catch (error) {
       console.error('Error in "getChartDefaultConfigByType":', error);
     }

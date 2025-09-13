@@ -11,7 +11,12 @@ import {
   CWPopover,
 } from '@chartwright/core-components';
 import InputRenderer from '../inputRenderer';
-import { LetterText, SquareDashedMousePointer } from 'lucide-react';
+import {
+  Highlighter,
+  LetterText,
+  PaintBucket,
+  SquareDashedMousePointer,
+} from 'lucide-react';
 
 import GridIcon from '../../../../assets/grid.svg?react';
 import XAxisEdgeIcon from '../../../../assets/x-axis-edge.svg?react';
@@ -71,6 +76,10 @@ function ChartDataEditor() {
 
   const getPopoverIcon = useCallback((iconName: string) => {
     switch (iconName) {
+      case 'item-style':
+        return <Highlighter className="size-4" aria-hidden={true} />;
+      case 'background':
+        return <PaintBucket className="size-4" aria-hidden={true} />;
       case 'text':
         return <LetterText className="size-4" aria-hidden={true} />;
       case 'tooltip':
