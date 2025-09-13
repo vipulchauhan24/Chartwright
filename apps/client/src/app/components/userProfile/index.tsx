@@ -1,8 +1,11 @@
 import React from 'react';
 import { DropdownMenu, Avatar } from 'radix-ui';
 import useAuthentication from '../../charteditor/hooks/useAuthentication';
-import { CWSGhostIconButton } from '@chartwright/core-components';
-import { LogIn, LogOut, User } from 'lucide-react';
+import {
+  CWSGhostIconButton,
+  CWSolidButton,
+} from '@chartwright/core-components';
+import { LogOut, User } from 'lucide-react';
 import { removeFromLocalStorage } from '../../charteditor/utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../charteditor/utils/constants';
 
@@ -25,6 +28,10 @@ function UserProfile() {
     });
   };
 
+  if (!auth.isAuthenticated) {
+    return <CWSolidButton label="Sign in" onClick={redirectToLoginPage} />;
+  }
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -41,19 +48,11 @@ function UserProfile() {
           align="end"
         >
           <DropdownMenu.Item className="px-2">
-            {auth.isAuthenticated ? (
-              <CWSGhostIconButton
-                icon={<LogOut className="size-4" aria-hidden={true} />}
-                label="Sign out"
-                onClick={logout}
-              />
-            ) : (
-              <CWSGhostIconButton
-                icon={<LogIn className="size-4" aria-hidden={true} />}
-                label="Sign in"
-                onClick={redirectToLoginPage}
-              />
-            )}
+            <CWSGhostIconButton
+              icon={<LogOut className="size-4" aria-hidden={true} />}
+              label="Sign out"
+              onClick={logout}
+            />
           </DropdownMenu.Item>
 
           <DropdownMenu.Arrow className="fill-surface" />

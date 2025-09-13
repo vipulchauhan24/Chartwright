@@ -3,8 +3,6 @@ import { useAuth } from 'react-oidc-context';
 import { userLogin } from '../service/userAPI';
 import {
   fetchFromLocalStorage,
-  fetchFromSessionStorage,
-  removeFromLocalStorage,
   removeFromSessionStorage,
   storeInSessionStorage,
 } from './charteditor/utils/lib';
@@ -12,11 +10,7 @@ import {
   LOCAL_STORAGE_KEYS,
   SESSION_STORAGE_KEYS,
 } from './charteditor/utils/constants';
-import {
-  CWOutlineButton,
-  CWSolidButton,
-  CWSpinner,
-} from '@chartwright/core-components';
+import { CWSolidButton, CWSpinner } from '@chartwright/core-components';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -32,6 +26,11 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     await userLogin(loginPayload);
   };
 
+  const guestLogin = useCallback(() => {
+    setIsUserAuthenticated(true);
+    storeInSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER, 'true');
+  }, []);
+
   useEffect(() => {
     setIsUserAuthenticated(auth.isAuthenticated);
     if (auth.isAuthenticated) {
@@ -44,29 +43,32 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
         };
         login(loginPayload);
       }
+    } else {
+      // const isGuestUser = fetchFromSessionStorage(
+      //   SESSION_STORAGE_KEYS.IS_GHOST_USER
+      // );
+      // if (isGuestUser === 'true') {
+      //   setIsUserAuthenticated(true);
+      //   removeFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+      // }
+      guestLogin();
     }
-    const isGuestUser = fetchFromSessionStorage(
-      SESSION_STORAGE_KEYS.IS_GHOST_USER
-    );
-    if (isGuestUser === 'true') {
-      setIsUserAuthenticated(true);
-      removeFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-    }
+
     setIsLoading(false);
-  }, [auth.isAuthenticated, auth.user?.profile.email, auth.user?.profile.sub]);
+  }, [
+    auth.isAuthenticated,
+    auth.user?.profile.email,
+    auth.user?.profile.sub,
+    guestLogin,
+  ]);
 
   useEffect(() => {
     setIsLoading(auth.isLoading);
   }, [auth.isLoading]);
 
-  const useLogin = useCallback(() => {
-    auth.signinRedirect();
-  }, [auth]);
-
-  const guestLogin = useCallback(() => {
-    setIsUserAuthenticated(true);
-    storeInSessionStorage(SESSION_STORAGE_KEYS.IS_GHOST_USER, 'true');
-  }, []);
+  // const useLogin = useCallback(() => {
+  //   auth.signinRedirect();
+  // }, [auth]);
 
   if (isLoading) {
     return (
@@ -76,16 +78,16 @@ function AuthGaurd({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isUserAuthenticated) {
-    return (
-      <div className="h-full w-full flex items-center justify-center bg-app">
-        <div className="flex gap-2 flex-col">
-          <CWSolidButton label="Guest login" onClick={guestLogin} />
-          <CWSolidButton label="User login" onClick={useLogin} />
-        </div>
-      </div>
-    );
-  }
+  // if (!isUserAuthenticated) {
+  //   return (
+  //     <div className="h-full w-full flex items-center justify-center bg-app">
+  //       <div className="flex gap-2 flex-col">
+  //         <CWSolidButton label="Guest login" onClick={guestLogin} />
+  //         <CWSolidButton label="User login" onClick={useLogin} />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return children;
 }
