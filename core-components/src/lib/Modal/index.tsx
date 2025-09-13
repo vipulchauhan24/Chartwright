@@ -27,7 +27,7 @@ export function CWModal({
             <Dialog.Title className="text-2xl font-bold text-body">
               {title}
             </Dialog.Title>
-            <Dialog.Close asChild>
+            <Dialog.Close asChild aria-label="close">
               <CWIconButton
                 icon={<X className="size-5" aria-hidden={true} />}
               />

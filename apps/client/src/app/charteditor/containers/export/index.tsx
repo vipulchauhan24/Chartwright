@@ -1,8 +1,6 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
-import CWModal from '../../../components/modal';
 import {
   Asterisk,
   ChevronsLeftRightEllipsis,
@@ -23,13 +21,8 @@ import axios from 'axios';
 import {
   CWGhostLink,
   CWIconButton,
-  CWSolidButton,
+  CWTabs,
 } from '@chartwright/core-components';
-
-interface IExportChart {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 interface IExportItem {
   onClick: () => void;
@@ -43,8 +36,7 @@ interface IExportItem {
 
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
-function ExportChart(props: IExportChart) {
-  const { isOpen, setIsOpen } = props;
+function ExportChart() {
   const { isAuthenticated } = useAuthentication();
   const auth = useAuth();
   const [chrtId] = useAtom(chartId);
@@ -52,10 +44,6 @@ function ExportChart(props: IExportChart) {
   const [imageURLLoading, setImageURLLoading] = useState<boolean>(true);
   const [iframeURL, setIframeURL] = useState<string>('');
   const [iframeURLLoading, setIframeURLLoading] = useState<boolean>(true);
-
-  const closeModal = () => {
-    setIsOpen(false);
-  };
 
   const fetchEmbedURL = useCallback(
     async (chrtId: string, type: 'image' | 'iframe') => {
@@ -207,28 +195,11 @@ function ExportChart(props: IExportChart) {
     ];
   }, [imageURL, imageURLLoading, iframeURL, iframeURLLoading, embedToLink]);
 
-  const tabList = useMemo(() => {
-    return [
-      {
-        title: 'Download',
-        icon: <Download className="size-4" aria-hidden={true} />,
-        items: downloadItems,
-      },
-      {
-        title: 'Embed',
-        icon: (
-          <ChevronsLeftRightEllipsis className="size-4" aria-hidden={true} />
-        ),
-        items: embedItems,
-      },
-    ];
-  }, [downloadItems, embedItems]);
-
-  const redirectToLoginPage = () => {
+  const redirectToLoginPage = useCallback(() => {
     auth.signinRedirect();
-  };
+  }, [auth]);
 
-  const LoginRequiredComp = () => {
+  const LoginRequiredComp = useCallback(() => {
     return (
       <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.7)] flex items-center justify-between px-4 z-10 opacity-0 hover:opacity-100">
         <div className="flex items-center gap-1">
@@ -241,7 +212,7 @@ function ExportChart(props: IExportChart) {
         />
       </div>
     );
-  };
+  }, [redirectToLoginPage]);
 
   const copyToClipboard = useCallback(async (url: string) => {
     toast.promise(
@@ -282,93 +253,105 @@ function ExportChart(props: IExportChart) {
     );
   }, []);
 
-  const Card = (props: IExportItem) => {
-    return (
-      <div className="bg-app py-6 px-4 rounded-md mb-4 border border-default relative">
-        {!isAuthenticated && props.userLoginCheck && <LoginRequiredComp />}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {props.image}
-            <p className="font-semibold">{props.label}</p>
+  const Card = useCallback(
+    (props: IExportItem) => {
+      return (
+        <div className="bg-app py-6 px-4 rounded-md mb-4 border border-default relative">
+          {!isAuthenticated && props.userLoginCheck && <LoginRequiredComp />}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {props.image}
+              <p className="font-semibold">{props.label}</p>
+            </div>
+            <CWIconButton
+              icon={props.icon}
+              onClick={props.onClick}
+              disabled={!!props.url}
+              aria-label={props.label}
+            />
           </div>
-          <CWIconButton
-            icon={props.icon}
-            onClick={props.onClick}
-            disabled={!!props.url}
-          />
-        </div>
-        {props.loading && (
-          <>
-            <div className="h-4 w-2/3 animate-pulse bg-text-secondary rounded-xl mt-4"></div>
-            <div className="h-3 w-1/3 animate-pulse bg-text-secondary rounded-xl mt-1"></div>
-          </>
-        )}
-        {!!props.url?.length && !props.loading && (
-          <div className="flex items-center gap-4 mt-4">
-            <span className="flex items-center gap-1">
-              <strong>Link: </strong>
-              <CWGhostLink
-                href={props.url}
-                label={<span className="truncate w-56">{props.url}</span>}
+          {props.loading && (
+            <>
+              <div className="h-4 w-2/3 animate-pulse bg-text-secondary rounded-xl mt-4"></div>
+              <div className="h-3 w-1/3 animate-pulse bg-text-secondary rounded-xl mt-1"></div>
+            </>
+          )}
+          {!!props.url?.length && !props.loading && (
+            <div className="flex items-center gap-4 mt-4">
+              <span className="flex items-center gap-1">
+                <strong>Link: </strong>
+                <CWGhostLink
+                  href={props.url}
+                  label={<span className="truncate w-56">{props.url}</span>}
+                />
+              </span>
+              <CWIconButton
+                tooltip="Copy link"
+                icon={<Copy className="size-4" aria-hidden={true} />}
+                onClick={() => {
+                  copyToClipboard(`${props.url}`);
+                }}
               />
-            </span>
-            <CWIconButton
-              tooltip="Copy link"
-              icon={<Copy className="size-4" aria-hidden={true} />}
-              onClick={() => {
-                copyToClipboard(`${props.url}`);
-              }}
-            />
-            <CWIconButton
-              tooltip="Delete link"
-              icon={<Trash className="size-4" aria-hidden={true} />}
-              onClick={async () => {
-                deleteEmbedURL(`${props.url}`);
-              }}
-            />
-          </div>
-        )}
-      </div>
-    );
-  };
+              <CWIconButton
+                tooltip="Delete link"
+                icon={<Trash className="size-4" aria-hidden={true} />}
+                onClick={async () => {
+                  deleteEmbedURL(`${props.url}`);
+                }}
+              />
+            </div>
+          )}
+        </div>
+      );
+    },
+    [LoginRequiredComp, copyToClipboard, deleteEmbedURL, isAuthenticated]
+  );
 
-  const getTabPanel = (title: string, items: Array<IExportItem>) => {
-    return (
-      <TabPanel key={title + '-tab-panel'} className="py-4">
-        {items.map((item: IExportItem) => (
-          <Card key={item.label} {...item} />
-        ))}
-      </TabPanel>
-    );
-  };
+  const tabList = useMemo(() => {
+    return [
+      {
+        id: 'download-chart',
+        title: 'Download',
+        icon: (
+          <Download
+            className="size-4"
+            aria-hidden={true}
+            aria-label="Download"
+          />
+        ),
+        content: (
+          <>
+            {downloadItems.map((item: IExportItem) => (
+              <Card key={item.label} {...item} />
+            ))}
+          </>
+        ),
+      },
+      {
+        id: 'embed-chart',
+        title: 'Embed',
+        icon: (
+          <ChevronsLeftRightEllipsis
+            className="size-4"
+            aria-hidden={true}
+            aria-label="Embed"
+          />
+        ),
+        content: (
+          <>
+            {embedItems.map((item: IExportItem) => (
+              <Card key={item.label} {...item} />
+            ))}
+          </>
+        ),
+      },
+    ];
+  }, [Card, downloadItems, embedItems]);
 
   return (
-    <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Export">
-      <div className="w-96">
-        <TabGroup className="mt-2">
-          <TabList className="flex gap-1 bg-app rounded-md px-2 py-1">
-            {tabList.map(({ title, icon }) => (
-              <Tab
-                key={title}
-                className="text-sm font-semibold data-[selected]:bg-surface data-[selected]:text-primary py-1 px-2 rounded-md flex items-center gap-1"
-              >
-                {icon}
-                {title}
-              </Tab>
-            ))}
-          </TabList>
-          <TabPanels className="mt-3">
-            {tabList.map(({ title, items }) => {
-              return getTabPanel(title, items);
-            })}
-          </TabPanels>
-        </TabGroup>
-
-        <div className="mt-2 flex items-center justify-end gap-2">
-          <CWSolidButton label="Done" onClick={closeModal} />
-        </div>
-      </div>
-    </CWModal>
+    <div className="mt-4">
+      <CWTabs defaultSelected={tabList[0]['id']} tabList={tabList} />
+    </div>
   );
 }
 

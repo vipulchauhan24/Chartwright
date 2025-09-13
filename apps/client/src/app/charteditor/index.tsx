@@ -7,11 +7,9 @@ import {
 } from '../../service/chartsApi';
 import { chartGallery, loadingChartConfig } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import { SESSION_STORAGE_KEYS } from './utils/constants';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchFromSessionStorage, storeInSessionStorage } from './utils/lib';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -20,7 +18,6 @@ import {
   CWModal,
   CWSpinner,
 } from '@chartwright/core-components';
-import ImportData from './containers/importData';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -32,6 +29,7 @@ const ViewMyCharts = lazy(() => import('./containers/viewMyCharts'));
 const SaveChart = lazy(() => import('./containers/saveChart'));
 const ChartGallery = lazy(() => import('./containers/chartGallery'));
 const ExportChart = lazy(() => import('./containers/export'));
+const ImportData = lazy(() => import('./containers/importData'));
 
 function ChartEditor() {
   const { id } = useParams();
@@ -43,7 +41,7 @@ function ChartEditor() {
   const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
   const [chartGalleryData] = useAtom(chartGallery);
   const [isLoading] = useAtom(loadingChartConfig);
-  const [showExportChartModal, setShowExportChartModal] = useState(false);
+  const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
   const [showChartGallery, setShowChartGallery] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
@@ -61,9 +59,6 @@ function ChartEditor() {
 
   useEffect(() => {
     if (chartGalleryData.length && !isLoading && !id) {
-      // const chartKey =
-      //   fetchFromSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID) ||
-      //   'simple-bar-chart';
       getDefaultChartConfig('simple-bar-chart');
     } else if (chartGalleryData.length && !isLoading && id) {
       fetchDefaultChartConfig(id);
@@ -75,10 +70,6 @@ function ChartEditor() {
     id,
     fetchDefaultChartConfig,
   ]);
-
-  const exportChart = useCallback(() => {
-    setShowExportChartModal(true);
-  }, []);
 
   const openChartGallery = useCallback(() => {
     setShowChartGallery(true);
@@ -96,14 +87,13 @@ function ChartEditor() {
     setIsImportDialogVisible(open);
   }, []);
 
-  const openImportDataModal = useCallback(() => {
-    setIsImportDialogVisible(true);
+  const toggleExportDataModal = useCallback((open: boolean) => {
+    setIsExportDialogVisible(open);
   }, []);
 
   const onSetChartViaGalleryOptions = useCallback(
     (value: string) => {
       getDefaultChartConfig(value);
-      // storeInSessionStorage(SESSION_STORAGE_KEYS.GAL_CHART_ID, value);
       if (id) {
         navigate(`/chart`);
       }
@@ -118,15 +108,29 @@ function ChartEditor() {
   const chartUtitlityBtns = useMemo(() => {
     return [
       {
-        tooltip: 'View chart templates',
-        icon: <ChartPie className="size-4" aria-hidden={true} />,
-        onClick: openChartGallery,
+        tooltip: 'Import from file',
+        icon: <FolderInput className="size-4" aria-hidden={true} />,
+        onClick: () => {
+          toggleImportDataModal(true);
+        },
       },
       {
         tooltip: 'Export',
         icon: <Share2 className="size-4" aria-hidden={true} />,
-        onClick: exportChart,
+        onClick: () => {
+          toggleExportDataModal(true);
+        },
         disabled: exportDisabled,
+      },
+    ];
+  }, [exportDisabled, toggleImportDataModal, toggleExportDataModal]);
+
+  const chartUtitlityAuthoredBtns = useMemo(() => {
+    return [
+      {
+        tooltip: 'View chart templates',
+        icon: <ChartPie className="size-4" aria-hidden={true} />,
+        onClick: openChartGallery,
       },
       {
         tooltip: 'View saved charts',
@@ -138,21 +142,43 @@ function ChartEditor() {
         icon: <Save className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated ? redirectToLoginPage : openSaveChartModal,
       },
-      {
-        tooltip: 'Import from file',
-        icon: <FolderInput className="size-4" aria-hidden={true} />,
-        onClick: openImportDataModal,
-      },
     ];
   }, [
-    exportChart,
-    exportDisabled,
     isAuthenticated,
     openChartGallery,
-    openImportDataModal,
     openSaveChartModal,
     redirectToLoginPage,
     viewMyCharts,
+  ]);
+
+  const modalProps = useMemo(() => {
+    if (isImportDialogVisible) {
+      return {
+        open: isImportDialogVisible,
+        setOpen: toggleImportDataModal,
+        title: 'Import Data',
+        content: <ImportData toggleImportDataModal={toggleImportDataModal} />,
+      };
+    } else if (isExportDialogVisible) {
+      return {
+        open: isExportDialogVisible,
+        setOpen: toggleExportDataModal,
+        title: 'Export Chart',
+        content: <ExportChart />,
+      };
+    }
+
+    return {
+      open: isImportDialogVisible,
+      setOpen: toggleImportDataModal,
+      title: 'Import Data',
+      content: <ImportData toggleImportDataModal={toggleImportDataModal} />,
+    };
+  }, [
+    isImportDialogVisible,
+    toggleImportDataModal,
+    isExportDialogVisible,
+    toggleExportDataModal,
   ]);
 
   if (isLoading) {
@@ -188,6 +214,17 @@ function ChartEditor() {
                   );
                 })}
               </div>
+              <div className="flex items-center gap-2">
+                {chartUtitlityAuthoredBtns.map((btnConfig) => {
+                  return (
+                    <CWIconOutlineButton
+                      {...btnConfig}
+                      key={btnConfig.tooltip}
+                      aria-label={btnConfig.tooltip}
+                    />
+                  );
+                })}
+              </div>
             </div>
             <ChartPreview />
           </div>
@@ -195,10 +232,10 @@ function ChartEditor() {
             <ChartDataEditor />
           </aside>
         </div>
-        <ExportChart
+        {/* <ExportChart
           isOpen={showExportChartModal}
           setIsOpen={setShowExportChartModal}
-        />
+        /> */}
         <ChartGallery
           isOpen={showChartGallery}
           setIsOpen={setShowChartGallery}
@@ -209,12 +246,7 @@ function ChartEditor() {
           setIsOpen={setShowSaveChartModal}
         />
         <ViewMyCharts isOpen={showMyCharts} setIsOpen={setShowMyCharts} />
-        <CWModal
-          open={isImportDialogVisible}
-          setOpen={toggleImportDataModal}
-          title="Import Data"
-          content={<ImportData toggleImportDataModal={toggleImportDataModal} />}
-        />
+        <CWModal {...modalProps} />
       </>
     </AppShell>
   );
