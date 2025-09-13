@@ -61,67 +61,114 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   const [chartType, setChartType] = useState<chart_types>('bar');
   const { isProcessing, buildChartConfig } = useChartConfig();
 
-  const processUploadedFile = useCallback((file: Dropzone.DropzoneFile) => {
-    try {
-      setIsFileProcessing(true);
-      const reader = new FileReader();
-      if (file.name.endsWith('.csv')) {
-        Papa.parse(file, {
-          header: true,
-          complete: (result) => {
-            console.log('CSV Data:', result.data);
-          },
-        });
-      } else if (file.name.endsWith('.xlsx')) {
-        reader.onload = (e) => {
-          const data = e.target?.result;
-          if (!data) return;
-
-          const workbook = read(data, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = utils.sheet_to_json(worksheet);
-
-          setUploadedFileData(jsonData as []);
-
-          // Get headers - first row values
-          const headers = utils.sheet_to_json(worksheet, {
-            header: 1,
-          })[0];
-
-          const columns = (headers as Array<never>).map((name) => {
-            return {
-              id: name,
-              value: name,
-              label: name,
-            };
-          });
-
-          setColumnNames(columns);
-
-          dropzoneInstRef.current?.emit('uploadprogress', file, 100, file.size);
-          dropzoneInstRef.current?.emit('success', file, {
-            message: 'Processed locally',
-          });
-          dropzoneInstRef.current?.emit('complete', file);
-
-          setIsFileProcessing(false);
-          setFileProcessingFinished(true);
-
-          stepperRef.current?.goNext();
+  const processHeaders = useCallback(
+    (headers: Array<string>, file: { size: number }) => {
+      const columns = headers.map((name) => {
+        return {
+          id: name,
+          value: name,
+          label: name,
         };
-        reader.onerror = () => {
-          //   self.emit('error', file, 'Failed to read file');
-          //   self.emit('complete', file);
-        };
-        reader.readAsArrayBuffer(file);
+      });
+
+      setColumnNames(columns);
+
+      dropzoneInstRef.current?.emit('uploadprogress', file, 100, file.size);
+      dropzoneInstRef.current?.emit('success', file, {
+        message: 'Processed locally',
+      });
+      dropzoneInstRef.current?.emit('complete', file);
+
+      setIsFileProcessing(false);
+      setFileProcessingFinished(true);
+
+      stepperRef.current?.goNext();
+    },
+    []
+  );
+
+  const processXlsxFile = useCallback(
+    (e: ProgressEvent<FileReader>, file: { size: number }) => {
+      try {
+        const data = e.target?.result;
+        if (!data) return;
+
+        const workbook = read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = utils.sheet_to_json(worksheet);
+
+        setUploadedFileData(jsonData as []);
+
+        // Get headers - first row values
+        const headers = utils.sheet_to_json(worksheet, {
+          header: 1,
+        })[0];
+        processHeaders(headers as Array<string>, file);
+      } catch (error: unknown) {
+        console.error('Error in reading excel file: ', error);
+        dropzoneInstRef.current?.emit(
+          'error',
+          file,
+          'Failed to read the uploaded file.'
+        );
+        setIsFileProcessing(false);
       }
-    } catch (error: unknown) {
-      console.error("Error in 'processUploadedFile': ", error);
-      //   self.emit('error', file, error?.message || 'Parse failed');
-      //   self.emit('complete', file);
-    }
-  }, []);
+    },
+    [processHeaders]
+  );
+
+  const processCsvData = useCallback(
+    (result: Papa.ParseResult<unknown>, file: { size: number }) => {
+      setUploadedFileData(result.data as []);
+      const headers: string[] = result.meta.fields || [];
+      processHeaders(headers, file);
+    },
+    [processHeaders]
+  );
+
+  const processUploadedFile = useCallback(
+    (file: Dropzone.DropzoneFile) => {
+      try {
+        setIsFileProcessing(true);
+        if (file.name.endsWith('.csv')) {
+          Papa.parse(file, {
+            header: true,
+            dynamicTyping: true, //Prevent numbers to be converted to string.
+            complete: (result) => {
+              processCsvData(result, file);
+            },
+            error: () => {
+              dropzoneInstRef.current?.emit(
+                'error',
+                file,
+                'Failed to read the uploaded file.'
+              );
+              setIsFileProcessing(false);
+            },
+          });
+        } else if (file.name.endsWith('.xlsx')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            processXlsxFile(e, file);
+          };
+          reader.readAsArrayBuffer(file);
+          reader.onerror = () => {
+            dropzoneInstRef.current?.emit(
+              'error',
+              file,
+              'Failed to read the uploaded file.'
+            );
+            setIsFileProcessing(false);
+          };
+        }
+      } catch (error: unknown) {
+        console.error('Error in processing uploaded file: ', error);
+        setIsFileProcessing(false);
+      }
+    },
+    [processCsvData, processXlsxFile]
+  );
 
   useEffect(() => {
     if (dropzoneRef.current && !dropzoneInstRef.current) {
