@@ -83,10 +83,12 @@ export class ChartsController {
 
   @Get('chart/image/:key')
   async getChartImageByKey(@Param('key') key: string, @Res() res: Response) {
-    const { imageStream, type } = await this.chartService.getImageStreamByKey(
-      key
-    );
+    const { imageStream, type, ETag, LastModified } =
+      await this.chartService.getImageStreamByKey(key);
     res.setHeader('Content-Type', `${type}`);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('ETag', `${ETag}`);
+    res.setHeader('Last-Modified', `${LastModified?.toUTCString()}`);
     imageStream.pipe(res);
     return imageStream;
   }

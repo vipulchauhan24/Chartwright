@@ -219,8 +219,14 @@ export class ChartService {
 
   async getImageStreamByKey(key: string) {
     try {
-      const { Body, ContentType } = await this.s3ORM.getObject(key);
-      return { imageStream: Body as Readable, type: ContentType };
+      const { Body, ContentType, ETag, LastModified } =
+        await this.s3ORM.getObject(key);
+      return {
+        imageStream: Body as Readable,
+        type: ContentType,
+        ETag,
+        LastModified,
+      };
     } catch (error) {
       console.error(error);
       throw new HttpException(

@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 
 interface ICWGhostButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string;
+  label: string | React.ReactNode;
   disabled?: boolean;
 }
 export const CWGhostButton = forwardRef<HTMLButtonElement, ICWGhostButton>(

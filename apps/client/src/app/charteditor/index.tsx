@@ -27,7 +27,7 @@ const GlobalOptionsEditor = lazy(
 );
 const ViewMyCharts = lazy(() => import('./containers/viewMyCharts'));
 const SaveChart = lazy(() => import('./containers/saveChart'));
-const ChartGallery = lazy(() => import('./containers/chartGallery'));
+const ChartTemplates = lazy(() => import('./containers/chartTemplates'));
 const ExportChart = lazy(() => import('./containers/export'));
 const ImportData = lazy(() => import('./containers/importData'));
 
@@ -35,19 +35,21 @@ function ChartEditor() {
   const { id } = useParams();
   const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
+
   const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
   const [, fetchChartGlobalData] = useAtom(fetchChartGlobalOptions);
   const [exportDisabled] = useAtom(isExportDisabled);
   const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
   const [chartGalleryData] = useAtom(chartGallery);
   const [isLoading] = useAtom(loadingChartConfig);
-  const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
-  const [showChartGallery, setShowChartGallery] = useState(false);
+
+  const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
+  const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
   const [showMyCharts, setShowMyCharts] = useState(false);
   const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     fetchChartGalleryData(); // Fetch data on mount
@@ -71,10 +73,6 @@ function ChartEditor() {
     fetchDefaultChartConfig,
   ]);
 
-  const openChartGallery = useCallback(() => {
-    setShowChartGallery(true);
-  }, []);
-
   const viewMyCharts = useCallback(() => {
     setShowMyCharts(true);
   }, []);
@@ -91,15 +89,19 @@ function ChartEditor() {
     setIsExportDialogVisible(open);
   }, []);
 
-  const onSetChartViaGalleryOptions = useCallback(
-    (value: string) => {
-      getDefaultChartConfig(value);
-      if (id) {
-        navigate(`/chart`);
-      }
-    },
-    [getDefaultChartConfig, navigate, id]
-  );
+  const toggleChartTemplateModal = useCallback((open: boolean) => {
+    setIsChartTemplateVisible(open);
+  }, []);
+
+  // const onSetChartViaGalleryOptions = useCallback(
+  //   (value: string) => {
+  //     getDefaultChartConfig(value);
+  //     if (id) {
+  //       navigate(`/chart`);
+  //     }
+  //   },
+  //   [getDefaultChartConfig, navigate, id]
+  // );
 
   const redirectToLoginPage = useCallback(() => {
     auth.signinRedirect();
@@ -130,7 +132,9 @@ function ChartEditor() {
       {
         tooltip: 'View chart templates',
         icon: <ChartPie className="size-4" aria-hidden={true} />,
-        onClick: openChartGallery,
+        onClick: () => {
+          toggleChartTemplateModal(true);
+        },
       },
       {
         tooltip: 'View saved charts',
@@ -145,7 +149,7 @@ function ChartEditor() {
     ];
   }, [
     isAuthenticated,
-    openChartGallery,
+    toggleChartTemplateModal,
     openSaveChartModal,
     redirectToLoginPage,
     viewMyCharts,
@@ -166,6 +170,16 @@ function ChartEditor() {
         title: 'Export Chart',
         content: <ExportChart />,
       };
+    } else if (isChartTemplateVisible) {
+      return {
+        open: isChartTemplateVisible,
+        setOpen: toggleChartTemplateModal,
+        title: 'Chart Template',
+        content: (
+          <ChartTemplates toggleChartTemplateModal={toggleChartTemplateModal} />
+        ),
+        fullScreen: true,
+      };
     }
 
     return {
@@ -176,9 +190,11 @@ function ChartEditor() {
     };
   }, [
     isImportDialogVisible,
-    toggleImportDataModal,
     isExportDialogVisible,
+    isChartTemplateVisible,
+    toggleImportDataModal,
     toggleExportDataModal,
+    toggleChartTemplateModal,
   ]);
 
   if (isLoading) {
@@ -232,15 +248,6 @@ function ChartEditor() {
             <ChartDataEditor />
           </aside>
         </div>
-        {/* <ExportChart
-          isOpen={showExportChartModal}
-          setIsOpen={setShowExportChartModal}
-        /> */}
-        <ChartGallery
-          isOpen={showChartGallery}
-          setIsOpen={setShowChartGallery}
-          onSetChartViaGalleryOptions={onSetChartViaGalleryOptions}
-        />
         <SaveChart
           isOpen={showSaveChartModal}
           setIsOpen={setShowSaveChartModal}

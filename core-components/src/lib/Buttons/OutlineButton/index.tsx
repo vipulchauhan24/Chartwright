@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 
 interface ICWOutlineButton
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string;
+  label: string | React.ReactNode;
   disabled?: boolean;
 }
 

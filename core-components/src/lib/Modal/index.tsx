@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog } from 'radix-ui';
 import { X } from 'lucide-react';
 import { CWIconButton } from '../Buttons/IconButton';
+import clsx from 'clsx';
 
 interface ICWModal {
   open: boolean;
@@ -9,6 +10,7 @@ interface ICWModal {
   title: string;
   description?: string;
   content: React.ReactNode;
+  fullScreen?: boolean;
 }
 
 export function CWModal({
@@ -17,12 +19,20 @@ export function CWModal({
   title,
   description,
   content,
+  fullScreen,
 }: ICWModal) {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md surface py-4 px-6 shadow-popover focus:outline-none z-50">
+        <Dialog.Content
+          className={clsx(
+            fullScreen
+              ? 'left-0 top-0 w-full h-full'
+              : 'left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md',
+            'fixed surface py-4 px-6 shadow-popover focus:outline-none z-50'
+          )}
+        >
           <div className="flex justify-between items-center">
             <Dialog.Title className="text-2xl font-bold text-body">
               {title}
@@ -33,9 +43,11 @@ export function CWModal({
               />
             </Dialog.Close>
           </div>
-          <Dialog.Description className="text-sm mb-2 font-normal text-body">
-            {description}
-          </Dialog.Description>
+          {description && (
+            <Dialog.Description className="text-sm mb-2 font-normal text-body">
+              {description}
+            </Dialog.Description>
+          )}
           <div>{content}</div>
         </Dialog.Content>
       </Dialog.Portal>
