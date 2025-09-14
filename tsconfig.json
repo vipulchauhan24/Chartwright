@@ -11,6 +11,9 @@
     },
     {
       "path": "./core-components"
+    },
+    {
+      "path": "./libs/chart-renderer"
     }
   ]
 }
