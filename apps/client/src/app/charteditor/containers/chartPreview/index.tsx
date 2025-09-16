@@ -13,6 +13,8 @@ import {
 } from '../../utils/lib';
 import { ChartNoAxesCombined } from 'lucide-react';
 
+import { ChartRenderer } from '@chartwright/chart-renderer';
+
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
 function ChartPreview() {
@@ -28,16 +30,26 @@ function ChartPreview() {
   }, [setIsExportChartDisabled]);
 
   useEffect(() => {
-    chartInstance.current = echarts.init(chartRef.current);
+    if (!chartDataConfig) {
+      return;
+    }
+    // chartInstance.current = echarts.init(chartRef.current);
 
+    const renderer = new ChartRenderer('echarts-container');
+    setTimeout(() => {
+      renderer.sendMessage({
+        type: 'render',
+        option: chartDataConfig,
+      });
+    }, 2000);
     // Clean up on unmount
     return () => {
-      chartInstance.current?.dispose();
+      // chartInstance.current?.dispose();
     };
-  }, []);
+  }, [chartDataConfig]);
 
   useEffect(() => {
-    if (!chartDataConfig) {
+    if (!chartDataConfig || !chartInstance.current) {
       return;
     }
     chartInstance.current?.on('finished', function () {
@@ -153,7 +165,7 @@ function ChartPreview() {
 
   return (
     <div className="w-full h-[calc(100%_-_58px)] pt-3 relative">
-      {!isChartRendered && (
+      {/* {!isChartRendered && (
         <div className="h-full w-full flex items-center justify-center z-10 bg-axis/50 absolute top-3 left-0 rounded-lg">
           <ChartNoAxesCombined
             className="size-10 stroke-border animate-pulse"
@@ -164,6 +176,10 @@ function ChartPreview() {
       <div
         ref={chartRef}
         className="h-full bg-surface p-4 rounded-lg overflow-hidden shadow-toolbar"
+      ></div> */}
+      <div
+        id="echarts-container"
+        className="h-full bg-surface p-2.5 rounded-sm overflow-hidden shadow-[rgba(0, 0, 0, 0.1) 0px 0px 20px] box-border"
       ></div>
     </div>
   );

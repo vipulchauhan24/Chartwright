@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #chart-container {
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script>
+      let port, chart;
+
+      // Receive port2 from host
+      window.addEventListener('message', (event) => {
+        if (event.origin !== window.origin) return; // basic check
+
+        if (event.data.type === 'init' && event.ports[0]) {
+          port = event.ports[0];
+          port.onmessage = (e) => {
+            if (e.data.type === 'render') {
+              const dom = document.getElementById('chart-container');
+              chart = echarts.init(dom, null, {
+                renderer: 'canvas',
+                useDirtyRect: false,
+              });
+              chart.setOption(e.data.option);
+            }
+          };
+
+          // Send a handshake back
+          port.postMessage({ type: 'ready' });
+        }
+      });
+
+      // window.addEventListener('resize', chart.resize);
+    </script>
+  </body>
+</html>

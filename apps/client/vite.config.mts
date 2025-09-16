@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import tailwindcss from '@tailwindcss/vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   root: __dirname,
@@ -33,6 +34,14 @@ export default defineConfig({
       babel: {
         presets: ['jotai/babel/preset'],
       },
+    }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: '../../libs/chart-renderer/dist/chart.html', // path to lib build
+          dest: '.', // copy into dist/ root -> available at /chart.html
+        },
+      ],
     }),
   ],
   // Uncomment this if you are using workers.

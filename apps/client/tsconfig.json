@@ -3,6 +3,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/ui-components"
+    },
+    {
+      "path": "../../libs/chart-renderer"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ],

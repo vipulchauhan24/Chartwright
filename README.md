@@ -116,3 +116,11 @@ And join the Nx community:
 ```sh
 npx nx generate @nx/react:library libs/ui-components
 ```
+
+## Generating typescript library.
+
+### Generating chart renderer library.
+
+```sh
+npx nx generate @nx/js:lib libs/chart-renderer --bundler=rollup
+```
