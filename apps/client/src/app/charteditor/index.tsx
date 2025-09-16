@@ -17,7 +17,7 @@ import {
   CWIconOutlineButton,
   CWModal,
   CWSpinner,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));

@@ -1,4 +1,4 @@
-import { CWGhostLink, CWSolidLink } from '@chartwright/core-components';
+import { CWGhostLink, CWSolidLink } from '@chartwright/ui-components';
 
 export default function PageNotFound() {
   return (

@@ -1,4 +1,4 @@
-import { CWGhostLink, CWSolidButton } from '@chartwright/core-components';
+import { CWGhostLink, CWSolidButton } from '@chartwright/ui-components';
 
 function ErrorBoundaryPage() {
   return (

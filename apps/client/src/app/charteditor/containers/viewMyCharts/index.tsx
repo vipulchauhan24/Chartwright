@@ -7,7 +7,7 @@ import { fetchMyCharts } from '../../../../service/chartsApi';
 import { useNavigate } from 'react-router-dom';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
-import { CWSolidIconButton, CWSpinner } from '@chartwright/core-components';
+import { CWSolidIconButton, CWSpinner } from '@chartwright/ui-components';
 
 interface IViewMyCharts {
   isOpen: boolean;

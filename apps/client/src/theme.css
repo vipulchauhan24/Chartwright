@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@source "../../../core-components/src/";
+@source "../../../libs/ui-components/src/";
 
 /* Remove every default Tailwind color */
 @theme {

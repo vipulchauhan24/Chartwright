@@ -18,11 +18,7 @@ import { chartId } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import axios from 'axios';
-import {
-  CWGhostLink,
-  CWIconButton,
-  CWTabs,
-} from '@chartwright/core-components';
+import { CWGhostLink, CWIconButton, CWTabs } from '@chartwright/ui-components';
 
 interface IExportItem {
   onClick: () => void;

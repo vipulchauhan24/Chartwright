@@ -13,7 +13,7 @@ import {
   CWSpinner,
   CWStepper,
   ICWStepper,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
 

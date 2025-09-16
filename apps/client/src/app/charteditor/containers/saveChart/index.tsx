@@ -11,7 +11,7 @@ import {
   CWOutlineLoadingButton,
   CWSolidButton,
   CWTextInput,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 
 interface ISaveChart {
   isOpen: boolean;

@@ -5,7 +5,7 @@ import {
   CWGhostButton,
   CWOutlineButton,
   CWSpinner,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 import { API_ENDPOINTS } from '../../utils/constants';
 
 interface IChartTemplates {

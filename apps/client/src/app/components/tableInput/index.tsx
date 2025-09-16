@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash } from 'lucide-react';
-import { CWIconButton, CWTextInput } from '@chartwright/core-components';
+import { CWIconButton, CWTextInput } from '@chartwright/ui-components';
 
 interface ICWTableInput {
   id: string;

@@ -10,7 +10,7 @@ import {
   LOCAL_STORAGE_KEYS,
   SESSION_STORAGE_KEYS,
 } from './charteditor/utils/constants';
-import { CWSolidButton, CWSpinner } from '@chartwright/core-components';
+import { CWSolidButton, CWSpinner } from '@chartwright/ui-components';
 
 function AuthGaurd({ children }: { children: React.ReactNode }) {
   const auth = useAuth();

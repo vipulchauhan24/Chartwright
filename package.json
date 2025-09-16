@@ -62,7 +62,6 @@
   "workspaces": [
     "packages/*",
     "apps/*",
-    "core-components",
     "libs/*"
   ],
   "dependencies": {

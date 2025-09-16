@@ -1,4 +1,4 @@
-import { CWGhostLink } from '@chartwright/core-components';
+import { CWGhostLink } from '@chartwright/ui-components';
 import UserProfile from '../../components/userProfile';
 
 function AppHeader() {

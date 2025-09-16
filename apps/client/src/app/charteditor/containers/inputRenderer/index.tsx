@@ -7,7 +7,7 @@ import {
   CWColorInput,
   CWNumberInput,
   CWTextArea,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 
 interface IInputRenderer {
   id: string;

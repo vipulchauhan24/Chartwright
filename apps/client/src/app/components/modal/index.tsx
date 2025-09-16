@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { X } from 'lucide-react';
-import { CWIconButton } from '@chartwright/core-components';
+import { CWIconButton } from '@chartwright/ui-components';
 
 interface ICWModal {
   title: string;

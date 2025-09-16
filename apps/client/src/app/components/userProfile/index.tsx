@@ -1,10 +1,7 @@
 import React from 'react';
 import { DropdownMenu, Avatar } from 'radix-ui';
 import useAuthentication from '../../charteditor/hooks/useAuthentication';
-import {
-  CWSGhostIconButton,
-  CWSolidButton,
-} from '@chartwright/core-components';
+import { CWSGhostIconButton, CWSolidButton } from '@chartwright/ui-components';
 import { LogOut, User } from 'lucide-react';
 import { removeFromLocalStorage } from '../../charteditor/utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../charteditor/utils/constants';

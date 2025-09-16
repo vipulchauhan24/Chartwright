@@ -9,7 +9,7 @@ import {
   CWAccordian,
   CWGhostButton,
   CWPopover,
-} from '@chartwright/core-components';
+} from '@chartwright/ui-components';
 import InputRenderer from '../inputRenderer';
 import { LetterText, SquareDashedMousePointer } from 'lucide-react';
 

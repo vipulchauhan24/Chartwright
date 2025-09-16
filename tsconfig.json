@@ -10,10 +10,7 @@
       "path": "./apps/server"
     },
     {
-      "path": "./core-components"
-    },
-    {
-      "path": "./libs/chart-renderer"
+      "path": "./libs/ui-components"
     }
   ]
 }
