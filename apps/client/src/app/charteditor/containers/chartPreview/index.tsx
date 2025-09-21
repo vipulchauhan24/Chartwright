@@ -179,7 +179,7 @@ function ChartPreview() {
       ></div> */}
       <div
         id="echarts-container"
-        className="h-full bg-surface p-2.5 rounded-sm overflow-hidden shadow-[rgba(0, 0, 0, 0.1) 0px 0px 20px] box-border"
+        className="h-full bg-surface p-2.5 rounded-md overflow-hidden shadow-card box-border"
       ></div>
     </div>
   );
