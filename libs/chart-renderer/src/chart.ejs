@@ -24,29 +24,87 @@
     <script>
       let port, chart;
 
+      const MESSAGE_TYPES = Object.freeze({
+        READY: 'ready',
+        INIT: 'init',
+        RENDER: 'render',
+        CHART_INIT: 'chart-init',
+        CHART_FINISHED: 'chart-finished',
+        CHART_DISPOSE: 'chart-dispose',
+        CHART_UPDATE: 'chart-update',
+        CHART_DOWNLOAD: 'chart-download',
+      });
+
+      function dispose() {
+        try {
+          chart?.dispose();
+          console.log('Chart disposed');
+        } catch (error) {
+          console.error('Error in disposing chart');
+        }
+      }
+
+      function sendMessage(data) {
+        port?.postMessage(data);
+      }
+
+      function onMessage(e) {
+        switch (event.data.type) {
+          case MESSAGE_TYPES.RENDER:
+            const dom = document.getElementById('chart-container');
+            dispose();
+            chart = echarts.init(dom, null, {
+              renderer: 'canvas',
+              useDirtyRect: false,
+            });
+            chart.setOption(e.data.options, {
+              notMerge: true,
+              lazyUpdate: true,
+              silent: true,
+            });
+            chart?.on('finished', function () {
+              port.postMessage({ type: MESSAGE_TYPES.CHART_FINISHED });
+            });
+            port.postMessage({ type: MESSAGE_TYPES.CHART_INIT });
+            break;
+          case MESSAGE_TYPES.CHART_DISPOSE:
+            dispose();
+            break;
+          case MESSAGE_TYPES.CHART_UPDATE:
+            chart.setOption(e.data.options, {
+              notMerge: true,
+              lazyUpdate: true,
+              silent: true,
+            });
+            break;
+          case MESSAGE_TYPES.CHART_DOWNLOAD:
+            const imageURI = chart.getDataURL({
+              type: e.data.uriType,
+              backgroundColor: e.data.backgroundColor,
+            });
+            sendMessage({
+              type: MESSAGE_TYPES.CHART_DOWNLOAD,
+              imageURI: imageURI,
+              ...e.data,
+            });
+            break;
+
+          default:
+            break;
+        }
+      }
+
       // Receive port2 from host
       window.addEventListener('message', (event) => {
         if (event.origin !== window.origin) return; // basic check
 
-        if (event.data.type === 'init' && event.ports[0]) {
+        if (event.data.type === MESSAGE_TYPES.INIT && event.ports[0]) {
           port = event.ports[0];
-          port.onmessage = (e) => {
-            if (e.data.type === 'render') {
-              const dom = document.getElementById('chart-container');
-              chart = echarts.init(dom, null, {
-                renderer: 'canvas',
-                useDirtyRect: false,
-              });
-              chart.setOption(e.data.option);
-            }
-          };
-
+          port.onmessage = onMessage;
           // Send a handshake back
-          port.postMessage({ type: 'ready' });
+          sendMessage({ type: MESSAGE_TYPES.READY });
         }
       });
-
-      // window.addEventListener('resize', chart.resize);
     </script>
   </body>
 </html>

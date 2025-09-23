@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import * as echarts from 'echarts';
 import { useAtom } from 'jotai';
 import { currentChartConfigStore } from '../../../../store/charts';
 import { isExportDisabled } from '../../../../store/app';
@@ -17,10 +16,11 @@ import { ChartRenderer } from '@chartwright/chart-renderer';
 
 const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
+const CHART_CONTAINER_ID = 'echarts-container';
+
 function ChartPreview() {
   const [chartDataConfig] = useAtom(currentChartConfigStore);
-  const chartRef = useRef(null);
-  const chartInstance = useRef<echarts.EChartsType | undefined>(undefined);
+  const chartRendererInst = useRef<ChartRenderer>(undefined);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
   const [isChartRendered, setIsChartRendered] = useState(false);
 
@@ -29,143 +29,159 @@ function ChartPreview() {
     setIsChartRendered(true);
   }, [setIsExportChartDisabled]);
 
-  useEffect(() => {
-    if (!chartDataConfig) {
-      return;
-    }
-    // chartInstance.current = echarts.init(chartRef.current);
-
-    const renderer = new ChartRenderer('echarts-container');
-    setTimeout(() => {
-      renderer.sendMessage({
-        type: 'render',
-        option: chartDataConfig,
-      });
-    }, 2000);
-    // Clean up on unmount
-    return () => {
-      // chartInstance.current?.dispose();
-    };
+  const renderChart = useCallback(() => {
+    chartRendererInst.current?.renderChart(chartDataConfig);
   }, [chartDataConfig]);
 
-  useEffect(() => {
-    if (!chartDataConfig || !chartInstance.current) {
-      return;
+  const downloadChart = useCallback(async (event: any) => {
+    const { uriType, copy, pdf, imageURI } = event.detail;
+
+    const actions: Record<string, () => Promise<void>> = {
+      downloadImage: async () => {
+        fileDownload(imageURI, 'chart');
+      },
+      copyImage: async () => {
+        const res = await fetch(imageURI); // base64 → blob
+        const blob = await res.blob();
+        await copyToMemory({ [blob.type]: blob });
+      },
+      downloadPDF: async () => {
+        const pdfBase64 = await base64ImageToBase64PDF(imageURI);
+        fileDownload(`${pdfBase64}`, 'chart');
+      },
+    };
+
+    let actionKey: keyof typeof actions | null = null;
+    let messages = { loading: '', success: <>Success!</> };
+
+    if ((uriType === 'png' || uriType === 'jpeg') && !copy && !pdf) {
+      actionKey = 'downloadImage';
+      messages = {
+        loading: 'Downloading...',
+        success: <b>Image downloaded successfully!</b>,
+      };
+    } else if (uriType === 'png' && copy) {
+      actionKey = 'copyImage';
+      messages = {
+        loading: 'Copying...',
+        success: <b>Copied to clipboard!</b>,
+      };
+    } else if (uriType === 'png' && pdf) {
+      actionKey = 'downloadPDF';
+      messages = {
+        loading: 'Downloading...',
+        success: <b>Image downloaded successfully!</b>,
+      };
     }
-    chartInstance.current?.on('finished', function () {
-      chartRenderFinished();
-    });
-    chartInstance.current?.setOption(chartDataConfig, {
-      notMerge: true,
-      lazyUpdate: true,
-      silent: true,
-    });
-  }, [chartDataConfig, chartRenderFinished]);
 
-  const generateImage = (
-    type: 'png' | 'jpeg' | 'svg' | undefined = 'png'
-  ): string => {
-    if (!chartInstance.current) {
-      throw new Error('Failed to generate image.');
-    }
-    const imgURI = chartInstance.current.getDataURL({
-      type: type,
-      backgroundColor: '#FFFFFF',
-    });
+    if (!actionKey) return;
 
-    return imgURI;
-  };
-
-  const copyToClipboard = useCallback(async () => {
     toast.promise(
       async () => {
         try {
-          const imgURI = await generateImage();
-          const res = await fetch(imgURI); // Convert base64 to blob
-          const blob = await res.blob();
-          await copyToMemory({ [blob.type]: blob });
+          await actions[actionKey]();
         } catch (err) {
-          console.error('Failed to copy image:', err);
+          console.error('Download error:', err);
           throw err;
         }
       },
       {
-        loading: 'Copying...',
-        success: <b>Copied to clipboard!</b>,
+        ...messages,
         error: <b>{EXPORT_ERROR_MSG}</b>,
       }
     );
   }, []);
 
-  const downloadImage = useCallback(
-    async (type: 'png' | 'jpeg' | 'svg' | undefined = 'png') => {
-      toast.promise(
-        async () => {
-          try {
-            const imgURI = await generateImage(type);
-            fileDownload(`${imgURI}`, 'chart');
-          } catch (err) {
-            console.error('Failed to download image:', err);
-            throw err;
-          }
-        },
-        {
-          loading: 'Downloading...',
-          success: <b>Image downloaded successfully!</b>,
-          error: <b>{EXPORT_ERROR_MSG}</b>,
-        }
+  useEffect(() => {
+    return () => {
+      chartRendererInst.current?.disposeChart();
+      chartRendererInst.current?.removeEventListener('ready', renderChart);
+
+      chartRendererInst.current?.removeEventListener(
+        'chart-finished',
+        chartRenderFinished
       );
+
+      chartRendererInst.current?.removeEventListener(
+        'chart-download',
+        downloadChart
+      );
+    };
+  }, [chartRenderFinished, downloadChart, renderChart]);
+
+  useEffect(() => {
+    if (!chartRendererInst.current && chartDataConfig) {
+      chartRendererInst.current = new ChartRenderer(CHART_CONTAINER_ID);
+
+      chartRendererInst.current.addEventListener('ready', renderChart);
+
+      chartRendererInst.current.addEventListener(
+        'chart-finished',
+        chartRenderFinished
+      );
+
+      chartRendererInst.current.addEventListener(
+        'chart-download',
+        downloadChart
+      );
+    }
+  }, [chartDataConfig, chartRenderFinished, downloadChart, renderChart]);
+
+  useEffect(() => {
+    if (chartRendererInst.current && chartDataConfig) {
+      console.log('config changed');
+      chartRendererInst.current?.updateChart(chartDataConfig);
+    }
+  }, [chartDataConfig]);
+
+  const generateImage = useCallback(
+    (type: 'png' | 'jpeg', copy?: boolean, pdf?: boolean) => {
+      if (!chartRendererInst.current) {
+        throw new Error('Failed to generate image.');
+      }
+      chartRendererInst.current.downloadChart({
+        uriType: type,
+        backgroundColor: '#FFFFFF',
+        copy,
+        pdf,
+      });
     },
     []
   );
 
-  const exportToPDF = useCallback(async () => {
-    toast.promise(
-      async () => {
-        try {
-          const imgURI = await generateImage();
-          const pdfBase64 = await base64ImageToBase64PDF(`${imgURI}`);
-          fileDownload(`${pdfBase64}`, 'chart');
-        } catch (err) {
-          console.error('Failed to download image:', err);
-          throw err;
-        }
-      },
-      {
-        loading: 'Downloading...',
-        success: <b>Image downloaded successfully!</b>,
-        error: <b>{EXPORT_ERROR_MSG}</b>,
-      }
-    );
-  }, []);
-
   useEffect(() => {
-    emitter.on(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
+    emitter.on(EVENTS.COPY_TO_CLIPBAORD, () => {
+      generateImage('png', true);
+    });
     emitter.on(EVENTS.EXPORT_TO_PNG, () => {
-      downloadImage();
+      generateImage('png');
     });
     emitter.on(EVENTS.EXPORT_TO_JPG, () => {
-      downloadImage('jpeg');
+      generateImage('jpeg');
     });
-    emitter.on(EVENTS.EXPORT_TO_PDF, exportToPDF);
-    // emitter.on(EVENTS.EXPORT_TO_SVG, exportToSVG);
+    emitter.on(EVENTS.EXPORT_TO_PDF, () => {
+      generateImage('png', false, true);
+    });
 
     return () => {
-      emitter.off(EVENTS.COPY_TO_CLIPBAORD, copyToClipboard);
+      emitter.off(EVENTS.COPY_TO_CLIPBAORD, () => {
+        generateImage('png', true);
+      });
       emitter.off(EVENTS.EXPORT_TO_PNG, () => {
-        downloadImage();
+        generateImage('png');
       });
       emitter.off(EVENTS.EXPORT_TO_JPG, () => {
-        downloadImage('jpeg');
+        generateImage('jpeg');
       });
-      emitter.off(EVENTS.EXPORT_TO_PDF, exportToPDF);
-      // emitter.off(EVENTS.EXPORT_TO_SVG, exportToSVG);
+      emitter.off(EVENTS.EXPORT_TO_PDF, () => {
+        generateImage('png', false, true);
+      });
     };
-  }, [copyToClipboard, downloadImage, exportToPDF]);
+  }, [generateImage]);
 
   return (
     <div className="w-full h-[calc(100%_-_58px)] pt-3 relative">
-      {/* {!isChartRendered && (
+      {!isChartRendered && (
         <div className="h-full w-full flex items-center justify-center z-10 bg-axis/50 absolute top-3 left-0 rounded-lg">
           <ChartNoAxesCombined
             className="size-10 stroke-border animate-pulse"
@@ -174,11 +190,7 @@ function ChartPreview() {
         </div>
       )}
       <div
-        ref={chartRef}
-        className="h-full bg-surface p-4 rounded-lg overflow-hidden shadow-toolbar"
-      ></div> */}
-      <div
-        id="echarts-container"
+        id={CHART_CONTAINER_ID}
         className="h-full bg-surface p-2.5 rounded-md overflow-hidden shadow-card box-border"
       ></div>
     </div>
