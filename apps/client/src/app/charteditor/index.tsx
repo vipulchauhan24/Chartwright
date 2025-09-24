@@ -9,7 +9,7 @@ import { chartGallery, loadingChartConfig } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -47,7 +47,7 @@ function ChartEditor() {
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
-  const [showMyCharts, setShowMyCharts] = useState(false);
+  const [isMyChartModalVisible, setIsMyChartModalVisible] = useState(false);
   const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
   // const navigate = useNavigate();
 
@@ -73,10 +73,6 @@ function ChartEditor() {
     fetchDefaultChartConfig,
   ]);
 
-  const viewMyCharts = useCallback(() => {
-    setShowMyCharts(true);
-  }, []);
-
   const openSaveChartModal = useCallback(() => {
     setShowSaveChartModal(true);
   }, []);
@@ -91,6 +87,10 @@ function ChartEditor() {
 
   const toggleChartTemplateModal = useCallback((open: boolean) => {
     setIsChartTemplateVisible(open);
+  }, []);
+
+  const toggleMyChartsModal = useCallback((open: boolean) => {
+    setIsMyChartModalVisible(open);
   }, []);
 
   // const onSetChartViaGalleryOptions = useCallback(
@@ -139,7 +139,11 @@ function ChartEditor() {
       {
         tooltip: 'View saved charts',
         icon: <ChartArea className="size-4" aria-hidden={true} />,
-        onClick: !isAuthenticated ? redirectToLoginPage : viewMyCharts,
+        onClick: !isAuthenticated
+          ? redirectToLoginPage
+          : () => {
+              toggleMyChartsModal(true);
+            },
       },
       {
         tooltip: 'Save changes',
@@ -149,10 +153,10 @@ function ChartEditor() {
     ];
   }, [
     isAuthenticated,
-    toggleChartTemplateModal,
-    openSaveChartModal,
     redirectToLoginPage,
-    viewMyCharts,
+    openSaveChartModal,
+    toggleChartTemplateModal,
+    toggleMyChartsModal,
   ]);
 
   const modalProps = useMemo(() => {
@@ -180,6 +184,13 @@ function ChartEditor() {
         ),
         fullScreen: true,
       };
+    } else if (isMyChartModalVisible) {
+      return {
+        open: isMyChartModalVisible,
+        setOpen: toggleMyChartsModal,
+        title: 'My Saved Charts',
+        content: <ViewMyCharts toggleMyChartsModal={toggleMyChartsModal} />,
+      };
     }
 
     return {
@@ -192,9 +203,11 @@ function ChartEditor() {
     isImportDialogVisible,
     isExportDialogVisible,
     isChartTemplateVisible,
+    isMyChartModalVisible,
     toggleImportDataModal,
     toggleExportDataModal,
     toggleChartTemplateModal,
+    toggleMyChartsModal,
   ]);
 
   if (isLoading) {
@@ -252,7 +265,6 @@ function ChartEditor() {
           isOpen={showSaveChartModal}
           setIsOpen={setShowSaveChartModal}
         />
-        <ViewMyCharts isOpen={showMyCharts} setIsOpen={setShowMyCharts} />
         <CWModal {...modalProps} />
       </>
     </AppShell>

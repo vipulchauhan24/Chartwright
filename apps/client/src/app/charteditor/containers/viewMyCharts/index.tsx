@@ -1,24 +1,21 @@
-import { useEffect } from 'react';
-import CWModal from '../../../components/modal';
-import { ExternalLink } from 'lucide-react';
-import { myCharts } from '../../../../store/charts';
+import { CWSolidIconButton, CWSpinner } from '@chartwright/ui-components';
 import { useAtom } from 'jotai';
-import { fetchMyCharts } from '../../../../service/chartsApi';
+import React, { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loadingMyCharts, myCharts } from '../../../../store/charts';
+import { fetchMyCharts } from '../../../../service/chartsApi';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
-import { CWSolidIconButton, CWSpinner } from '@chartwright/ui-components';
-
+import { ExternalLink } from 'lucide-react';
 interface IViewMyCharts {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleMyChartsModal: (open: boolean) => void;
 }
-
 function ViewMyCharts(props: IViewMyCharts) {
-  const { isOpen, setIsOpen } = props;
-  const [charts] = useAtom(myCharts);
-  const [, fetchCharts] = useAtom(fetchMyCharts);
+  const { toggleMyChartsModal } = props;
   const navigate = useNavigate();
+  const [isLoading] = useAtom(loadingMyCharts);
+  const [, fetchCharts] = useAtom(fetchMyCharts);
+  const [charts] = useAtom(myCharts);
 
   useEffect(() => {
     const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
@@ -27,18 +24,21 @@ function ViewMyCharts(props: IViewMyCharts) {
     }
   }, [fetchCharts]);
 
-  const viewMyChart = (chartId: string) => {
-    setIsOpen(false);
-    navigate(`/chart/${chartId}`);
-  };
+  const viewMyChart = useCallback(
+    (chartId: string) => {
+      toggleMyChartsModal(false);
+      navigate(`/chart/${chartId}`);
+    },
+    [navigate, toggleMyChartsModal]
+  );
 
   return (
-    <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="My Charts">
-      {!charts.length ? (
+    <div>
+      {isLoading ? (
         <div className="py-10 px-40 flex items-center justify-center">
           <CWSpinner />
         </div>
-      ) : (
+      ) : charts.length ? (
         <div className=" mt-4 relative overflow-x-auto">
           <table className="w-full text-sm text-left text-body">
             <thead className="text-xs uppercase bg-app">
@@ -87,9 +87,11 @@ function ViewMyCharts(props: IViewMyCharts) {
             </tbody>
           </table>
         </div>
+      ) : (
+        <h2>No Save Charts</h2>
       )}
-    </CWModal>
+    </div>
   );
 }
 
-export default ViewMyCharts;
+export default React.memo(ViewMyCharts);

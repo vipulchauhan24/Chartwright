@@ -51,7 +51,7 @@ export function CWAccordian(props: ICWAccordian) {
 
   return (
     <Accordion.Root
-      className="mx- auto w-full rounded-xl bg-surface"
+      className="mx- auto w-full rounded-xl"
       type="multiple"
       value={openItems}
       onValueChange={updateOpenItems}
@@ -60,7 +60,7 @@ export function CWAccordian(props: ICWAccordian) {
         const { title, panelHeadingButton, panelComponent } = item;
         return (
           <Accordion.Item
-            className="border border-default rounded-xl mt-2"
+            className="border border-default rounded-xl mt-2 bg-surface"
             value={title}
             key={`${title}-${indx}`}
           >

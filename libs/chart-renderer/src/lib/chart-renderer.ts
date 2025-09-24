@@ -31,6 +31,9 @@ export class ChartRenderer extends EventTarget {
    * @param option Chart config data.
    */
   public updateChart(options: any) {
+    if (!this._chartInitSuccess) {
+      return;
+    }
     this._sendMessage({
       type: MESSAGE_TYPES.CHART_UPDATE,
       options: options,

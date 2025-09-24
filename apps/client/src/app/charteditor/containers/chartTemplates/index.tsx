@@ -1,11 +1,6 @@
-import { useAtom } from 'jotai';
 import React from 'react';
+import { useAtom } from 'jotai';
 import { chartGallery } from '../../../../store/charts';
-import {
-  CWGhostButton,
-  CWOutlineButton,
-  CWSpinner,
-} from '@chartwright/ui-components';
 import { API_ENDPOINTS } from '../../utils/constants';
 
 interface IChartTemplates {
@@ -45,4 +40,4 @@ function ChartTemplates(props: IChartTemplates) {
   );
 }
 
-export default ChartTemplates;
+export default React.memo(ChartTemplates);

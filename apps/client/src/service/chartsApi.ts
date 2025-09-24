@@ -8,6 +8,7 @@ import {
   currentChartConfigStore,
   currentChartGlobalConfig,
   loadingChartConfig,
+  loadingMyCharts,
   myCharts,
 } from '../store/charts';
 import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
@@ -127,6 +128,8 @@ export const fetchMyCharts = atom(null, async (get, set, userId) => {
     set(myCharts, response.data);
   } catch {
     set(myCharts, []);
+  } finally {
+    set(loadingMyCharts, false);
   }
 });
 

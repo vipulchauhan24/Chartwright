@@ -107,7 +107,8 @@ function ChartPreview() {
         downloadChart
       );
     };
-  }, [chartRenderFinished, downloadChart, renderChart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!chartRendererInst.current && chartDataConfig) {

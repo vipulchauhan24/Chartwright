@@ -16,7 +16,7 @@ export const CWIconButton = forwardRef<HTMLButtonElement, ICWIconButton>(
           {...props}
           className={clsx(
             disabled && '!btn-disabled pointer-events-none select-none',
-            'bg-surface p-1 hover:btn-primary-hover hover:text-surface rounded-sm cursor-pointer'
+            'bg-bg p-1 hover:btn-primary-hover hover:text-surface rounded-sm cursor-pointer'
           )}
         >
           {icon}
