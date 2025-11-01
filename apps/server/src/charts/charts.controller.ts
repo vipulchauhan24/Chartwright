@@ -128,8 +128,14 @@ export class ChartsController {
   }
 
   @Get('user-chart/:id')
-  getUserChartById(@Param('id') id: string) {
-    return this.chartService.getUserChartById(id);
+  async getUserChartById(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const chart = await this.chartService.getUserChartById(id);
+    res.status(chart.id ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+
+    return chart.id ? chart : `Chart not found!`;
   }
 
   @Get('user-chart/all/:user_id')
