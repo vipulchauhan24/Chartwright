@@ -1,155 +1,214 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { TABLE_NAME } from '../lib/constants';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { SERVER_ERROR_MESSAGES, TABLE_NAME } from '../lib/constants';
 import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
 import { EmbedChartDTO } from './validations/embedChart.dto';
+import { DBService } from '../db/db.service';
 
 @Injectable()
 export class ChartService {
   constructor(
     @Inject('DATABASE_CONNECTION') private db: any,
+    private dbService: DBService,
     private s3ORM: S3ORM
   ) {}
 
-  async getChartGlobalConfigs() {
-    try {
-      const items = await this.db.execute(
-        `SELECT * FROM ${TABLE_NAME.CHART_FEATURE};`
-      );
+  // CHART TEMPLATE APIS.
 
-      return items;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+  async saveChartTemplate(params: { id?: string; name: string; config: JSON }) {
+    try {
+      const { id, name, config } = params;
+      let query = '';
+
+      if (id) {
+        query = `UPDATE ${TABLE_NAME.CHART_TEMPLATES} SET name = '${name}', config='${config}' where id = '${id}';`;
+      } else {
+        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config) VALUES ('${name}', '${config}');`;
+      }
+
+      if (query) {
+        await this.db.execute(query);
+        return id
+          ? { status: HttpStatus.OK, message: 'Template data updated.' }
+          : { status: HttpStatus.CREATED, message: 'Template created.' };
+      }
+      return;
+    } catch (error: any) {
+      console.error("Error in 'saveChartTemplate' service: ", error);
+      this.dbService.validatePostgresError(error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async getChartGlobalConfigsByType(type: string) {
-    try {
-      const items = await this.db.execute(
-        `SELECT config FROM ${TABLE_NAME.CHART_FEATURE} where type='${type}';`
-      );
-
-      return items[0];
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  /**
-   * Default Config Apis.
-   */
-  async setChartDefaultConfig(params: { type: string; config: JSON }) {
-    try {
-      const { type, config } = params;
-      const query = `INSERT INTO ${
-        TABLE_NAME.CHART_DEFAULT_CONFIG
-      } (type, config) VALUES ('${type}', '${JSON.stringify(
-        config
-      )}') RETURNING *;`;
-
-      const result = await this.db.execute(query);
-      return result[0];
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  async getChartDefaultConfigByType(type: string) {
-    try {
-      const items = await this.db.execute(
-        `SELECT config FROM ${TABLE_NAME.CHART_DEFAULT_CONFIG} where type='${type}';`
-      );
-
-      return items.length ? items[0] : {};
-    } catch (error) {
-      console.error("Error in 'getChartTemplates': ", error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  /**
-   * CHART TEMPLATES APIs.
-   */
   async getChartTemplates() {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.CHART_TEMPLATES};`
+        `SELECT id, name, type, config FROM ${TABLE_NAME.CHART_TEMPLATES};`
       );
 
       return items;
     } catch (error) {
-      console.error("Error in 'getChartTemplates': ", error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error("Error in 'getChartTemplates' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async getChartGalleryData() {
+  async deleteChartTemplate(id: string) {
+    try {
+      await this.db.execute(
+        `DELETE FROM ${TABLE_NAME.CHART_TEMPLATES} WHERE id='${id}';`
+      );
+
+      return { status: HttpStatus.OK, message: 'Template deleted.' };
+    } catch (error) {
+      console.error("Error in 'deleteChartTemplate' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  // CHART BASE CONFIG APIS.
+
+  async saveChartBaseConfigTemplate(params: {
+    id?: string;
+    type: string;
+    config: JSON;
+  }) {
+    try {
+      const { id, type, config } = params;
+      let query = '';
+
+      if (id) {
+        query = `UPDATE ${TABLE_NAME.CHART_BASE_CONFIG} SET type = '${type}', config='${config}' where id = '${id}';`;
+      } else {
+        query = `INSERT INTO ${TABLE_NAME.CHART_BASE_CONFIG} (type, config) VALUES ('${type}', '${config}');`;
+      }
+
+      if (query) {
+        await this.db.execute(query);
+        return id
+          ? { status: HttpStatus.OK, message: 'Base config data updated.' }
+          : { status: HttpStatus.CREATED, message: 'Base config created.' };
+      }
+      return;
+    } catch (error: any) {
+      console.error("Error in 'saveChartBaseConfigTemplate' service: ", error);
+      this.dbService.validatePostgresError(error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getChartBaseConfigTemplate() {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.CHARTS};`
+        `SELECT id, type, config FROM ${TABLE_NAME.CHART_BASE_CONFIG};`
       );
 
       return items;
     } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error("Error in 'getChartBaseConfigTemplate' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async getChartById(id: string) {
+  async deleteChartBaseConfigTemplate(id: string) {
     try {
-      const items = await this.db.execute(
-        `SELECT id, title, config, chart_type FROM ${TABLE_NAME.CHARTS} WHERE id = '${id}';`
+      await this.db.execute(
+        `DELETE FROM ${TABLE_NAME.CHART_BASE_CONFIG} WHERE id='${id}';`
       );
 
-      return items.length ? items[0] : {};
+      return { status: HttpStatus.OK, message: 'Base config deleted.' };
     } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error(
+        "Error in 'deleteChartBaseConfigTemplate' service: ",
+        error
+      );
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async getAllUserCharts(user_id: string) {
+  // CHART FEATURES API.
+
+  async saveChartFeatureData(params: {
+    id?: string;
+    type: string;
+    config: JSON;
+  }) {
+    try {
+      const { id, type, config } = params;
+      let query = '';
+
+      if (id) {
+        query = `UPDATE ${TABLE_NAME.CHART_FEATURE} SET type = '${type}', config='${config}' where id = '${id}';`;
+      } else {
+        query = `INSERT INTO ${TABLE_NAME.CHART_FEATURE} (type, config) VALUES ('${type}', '${config}');`;
+      }
+
+      if (query) {
+        await this.db.execute(query);
+        return id
+          ? { status: HttpStatus.OK, message: 'Chart features data updated.' }
+          : { status: HttpStatus.CREATED, message: 'Chart feature added.' };
+      }
+      return;
+    } catch (error: any) {
+      console.error("Error in 'saveChartFeatureData' service: ", error);
+      this.dbService.validatePostgresError(error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getAllChartFeatures() {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, chart_type, created_Date FROM ${TABLE_NAME.CHARTS} WHERE created_by = '${user_id}';`
+        `SELECT id, type, config FROM ${TABLE_NAME.CHART_FEATURE};`
       );
 
       return items;
     } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error("Error in 'getAllChartFeatures' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async saveChart(params: {
+  async deleteChartFeatureData(id: string) {
+    try {
+      await this.db.execute(
+        `DELETE FROM ${TABLE_NAME.CHART_FEATURE} WHERE id='${id}';`
+      );
+
+      return { status: HttpStatus.OK, message: 'Chart features info deleted.' };
+    } catch (error) {
+      console.error("Error in 'deleteChartFeatureData' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  // USER CHARTS API.
+
+  async saveUserChart(params: {
     id?: string;
     title: string;
     config: JSON;
@@ -173,46 +232,71 @@ export class ChartService {
         updated_date,
       } = params;
 
-      let query = `INSERT INTO ${
-        TABLE_NAME.CHARTS
-      } (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${JSON.stringify(
-        config
-      )}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}') RETURNING *;`;
+      let query = `INSERT INTO ${TABLE_NAME.USER_CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${config}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}') RETURNING *;`;
 
       if (id) {
-        query = `UPDATE ${
-          TABLE_NAME.CHARTS
-        } SET title = '${title}', config='${JSON.stringify(
-          config
-        )}', updated_by='${updated_by}', updated_date='${updated_date}' where id = '${id}' RETURNING *;`;
+        query = `UPDATE ${TABLE_NAME.USER_CHARTS} SET title = '${title}', config='${config}', updated_by='${updated_by}', updated_date='${updated_date}' where id = '${id}' RETURNING *;`;
       }
-      const result = await this.db.execute(query);
-      return result[0];
+
+      if (query) {
+        const result = await this.db.execute(query);
+        return id
+          ? { status: HttpStatus.OK, message: 'User chart updated.' }
+          : {
+              status: HttpStatus.CREATED,
+              message: 'User chart created.',
+              id: result[0].id,
+            };
+      }
+      return;
     } catch (error: any) {
-      console.error(error);
-      if (
-        error?.message ===
-        'duplicate key value violates unique constraint "title_unique"'
-      ) {
-        throw new HttpException('Chart title duplicate.', HttpStatus.CONFLICT);
-      }
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error("Error in 'saveUserChart' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  async deleteChart(id: string) {
+  async getUserChartById(id: string) {
     try {
-      return await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.CHARTS} WHERE id = '${id}';`
+      const items = await this.db.execute(
+        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
       );
+
+      return items.length ? items[0] : {};
     } catch (error) {
-      console.error('Error in deleting chart: ', error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      console.error("Error in 'getUserChartById' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getAllUserCharts(user_id: string) {
+    try {
+      const items = await this.db.execute(
+        `SELECT id, title, chart_type, created_Date FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
+      );
+
+      return items;
+    } catch (error) {
+      console.error("Error in 'getAllUserCharts' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async deleteUserChart(id: string) {
+    try {
+      await this.db.execute(
+        `DELETE FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
+      );
+      return { status: HttpStatus.OK, message: 'User chart deleted.' };
+    } catch (error) {
+      console.error("Error in 'deleteUserChart' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -229,9 +313,8 @@ export class ChartService {
       };
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -243,9 +326,8 @@ export class ChartService {
       return result[0];
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -261,9 +343,8 @@ export class ChartService {
       return result[0] ? `/render/${result[0].id}` : '';
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -275,9 +356,8 @@ export class ChartService {
       );
     } catch (error) {
       console.error('Error in deleting link: ', error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -291,12 +371,11 @@ export class ChartService {
       if (!items || !items.length) {
         return {};
       }
-      return await this.getChartById(items[0]['chart_id']);
+      return await this.getUserChartById(items[0]['chart_id']);
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        'Internal server error.',
-        HttpStatus.INTERNAL_SERVER_ERROR
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
     }
   }

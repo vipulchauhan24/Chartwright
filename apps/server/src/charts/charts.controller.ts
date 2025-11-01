@@ -9,59 +9,109 @@ import {
   ValidationPipe,
   Res,
   Query,
+  Put,
+  HttpStatus,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
 import { type Response } from 'express';
 import { EmbedChartDTO } from './validations/embedChart.dto';
+import { ChartTemplateDTO } from './validations/chartTemplate.dto';
+import { ChartFeatureAndBaseConfigDTO } from './validations/chartBaseConfig.dto';
 
 @Controller()
 export class ChartsController {
   constructor(private chartService: ChartService) {}
 
-  @Get('chart-global-configs')
-  getChartGlobalConfigs() {
-    return this.chartService.getChartGlobalConfigs();
-  }
+  // CHART TEMPLATE APIS.
 
-  @Get('chart-global-configs/:type')
-  getChartGlobalConfigsByType(@Param('type') type: string) {
-    return this.chartService.getChartGlobalConfigsByType(type);
-  }
-
-  /**
-   * Default Config Apis.
-   */
-  @Post('chart-default-config')
-  setChartDefaultConfig(
-    @Body() saveChartReqBody: { type: string; config: JSON }
-  ) {
-    return this.chartService.setChartDefaultConfig(saveChartReqBody);
-  }
-
-  @Get('chart-default-config/:type')
-  getChartDefaultConfigByType(@Param('type') type: string) {
-    return this.chartService.getChartDefaultConfigByType(type);
-  }
-
-  @Get('chart-gallery')
-  getChartGalleryData() {
-    return this.chartService.getChartGalleryData();
-  }
-
-  @Get('chart/:id')
-  getChartById(@Param('id') id: string) {
-    return this.chartService.getChartById(id);
-  }
-
-  @Get('my-charts/:user_id')
-  getAllUserCharts(@Param('user_id') user_id: string) {
-    return this.chartService.getAllUserCharts(user_id);
-  }
-
-  @Post('save-chart')
+  @Put('chart-template')
   @UsePipes(ValidationPipe)
-  saveChart(@Body() saveChartReqBody: SaveChartDTO) {
+  saveChartTemplate(
+    @Body() chartTemplateReqBody: ChartTemplateDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const params = {
+      id: chartTemplateReqBody.id,
+      name: chartTemplateReqBody.name,
+      config: chartTemplateReqBody.config,
+    };
+    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
+    return this.chartService.saveChartTemplate(params);
+  }
+
+  @Get('chart-template')
+  getChartTemplates() {
+    return this.chartService.getChartTemplates();
+  }
+
+  @Delete('chart-template/:id')
+  deleteChartTemplate(@Param('id') id: string) {
+    return this.chartService.deleteChartTemplate(id);
+  }
+
+  // CHART BASE CONFIG APIS.
+
+  @Put('chart-base-config')
+  @UsePipes(ValidationPipe)
+  saveChartBaseConfigTemplate(
+    @Body() chartTemplateReqBody: ChartFeatureAndBaseConfigDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const params = {
+      id: chartTemplateReqBody.id,
+      type: chartTemplateReqBody.type,
+      config: chartTemplateReqBody.config,
+    };
+    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
+    return this.chartService.saveChartBaseConfigTemplate(params);
+  }
+
+  @Get('chart-base-config')
+  getChartBaseConfigTemplate() {
+    return this.chartService.getChartBaseConfigTemplate();
+  }
+
+  @Delete('chart-base-config/:id')
+  deleteChartBaseConfigTemplate(@Param('id') id: string) {
+    return this.chartService.deleteChartBaseConfigTemplate(id);
+  }
+
+  // CHART FEATURES API.
+
+  @Put('chart-feature')
+  @UsePipes(ValidationPipe)
+  saveChartFeatureData(
+    @Body() chartTemplateReqBody: ChartFeatureAndBaseConfigDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const params = {
+      id: chartTemplateReqBody.id,
+      type: chartTemplateReqBody.type,
+      config: chartTemplateReqBody.config,
+    };
+    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
+    return this.chartService.saveChartFeatureData(params);
+  }
+
+  @Get('chart-feature')
+  getAllChartFeatures() {
+    return this.chartService.getAllChartFeatures();
+  }
+
+  @Delete('chart-feature/:id')
+  deleteChartFeatureData(@Param('id') id: string) {
+    return this.chartService.deleteChartFeatureData(id);
+  }
+
+  // USER CHARTS API.
+
+  @Put('user-chart')
+  @UsePipes(ValidationPipe)
+  saveUserChart(
+    @Body() saveChartReqBody: SaveChartDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const params = {
       id: saveChartReqBody.id,
       title: saveChartReqBody.title,
@@ -73,12 +123,23 @@ export class ChartsController {
       updated_by: saveChartReqBody.updated_by,
       updated_date: saveChartReqBody.updated_date,
     };
-    return this.chartService.saveChart(params);
+    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
+    return this.chartService.saveUserChart(params);
   }
 
-  @Delete('delete-chart/:id')
+  @Get('user-chart/:id')
+  getUserChartById(@Param('id') id: string) {
+    return this.chartService.getUserChartById(id);
+  }
+
+  @Get('user-chart/all/:user_id')
+  getAllUserCharts(@Param('user_id') user_id: string) {
+    return this.chartService.getAllUserCharts(user_id);
+  }
+
+  @Delete('user-chart/:id')
   deleteChart(@Param('id') id: string) {
-    return this.chartService.deleteChart(id);
+    return this.chartService.deleteUserChart(id);
   }
 
   @Get('chart/image/:key')

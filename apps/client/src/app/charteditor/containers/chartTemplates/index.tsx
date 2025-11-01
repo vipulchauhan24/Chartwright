@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAtom } from 'jotai';
-import { chartGallery } from '../../../../store/charts';
+import { chartTemplates } from '../../../../store/charts';
 import { API_ENDPOINTS } from '../../utils/constants';
 
 interface IChartTemplates {
@@ -9,7 +9,7 @@ interface IChartTemplates {
 
 function ChartTemplates(props: IChartTemplates) {
   const { toggleChartTemplateModal } = props;
-  const [charts] = useAtom(chartGallery);
+  const [charts] = useAtom(chartTemplates);
 
   return (
     <div className="mt-4 grid gap-4 grid-cols-5 max-h-[calc(100vh_-_80px)] overflow-auto relative">

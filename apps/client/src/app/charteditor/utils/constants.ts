@@ -8,8 +8,8 @@ export enum SESSION_STORAGE_KEYS {
 }
 
 export enum API_ENDPOINTS {
-  CHART_GALLERY = '/api/chart-gallery',
-  CHART_GLOBAL_CONFIGS = '/api/chart-global-configs',
-  CHART_DEFAULT_CONFIG = '/api/chart-default-config',
+  CHART_TEMPLATE = '/api/chart-template',
+  CHART_FEATURES = '/api/chart-feature',
+  CHART_BASE_CONFIG = '/api/chart-base-config',
   CHART_IMAGE = '/api/chart/image',
 }

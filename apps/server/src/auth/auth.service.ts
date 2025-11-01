@@ -4,7 +4,7 @@ import {
   GetIdCommand,
   GetCredentialsForIdentityCommand,
 } from '@aws-sdk/client-cognito-identity';
-import { TABLE_NAME } from '../lib/constants';
+import { SERVER_ERROR_MESSAGES, TABLE_NAME } from '../lib/constants';
 
 const identityPoolId = 'ap-south-1:19fd0fac-1d23-4626-a81d-83f3594fbc9d'; // Replace with your Identity Pool ID
 const region = 'ap-south-1'; // Replace with your AWS region
@@ -32,7 +32,7 @@ export class AuthService {
     } catch (error) {
       console.error('Guest sign-in error:', error);
       throw new HttpException(
-        'Internal server error.',
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
@@ -50,14 +50,14 @@ export class AuthService {
       );
 
       if (user.length) {
-        let billingDetails = await this.db.execute(
-          `SELECT * FROM ${TABLE_NAME.BILLING} WHERE user_id = '${user[0].id}';`
-        );
-        if (!billingDetails || !billingDetails.length) {
-          billingDetails = await this.db.execute(
-            `INSERT INTO ${TABLE_NAME.BILLING} (user_id, plan, status, created_date) VALUES ('${user[0].id}', 'free', 'active', '${created_date}');`
-          );
-        }
+        // let billingDetails = await this.db.execute(
+        //   `SELECT * FROM ${TABLE_NAME.BILLING} WHERE user_id = '${user[0].id}';`
+        // );
+        // if (!billingDetails || !billingDetails.length) {
+        //   billingDetails = await this.db.execute(
+        //     `INSERT INTO ${TABLE_NAME.BILLING} (user_id, plan, status, created_date) VALUES ('${user[0].id}', 'free', 'active', '${created_date}');`
+        //   );
+        // }
         return user[0];
       }
 
@@ -67,7 +67,7 @@ export class AuthService {
     } catch (error) {
       console.error('User sign-in error:', error);
       throw new HttpException(
-        'Internal server error.',
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }

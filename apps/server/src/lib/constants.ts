@@ -1,11 +1,22 @@
-const { DB_SCHEMA } = process.env;
+const { DB_SCHEMA, DB_SCHEMA_DEV, NODE_ENV } = process.env;
+
+const schema = NODE_ENV === 'development' ? DB_SCHEMA_DEV : DB_SCHEMA;
 
 export const TABLE_NAME = Object.freeze({
-  CHART_FEATURE: `${DB_SCHEMA}.chart_features`,
-  CHART_DEFAULT_CONFIG: `${DB_SCHEMA}.chart_default_config`,
-  CHART_TEMPLATES: `${DB_SCHEMA}.chart_templates`,
-  CHARTS: `${DB_SCHEMA}.charts`,
-  USERS: `${DB_SCHEMA}.users`,
-  BILLING: `${DB_SCHEMA}.billing`,
-  EMBED: `${DB_SCHEMA}.embedded`,
+  CHART_FEATURE: `${schema}.chart_features`,
+  CHART_BASE_CONFIG: `${schema}.chart_base_config`,
+  CHART_TEMPLATES: `${schema}.chart_templates`,
+  USER_CHARTS: `${schema}.user_charts`,
+  USERS: `${schema}.users`,
+  BILLING: `${schema}.billing`,
+  EMBED: `${schema}.embedded`,
+});
+
+export enum SERVER_ERROR_MESSAGES {
+  INTERNAL_SERVER_ERROR = 'Internal server error.',
+}
+
+export const POSTGRES_ERROR_CODES = Object.freeze({
+  DUPLICATE_KEY: '23505',
+  INVALID_VALUE: '22P02',
 });

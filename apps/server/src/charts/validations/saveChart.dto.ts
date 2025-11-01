@@ -33,8 +33,7 @@ export class SaveChartDTO {
   thumbnail?: string;
 
   @IsString()
-  @IsOptional()
-  chart_type?: string;
+  chart_type!: string;
 
   @IsOptional()
   @IsString()

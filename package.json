@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "license": "NONE",
   "scripts": {
-    "client:dev": "nx run client:serve",
-    "server:dev": "nx run server:serve",
+    "client:dev": "nx serve client",
+    "server:dev": "nx serve server --configuration=development",
+    "server:prod": "nx build server",
     "chart-renderer:build": "npx nx build @chartwright/chart-renderer",
-    "start": "nx run-many --target=serve --projects=client,server --parallel"
+    "start": "nx run-many --target=serve --projects=client,server --parallel --configuration=development"
   },
   "overrides": {
     "vite": "^7.1.4"
@@ -68,9 +69,7 @@
   ],
   "dependencies": {
     "@aws-sdk/client-cognito-identity": "^3.772.0",
-    "@aws-sdk/client-dynamodb": "^3.751.0",
     "@aws-sdk/client-s3": "^3.750.0",
-    "@headlessui/react": "^2.2.0",
     "@nestjs/common": "^10.0.2",
     "@nestjs/core": "^10.0.2",
     "@nestjs/platform-express": "^10.0.2",

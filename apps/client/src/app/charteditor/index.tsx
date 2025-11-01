@@ -1,11 +1,17 @@
 import { useAtom } from 'jotai';
 import {
   fetchChartConfig,
-  fetchChartGallery,
-  fetchChartGlobalOptions,
-  setDefaultChartConfig,
+  fetchChartTemplates,
+  fetchChartFeatures,
+  setInitChartData,
 } from '../../service/chartsApi';
-import { chartGallery, loadingChartConfig } from '../../store/charts';
+import {
+  chartId,
+  chartTemplates,
+  chartTitle,
+  currentChartConfigStore,
+  loadingChartConfig,
+} from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
@@ -36,11 +42,14 @@ function ChartEditor() {
   const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
 
-  const [, fetchChartGalleryData] = useAtom(fetchChartGallery);
-  const [, fetchChartGlobalData] = useAtom(fetchChartGlobalOptions);
+  const [, fetchChartTemplatesData] = useAtom(fetchChartTemplates);
+  const [, fetchChartFeaturesData] = useAtom(fetchChartFeatures);
   const [exportDisabled] = useAtom(isExportDisabled);
-  const [, getDefaultChartConfig] = useAtom(setDefaultChartConfig);
-  const [chartGalleryData] = useAtom(chartGallery);
+  // const [, getInitChartData] = useAtom(setInitChartData);
+  const [chartTemplatesData] = useAtom(chartTemplates);
+  const [, setCurrentChartConfigStore] = useAtom(currentChartConfigStore);
+  const [, setChartTitle] = useAtom(chartTitle);
+  const [, setChartId] = useAtom(chartId);
   const [isLoading] = useAtom(loadingChartConfig);
   const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
 
@@ -52,30 +61,30 @@ function ChartEditor() {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    fetchChartGalleryData(); // Fetch data on mount
-  }, [fetchChartGalleryData]);
+    fetchChartTemplatesData(); // Fetch data on mount
+  }, [fetchChartTemplatesData]);
 
   useEffect(() => {
-    fetchChartGlobalData(); // Fetch data on mount
-  }, [fetchChartGlobalData]);
+    fetchChartFeaturesData(); // Fetch data on mount
+  }, [fetchChartFeaturesData]);
 
   useEffect(() => {
-    if (chartGalleryData.length && !isLoading && !id) {
-      getDefaultChartConfig('simple-bar-chart');
-    } else if (chartGalleryData.length && !isLoading && id) {
+    if (chartTemplatesData.length && !isLoading && !id) {
+      setCurrentChartConfigStore(chartTemplatesData[0]['config']);
+      setChartTitle(chartTemplatesData[0]['name']);
+      setChartId(chartTemplatesData[0]['id']);
+    } else if (chartTemplatesData.length && !isLoading && id) {
       fetchDefaultChartConfig(id);
     }
   }, [
-    chartGalleryData,
-    getDefaultChartConfig,
+    chartTemplatesData,
     isLoading,
     id,
     fetchDefaultChartConfig,
+    setCurrentChartConfigStore,
+    setChartTitle,
+    setChartId,
   ]);
-
-  const openSaveChartModal = useCallback(() => {
-    setShowSaveChartModal(true);
-  }, []);
 
   const toggleImportDataModal = useCallback((open: boolean) => {
     setIsImportDialogVisible(open);
@@ -93,14 +102,18 @@ function ChartEditor() {
     setIsMyChartModalVisible(open);
   }, []);
 
+  const toggleSaveChartModal = useCallback((open: boolean) => {
+    setShowSaveChartModal(open);
+  }, []);
+
   // const onSetChartViaGalleryOptions = useCallback(
   //   (value: string) => {
-  //     getDefaultChartConfig(value);
+  //     getInitChartData(value);
   //     if (id) {
   //       navigate(`/chart`);
   //     }
   //   },
-  //   [getDefaultChartConfig, navigate, id]
+  //   [getInitChartData, navigate, id]
   // );
 
   const redirectToLoginPage = useCallback(() => {
@@ -148,13 +161,17 @@ function ChartEditor() {
       {
         tooltip: 'Save changes',
         icon: <Save className="size-4" aria-hidden={true} />,
-        onClick: !isAuthenticated ? redirectToLoginPage : openSaveChartModal,
+        onClick: !isAuthenticated
+          ? redirectToLoginPage
+          : () => {
+              toggleSaveChartModal(true);
+            },
       },
     ];
   }, [
     isAuthenticated,
     redirectToLoginPage,
-    openSaveChartModal,
+    toggleSaveChartModal,
     toggleChartTemplateModal,
     toggleMyChartsModal,
   ]);
@@ -191,6 +208,13 @@ function ChartEditor() {
         title: 'My Saved Charts',
         content: <ViewMyCharts toggleMyChartsModal={toggleMyChartsModal} />,
       };
+    } else if (showSaveChartModal) {
+      return {
+        open: showSaveChartModal,
+        setOpen: toggleSaveChartModal,
+        title: 'Save Chart',
+        content: <SaveChart toggleSaveChartModal={toggleSaveChartModal} />,
+      };
     }
 
     return {
@@ -204,10 +228,12 @@ function ChartEditor() {
     isExportDialogVisible,
     isChartTemplateVisible,
     isMyChartModalVisible,
+    showSaveChartModal,
     toggleImportDataModal,
     toggleExportDataModal,
     toggleChartTemplateModal,
     toggleMyChartsModal,
+    toggleSaveChartModal,
   ]);
 
   if (isLoading) {
@@ -261,10 +287,10 @@ function ChartEditor() {
             <ChartDataEditor />
           </aside>
         </div>
-        <SaveChart
+        {/* <SaveChart
           isOpen={showSaveChartModal}
           setIsOpen={setShowSaveChartModal}
-        />
+        /> */}
         <CWModal {...modalProps} />
       </>
     </AppShell>

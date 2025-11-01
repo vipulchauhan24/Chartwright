@@ -1,4 +1,3 @@
-import CWModal from '../../../components/modal';
 import { chartTitle, currentChartConfigStore } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
@@ -8,19 +7,18 @@ import { fetchFromLocalStorage } from '../../utils/lib';
 import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import { fetchMyCharts } from '../../../../service/chartsApi';
 import {
-  CWOutlineLoadingButton,
-  CWSolidButton,
+  CWOutlineButton,
+  CWSolidLoadingButton,
   CWTextInput,
 } from '@chartwright/ui-components';
 
 interface ISaveChart {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleSaveChartModal: (open: boolean) => void;
 }
 
 function SaveChart(props: ISaveChart) {
   const { id } = useParams();
-  const { isOpen, setIsOpen } = props;
+  const { toggleSaveChartModal } = props;
   const [, fetchCharts] = useAtom(fetchMyCharts);
   const [chartDataConfig] = useAtom(currentChartConfigStore);
   const [chrtTitle, setChrtTitle] = useAtom(chartTitle);
@@ -28,8 +26,8 @@ function SaveChart(props: ISaveChart) {
   const navigate = useNavigate();
 
   const closeModal = useCallback(() => {
-    setIsOpen(false);
-  }, [setIsOpen]);
+    toggleSaveChartModal(false);
+  }, [toggleSaveChartModal]);
 
   const saveChartChanges = useCallback(async () => {
     try {
@@ -75,26 +73,31 @@ function SaveChart(props: ISaveChart) {
   };
 
   return (
-    <CWModal isOpen={isOpen} setIsOpen={setIsOpen} title="Save Chart">
-      <div className="mt-4">
-        <CWTextInput
-          id="save-chart-input"
-          label="Chart Title:"
-          placeholder="Type title here..."
-          defaultValue={chrtTitle}
-          onChange={onChartTitleUpdate}
-        />
-        <div className="mt-4 flex items-center justify-end gap-2">
-          <CWSolidButton label="Cancel" onClick={closeModal} />
-          <CWOutlineLoadingButton
+    <div className="mt-4">
+      <CWTextInput
+        id="save-chart-input"
+        label="Chart Title:"
+        placeholder="Type title here..."
+        defaultValue={chrtTitle}
+        onChange={onChartTitleUpdate}
+      />
+      <div className="mt-4 flex items-center justify-end gap-2">
+        <div className="flex gap-4 mt-6">
+          <CWOutlineButton
+            label="Cancel"
+            onClick={closeModal}
+            disabled={isSaving}
+          />
+          <CWSolidLoadingButton
             label="Save"
+            onClick={saveChartChanges}
             loadingLabel="Saving"
             loading={isSaving}
-            onClick={saveChartChanges}
+            disabled={isSaving}
           />
         </div>
       </div>
-    </CWModal>
+    </div>
   );
 }
 
