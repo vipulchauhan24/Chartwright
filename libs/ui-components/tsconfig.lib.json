@@ -11,7 +11,9 @@
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "tsBuildInfoFile": "out-tsc/ui-components/tsconfig.lib.tsbuildinfo"
+    "tsBuildInfoFile": "out-tsc/ui-components/tsconfig.lib.tsbuildinfo",
+    "declaration": true,
+    "emitDeclarationOnly": false
   },
   "exclude": [
     "out-tsc",

@@ -7,6 +7,7 @@
     "server:dev": "nx serve server --configuration=development",
     "server:prod": "nx build server",
     "chart-renderer:build": "npx nx build @chartwright/chart-renderer",
+    "ui-components:build": "npx nx build @chartwright/ui-components",
     "start": "nx run-many --target=serve --projects=client,server --parallel --configuration=development"
   },
   "overrides": {
@@ -53,6 +54,8 @@
     "nx": "20.4.5",
     "prettier": "^2.6.2",
     "rollup": "^4.14.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
     "swc-loader": "0.1.15",
     "tslib": "^2.3.0",
     "typescript": "~5.7.2",
