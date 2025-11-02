@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
-import { currentChartConfigStore } from '../../../store/charts';
+import { activeChartConfig } from '../../../store/charts';
 import { getChartBaseConfig } from '../../../service/chartsApi';
 import toast from 'react-hot-toast';
 import { randomHexColor } from '../utils/lib';
@@ -8,7 +8,7 @@ import { randomHexColor } from '../utils/lib';
 type chart_types = 'bar' | 'line';
 
 function useChartConfig() {
-  const [, setChartDataConfig] = useAtom(currentChartConfigStore);
+  const [, setChartDataConfig] = useAtom(activeChartConfig);
   const [, getChartDefaultConfig] = useAtom(getChartBaseConfig);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);

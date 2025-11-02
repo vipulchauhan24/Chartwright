@@ -2,11 +2,11 @@ import { atom } from 'jotai';
 import axios from 'axios';
 import {
   chartTemplates,
-  chartFeatures,
+  allChartFeatures,
   chartId,
   chartTitle,
-  currentChartConfigStore,
-  currentChartGlobalConfig,
+  activeChartConfig,
+  activeChartFeatures,
   loadingChartConfig,
   loadingMyCharts,
   myCharts,
@@ -22,10 +22,10 @@ export const fetchChartTemplates = atom(null, async (_get, set) => {
   }
 });
 
-export const fetchChartFeatures = atom(null, async (_get, set) => {
+export const fetchAllChartsFeatures = atom(null, async (_get, set) => {
   try {
     const { data } = await axios.get(API_ENDPOINTS.CHART_FEATURES);
-    set(chartFeatures, data);
+    set(allChartFeatures, data);
   } catch (error) {
     console.error('Error in "fetchChartFeatures":', error);
   } finally {
@@ -44,71 +44,26 @@ export const getChartBaseConfig = atom(null, async (_get, _set, type) => {
   }
 });
 
-export const setInitChartData = atom(null, async (get, set, chartType) => {
-  try {
-    const chartTemplatesData = get(chartTemplates);
-    const availableChartGlobalConfigs = get(chartFeatures);
-    for (const indx in chartTemplatesData) {
-      const chartMatchPattern = String(chartTemplatesData[indx]['title'])
-        .toLowerCase()
-        .split(' ')
-        .join('-');
-      if (chartMatchPattern === chartType) {
-        for (const idx in availableChartGlobalConfigs) {
-          if (
-            chartTemplatesData[indx]['chart_type'] ===
-            availableChartGlobalConfigs[idx]['type']
-          ) {
-            set(
-              currentChartGlobalConfig,
-              availableChartGlobalConfigs[idx]['config']
-            );
-          }
-        }
-
-        set(
-          currentChartConfigStore,
-          JSON.parse(chartTemplatesData[indx]['config'])
-        );
-        set(chartTitle, chartTemplatesData[indx]['title']);
-        set(chartId, chartTemplatesData[indx]['id']);
-        break;
-      }
-    }
-  } catch (error) {
-    console.error('Error in "setInitChartData":', error);
-    set(currentChartGlobalConfig, undefined);
-    set(currentChartConfigStore, null);
-    set(chartTitle, '');
-    set(chartId, '');
-  } finally {
-    set(loadingChartConfig, false);
-  }
-});
-
 export const fetchChartConfig = atom(null, async (get, set, chart_id) => {
   try {
     const response = await axios.get(`/api/chart/${chart_id}`);
     const chartConfig = response.data;
-    const availableChartGlobalConfigs = get(chartFeatures);
+    const availableChartGlobalConfigs = get(allChartFeatures);
     for (const idx in availableChartGlobalConfigs) {
       if (
         chartConfig['chart_type'] === availableChartGlobalConfigs[idx]['type']
       ) {
-        set(
-          currentChartGlobalConfig,
-          availableChartGlobalConfigs[idx]['config']
-        );
+        set(activeChartFeatures, availableChartGlobalConfigs[idx]['config']);
         break;
       }
     }
 
-    set(currentChartConfigStore, JSON.parse(chartConfig['config']));
+    set(activeChartConfig, JSON.parse(chartConfig['config']));
     set(chartTitle, chartConfig['title']);
     set(chartId, chartConfig['id']);
   } catch {
-    set(currentChartGlobalConfig, undefined);
-    set(currentChartConfigStore, null);
+    set(activeChartFeatures, undefined);
+    set(activeChartConfig, null);
     set(chartTitle, '');
     set(chartId, '');
   } finally {
@@ -131,9 +86,9 @@ export const fetchEmbedChartConfig = atom(null, async (get, set, embedId) => {
   try {
     const response = await axios.get(`/api/embed-config/${embedId}`);
     const chartConfig = response.data;
-    // set(currentChartConfigStore, JSON.parse(chartConfig['config']));
+    // set(activeChartConfig, JSON.parse(chartConfig['config']));
   } catch {
-    set(currentChartConfigStore, null);
+    set(activeChartConfig, null);
   } finally {
     set(loadingChartConfig, false);
   }

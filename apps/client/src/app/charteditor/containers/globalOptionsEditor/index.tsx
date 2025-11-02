@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import {
-  currentChartConfigStore,
-  currentChartGlobalConfig,
+  activeChartConfig,
+  activeChartFeatures,
 } from '../../../../store/charts';
 import { getNestedValue, setByPath } from '../../utils/lib';
 import { useCallback, useMemo, useState } from 'react';
@@ -14,10 +14,8 @@ import InputRenderer from '../inputRenderer';
 import { LetterText, SquareDashedMousePointer } from 'lucide-react';
 
 function GlobalOptionsEditor() {
-  const [chartEditableFeatures] = useAtom(currentChartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(
-    currentChartConfigStore
-  );
+  const [chartEditableFeatures] = useAtom(activeChartFeatures);
+  const [chartDataConfig, setChartDataConfig] = useAtom(activeChartConfig);
   const [allOptionsOpen, setAllOptionsOpen] = useState<boolean>(false);
 
   const updateChartDataConfig = useCallback(

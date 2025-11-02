@@ -2,15 +2,16 @@ import { useAtom } from 'jotai';
 import {
   fetchChartConfig,
   fetchChartTemplates,
-  fetchChartFeatures,
-  setInitChartData,
+  fetchAllChartsFeatures,
 } from '../../service/chartsApi';
 import {
   chartId,
   chartTemplates,
   chartTitle,
-  currentChartConfigStore,
+  activeChartConfig,
   loadingChartConfig,
+  allChartFeatures,
+  activeChartFeatures,
 } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
@@ -43,15 +44,16 @@ function ChartEditor() {
   const { isAuthenticated } = useAuthentication();
 
   const [, fetchChartTemplatesData] = useAtom(fetchChartTemplates);
-  const [, fetchChartFeaturesData] = useAtom(fetchChartFeatures);
+  const [, fetchChartFeaturesData] = useAtom(fetchAllChartsFeatures);
   const [exportDisabled] = useAtom(isExportDisabled);
-  // const [, getInitChartData] = useAtom(setInitChartData);
   const [chartTemplatesData] = useAtom(chartTemplates);
-  const [, setCurrentChartConfigStore] = useAtom(currentChartConfigStore);
+  const [chartFeaturesData] = useAtom(allChartFeatures);
+  const [, setActiveChartFeatures] = useAtom(activeChartFeatures);
+  const [, setActiveChartConfig] = useAtom(activeChartConfig);
   const [, setChartTitle] = useAtom(chartTitle);
   const [, setChartId] = useAtom(chartId);
   const [isLoading] = useAtom(loadingChartConfig);
-  const [, fetchDefaultChartConfig] = useAtom(fetchChartConfig);
+  const [, fetchActiveChartConfig] = useAtom(fetchChartConfig);
 
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
@@ -69,21 +71,30 @@ function ChartEditor() {
   }, [fetchChartFeaturesData]);
 
   useEffect(() => {
-    if (chartTemplatesData.length && !isLoading && !id) {
-      setCurrentChartConfigStore(chartTemplatesData[0]['config']);
+    if (!isLoading && !id) {
+      setActiveChartConfig(chartTemplatesData[0]['config']);
       setChartTitle(chartTemplatesData[0]['name']);
       setChartId(chartTemplatesData[0]['id']);
-    } else if (chartTemplatesData.length && !isLoading && id) {
-      fetchDefaultChartConfig(id);
+      const chartType = chartTemplatesData[0]['type'];
+      for (const features of chartFeaturesData) {
+        if (features['type'] === chartType) {
+          setActiveChartFeatures(features['config']);
+          break;
+        }
+      }
+    } else if (!isLoading && id) {
+      fetchActiveChartConfig(id);
     }
   }, [
     chartTemplatesData,
+    chartFeaturesData,
     isLoading,
     id,
-    fetchDefaultChartConfig,
-    setCurrentChartConfigStore,
+    fetchActiveChartConfig,
+    setActiveChartConfig,
     setChartTitle,
     setChartId,
+    setActiveChartFeatures,
   ]);
 
   const toggleImportDataModal = useCallback((open: boolean) => {

@@ -80,7 +80,6 @@ export class ChartRenderer extends EventTarget {
   };
 
   private _onMessage = (event: any) => {
-    console.log('Host received:', event.data.type);
     switch (event.data.type) {
       case MESSAGE_TYPES.READY:
         this._dispatchEvent(MESSAGE_TYPES.READY, {

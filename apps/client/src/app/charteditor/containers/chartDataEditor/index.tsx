@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import {
-  currentChartConfigStore,
-  currentChartGlobalConfig,
+  activeChartConfig,
+  activeChartFeatures,
 } from '../../../../store/charts';
 import { getNestedValue, setByPath } from '../../utils/lib';
 import { useCallback, useMemo, useState } from 'react';
@@ -23,10 +23,8 @@ import XAxisEdgeIcon from '../../../../assets/x-axis-edge.svg?react';
 import YAxisEdgeIcon from '../../../../assets/y-axis-edge.svg?react';
 
 function ChartDataEditor() {
-  const [chartEditableFeatures] = useAtom(currentChartGlobalConfig);
-  const [chartDataConfig, setChartDataConfig] = useAtom(
-    currentChartConfigStore
-  );
+  const [chartEditableFeatures] = useAtom(activeChartFeatures);
+  const [chartDataConfig, setChartDataConfig] = useAtom(activeChartConfig);
   const [allOptionsOpen, setAllOptionsOpen] = useState<boolean>(false);
 
   const updateChartDataConfig = useCallback(

@@ -1,4 +1,4 @@
-import { chartTitle, currentChartConfigStore } from '../../../../store/charts';
+import { chartTitle, activeChartConfig } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 import axios from 'axios';
@@ -20,7 +20,7 @@ function SaveChart(props: ISaveChart) {
   const { id } = useParams();
   const { toggleSaveChartModal } = props;
   const [, fetchCharts] = useAtom(fetchMyCharts);
-  const [chartDataConfig] = useAtom(currentChartConfigStore);
+  const [chartDataConfig] = useAtom(activeChartConfig);
   const [chrtTitle, setChrtTitle] = useAtom(chartTitle);
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();

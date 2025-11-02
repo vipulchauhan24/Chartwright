@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
-import { currentChartConfigStore } from '../../../../store/charts';
+import { activeChartConfig } from '../../../../store/charts';
 import { isExportDisabled } from '../../../../store/app';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
@@ -19,7 +19,7 @@ const EXPORT_ERROR_MSG = 'Oops, try again later.';
 const CHART_CONTAINER_ID = 'echarts-container';
 
 function ChartPreview() {
-  const [chartDataConfig] = useAtom(currentChartConfigStore);
+  const [chartDataConfig] = useAtom(activeChartConfig);
   const chartRendererInst = useRef<ChartRenderer>(undefined);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
   const [isChartRendered, setIsChartRendered] = useState(false);
@@ -130,7 +130,6 @@ function ChartPreview() {
 
   useEffect(() => {
     if (chartRendererInst.current && chartDataConfig) {
-      console.log('config changed');
       chartRendererInst.current?.updateChart(chartDataConfig);
     }
   }, [chartDataConfig]);
