@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { chartTemplates } from '../../../../store/charts';
 import { API_ENDPOINTS } from '../../utils/constants';
@@ -10,6 +10,10 @@ interface IChartTemplates {
 function ChartTemplates(props: IChartTemplates) {
   const { toggleChartTemplateModal } = props;
   const [charts] = useAtom(chartTemplates);
+
+  const handleImgError = useCallback((event: any) => {
+    event.target.src = '/chart-template-fallback.svg';
+  }, []);
 
   return (
     <div className="mt-4 grid gap-4 grid-cols-5 max-h-[calc(100vh_-_80px)] overflow-auto relative">
@@ -25,12 +29,13 @@ function ChartTemplates(props: IChartTemplates) {
             <img
               className="w-full h-full object-cover rounded-md"
               src={`${API_ENDPOINTS.CHART_IMAGE}/${chart['thumbnail']}`}
-              alt={chart['title']}
+              alt={chart['name']}
+              onError={handleImgError}
               loading="lazy"
             />
             <div className="opacity-0 hover:opacity-100 absolute w-full h-full bg-black/50 top-0 left-0 flex items-center justify-center rounded-md">
               <h4 className="text-xl text-center font-semibold text-surface">
-                {chart['title']}
+                {chart['name']}
               </h4>
             </div>
           </div>
