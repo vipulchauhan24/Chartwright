@@ -80,11 +80,11 @@ function GlobalOptionsEditor() {
   const getChildrens = useCallback(
     (option: any) => {
       return option.children
-        ? option.children.map((childComp: any) => {
+        ? option.children.map((childComp: any, indx: number) => {
             switch (childComp.type) {
               case 'popover':
                 return (
-                  <div className="mr-2">
+                  <div className="mr-2" key={`${childComp.title}-${indx}`}>
                     <CWPopover
                       content={getInputRenderedComp(childComp)}
                       title={childComp.title}

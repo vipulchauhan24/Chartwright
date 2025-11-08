@@ -12,9 +12,11 @@ import {
 } from '@chartwright/ui-components';
 import InputRenderer from '../inputRenderer';
 import {
+  ChartArea,
   Highlighter,
   LetterText,
   PaintBucket,
+  PenLine,
   SquareDashedMousePointer,
 } from 'lucide-react';
 
@@ -74,8 +76,12 @@ function ChartDataEditor() {
 
   const getPopoverIcon = useCallback((iconName: string) => {
     switch (iconName) {
+      case 'area-style':
+        return <ChartArea className="size-4" aria-hidden={true} />;
       case 'item-style':
         return <Highlighter className="size-4" aria-hidden={true} />;
+      case 'line-style':
+        return <PenLine className="size-4" aria-hidden={true} />;
       case 'background':
         return <PaintBucket className="size-4" aria-hidden={true} />;
       case 'text':

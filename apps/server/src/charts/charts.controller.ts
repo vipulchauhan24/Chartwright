@@ -35,6 +35,7 @@ export class ChartsController {
       id: chartTemplateReqBody.id,
       name: chartTemplateReqBody.name,
       config: chartTemplateReqBody.config,
+      type: chartTemplateReqBody.type,
     };
     res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
     return this.chartService.saveChartTemplate(params);

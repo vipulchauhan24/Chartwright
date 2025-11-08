@@ -276,6 +276,109 @@ const REFERENCE_TABLE: any = {
       value: 'bottom',
     },
   ],
+  lineLabelPosition: [
+    {
+      id: 'labelPosition-top',
+      label: 'Top',
+      value: 'top',
+    },
+    {
+      id: 'labelPosition-left',
+      label: 'Left',
+      value: 'left',
+    },
+    {
+      id: 'labelPosition-right',
+      label: 'Right',
+      value: 'right',
+    },
+    {
+      id: 'labelPosition-bottom',
+      label: 'Bottom',
+      value: 'bottom',
+    },
+  ],
+  lineItemSymbol: [
+    {
+      id: 'lineItemSymbol-emptyCircle',
+      label: 'Empty Circle',
+      value: 'emptyCircle',
+    },
+    {
+      id: 'lineItemSymbol-circle',
+      label: 'Circle',
+      value: 'circle',
+    },
+    {
+      id: 'lineItemSymbol-rect',
+      label: 'Rect',
+      value: 'rect',
+    },
+    {
+      id: 'lineItemSymbol-roundRect',
+      label: 'Round Rect',
+      value: 'roundRect',
+    },
+    {
+      id: 'lineItemSymbol-triangle',
+      label: 'Triangle',
+      value: 'triangle',
+    },
+    {
+      id: 'lineItemSymbol-diamond',
+      label: 'Diamond',
+      value: 'diamond',
+    },
+    {
+      id: 'lineItemSymbol-pin',
+      label: 'Pin',
+      value: 'pin',
+    },
+    {
+      id: 'lineItemSymbol-arrow',
+      label: 'Arrow',
+      value: 'arrow',
+    },
+    {
+      id: 'lineItemSymbol-none',
+      label: 'none',
+      value: 'none',
+    },
+  ],
+  areaOrigin: [
+    {
+      id: 'areaOrigin-top',
+      label: 'Start',
+      value: 'start',
+    },
+    {
+      id: 'areaOrigin-middle',
+      label: 'End',
+      value: 'end',
+    },
+    {
+      id: 'areaOrigin-bottom',
+      label: 'Auto',
+      value: 'auto',
+    },
+  ],
+  lineType: [
+    {
+      id: 'lineType-solid',
+      label: 'Solid',
+      value: 'solid',
+    },
+    {
+      id: 'lineType-dashed',
+      label: 'Dashed',
+      value: 'dashed',
+    },
+    {
+      id: 'lineType-dotted',
+      label: 'Dotted',
+      value: 'dotted',
+    },
+  ],
 };
 
 enum FIELD_TYPE {

@@ -4,11 +4,11 @@ import { chartTemplates } from '../../../../store/charts';
 import { API_ENDPOINTS } from '../../utils/constants';
 
 interface IChartTemplates {
-  toggleChartTemplateModal: (open: boolean) => void;
+  onTemplateChange: (name: string) => void;
 }
 
 function ChartTemplates(props: IChartTemplates) {
-  const { toggleChartTemplateModal } = props;
+  const { onTemplateChange } = props;
   const [charts] = useAtom(chartTemplates);
 
   const handleImgError = useCallback((event: any) => {
@@ -16,14 +16,14 @@ function ChartTemplates(props: IChartTemplates) {
   }, []);
 
   return (
-    <div className="mt-4 grid gap-4 grid-cols-5 max-h-[calc(100vh_-_80px)] overflow-auto relative">
+    <div className="mt-4 flex gap-2 justify-center flex-wrap max-h-[calc(100vh_-_80px)] overflow-auto relative">
       {charts.map((chart) => {
         return (
           <div
             className="w-[280px] border border-border rounded-md shadow-card cursor-pointer relative"
             role="button"
             onClick={() => {
-              toggleChartTemplateModal(false);
+              onTemplateChange(chart['name']);
             }}
           >
             <img

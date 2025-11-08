@@ -20,15 +20,20 @@ export class ChartService {
 
   // CHART TEMPLATE APIS.
 
-  async saveChartTemplate(params: { id?: string; name: string; config: JSON }) {
+  async saveChartTemplate(params: {
+    id?: string;
+    name: string;
+    config: JSON;
+    type: string;
+  }) {
     try {
-      const { id, name, config } = params;
+      const { id, name, config, type } = params;
       let query = '';
 
       if (id) {
         query = `UPDATE ${TABLE_NAME.CHART_TEMPLATES} SET name = '${name}', config='${config}' where id = '${id}';`;
       } else {
-        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config) VALUES ('${name}', '${config}');`;
+        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config, type) VALUES ('${name}', '${config}', '${type}');`;
       }
 
       if (query) {

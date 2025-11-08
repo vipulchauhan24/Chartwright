@@ -10,4 +10,7 @@ export class ChartTemplateDTO {
 
   @IsJSON()
   config!: JSON;
+
+  @IsString()
+  type!: string;
 }

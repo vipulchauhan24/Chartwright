@@ -25,6 +25,7 @@ import {
   CWModal,
   CWSpinner,
 } from '@chartwright/ui-components';
+import toast from 'react-hot-toast';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -117,15 +118,36 @@ function ChartEditor() {
     setShowSaveChartModal(open);
   }, []);
 
-  // const onSetChartViaGalleryOptions = useCallback(
-  //   (value: string) => {
-  //     getInitChartData(value);
-  //     if (id) {
-  //       navigate(`/chart`);
-  //     }
-  //   },
-  //   [getInitChartData, navigate, id]
-  // );
+  const onTemplateChange = useCallback(
+    (name: string) => {
+      const template = chartTemplatesData.find((temp) => temp['name'] === name);
+      if (template) {
+        setActiveChartConfig(template['config']);
+        setChartTitle(template['name']);
+        setChartId(template['id']);
+        const chartType = template['type'];
+        for (const features of chartFeaturesData) {
+          if (features['type'] === chartType) {
+            setActiveChartFeatures(features['config']);
+            break;
+          }
+        }
+      } else {
+        toast.error('Oops! Chart template could not be loaded.');
+      }
+
+      toggleChartTemplateModal(false);
+    },
+    [
+      chartFeaturesData,
+      chartTemplatesData,
+      setActiveChartConfig,
+      setActiveChartFeatures,
+      setChartId,
+      setChartTitle,
+      toggleChartTemplateModal,
+    ]
+  );
 
   const redirectToLoginPage = useCallback(() => {
     auth.signinRedirect();
@@ -206,10 +228,8 @@ function ChartEditor() {
       return {
         open: isChartTemplateVisible,
         setOpen: toggleChartTemplateModal,
-        title: 'Chart Template',
-        content: (
-          <ChartTemplates toggleChartTemplateModal={toggleChartTemplateModal} />
-        ),
+        title: 'Chart Templates',
+        content: <ChartTemplates onTemplateChange={onTemplateChange} />,
         fullScreen: true,
       };
     } else if (isMyChartModalVisible) {
@@ -243,6 +263,7 @@ function ChartEditor() {
     toggleImportDataModal,
     toggleExportDataModal,
     toggleChartTemplateModal,
+    onTemplateChange,
     toggleMyChartsModal,
     toggleSaveChartModal,
   ]);
