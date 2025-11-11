@@ -19,5 +19,6 @@ export * from './components/Modal';
 export * from './components/Popover';
 export * from './components/Stepper';
 export * from './components/Spinner';
+export * from './components/FullscreenLoading';
 export * from './components/Switch';
 export * from './components/Tabs';

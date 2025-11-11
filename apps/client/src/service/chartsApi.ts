@@ -9,7 +9,8 @@ import {
   activeChartFeatures,
   loadingChartConfig,
   loadingMyCharts,
-  myCharts,
+  userCharts,
+  chartType,
 } from '../store/charts';
 import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
 
@@ -33,35 +34,39 @@ export const fetchAllChartsFeatures = atom(null, async (_get, set) => {
   }
 });
 
-export const getChartBaseConfig = atom(null, async (_get, _set, type) => {
+export const fetchAllUserCharts = atom(null, async (_get, set, userId) => {
   try {
-    const { data } = await axios.get(
-      `${API_ENDPOINTS.CHART_BASE_CONFIG}/${type}`
+    const response = await axios.get(
+      `${API_ENDPOINTS.USER_CHARTS}/all/${userId}`
     );
-    return JSON.parse(data.config);
-  } catch (error) {
-    console.error('Error in "getChartBaseConfig":', error);
+    set(userCharts, response.data);
+  } catch {
+    set(userCharts, []);
+  } finally {
+    set(loadingMyCharts, false);
   }
 });
 
-export const fetchChartConfig = atom(null, async (get, set, chart_id) => {
+export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
   try {
-    const response = await axios.get(`/api/chart/${chart_id}`);
-    const chartConfig = response.data;
-    const availableChartGlobalConfigs = get(allChartFeatures);
-    for (const idx in availableChartGlobalConfigs) {
-      if (
-        chartConfig['chart_type'] === availableChartGlobalConfigs[idx]['type']
-      ) {
-        set(activeChartFeatures, availableChartGlobalConfigs[idx]['config']);
+    const response = await axios.get(
+      `${API_ENDPOINTS.USER_CHARTS}/${userChartId}`
+    );
+    const userChart = response.data;
+    const chartFeatures = get(allChartFeatures);
+    for (const idx in chartFeatures) {
+      if (userChart['chart_type'] === chartFeatures[idx]['type']) {
+        set(activeChartFeatures, chartFeatures[idx]['config']);
         break;
       }
     }
 
-    set(activeChartConfig, JSON.parse(chartConfig['config']));
-    set(chartTitle, chartConfig['title']);
-    set(chartId, chartConfig['id']);
-  } catch {
+    set(activeChartConfig, userChart['config']);
+    set(chartTitle, userChart['title']);
+    set(chartType, userChart['chart_type']);
+    set(chartId, userChart['id']);
+  } catch (error) {
+    console.error('Error in "fetchUserChartById":', error);
     set(activeChartFeatures, undefined);
     set(activeChartConfig, null);
     set(chartTitle, '');
@@ -71,14 +76,14 @@ export const fetchChartConfig = atom(null, async (get, set, chart_id) => {
   }
 });
 
-export const fetchMyCharts = atom(null, async (get, set, userId) => {
+export const getChartBaseConfig = atom(null, async (_get, _set, type) => {
   try {
-    const response = await axios.get(`/api/my-charts/${userId}`);
-    set(myCharts, response.data);
-  } catch {
-    set(myCharts, []);
-  } finally {
-    set(loadingMyCharts, false);
+    const { data } = await axios.get(
+      `${API_ENDPOINTS.CHART_BASE_CONFIG}/${type}`
+    );
+    return JSON.parse(data.config);
+  } catch (error) {
+    console.error('Error in "getChartBaseConfig":', error);
   }
 });
 

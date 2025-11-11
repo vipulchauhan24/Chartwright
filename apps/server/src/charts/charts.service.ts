@@ -10,6 +10,8 @@ import { Readable } from 'stream';
 import { EmbedChartDTO } from './validations/embedChart.dto';
 import { DBService } from '../db/db.service';
 
+const { CHART_TEMPLATE_THUMBNAILS } = process.env;
+
 @Injectable()
 export class ChartService {
   constructor(
@@ -28,12 +30,13 @@ export class ChartService {
   }) {
     try {
       const { id, name, config, type } = params;
+      const thumbnail = name.toLocaleLowerCase().split(' ').join('_');
       let query = '';
 
       if (id) {
-        query = `UPDATE ${TABLE_NAME.CHART_TEMPLATES} SET name = '${name}', config='${config}' where id = '${id}';`;
+        query = `UPDATE ${TABLE_NAME.CHART_TEMPLATES} SET name = '${name}', config='${config}', thumbnail='${thumbnail}' where id = '${id}';`;
       } else {
-        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config, type) VALUES ('${name}', '${config}', '${type}');`;
+        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config, type, thumbnail) VALUES ('${name}', '${config}', '${type}', '${type}');`;
       }
 
       if (query) {
@@ -55,7 +58,7 @@ export class ChartService {
   async getChartTemplates() {
     try {
       const items = await this.db.execute(
-        `SELECT id, name, type, config FROM ${TABLE_NAME.CHART_TEMPLATES};`
+        `SELECT id, name, type, config, thumbnail FROM ${TABLE_NAME.CHART_TEMPLATES};`
       );
 
       return items;
@@ -76,6 +79,27 @@ export class ChartService {
       return { status: HttpStatus.OK, message: 'Template deleted.' };
     } catch (error) {
       console.error("Error in 'deleteChartTemplate' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getChartTemplateThumbnail(name: string) {
+    try {
+      const { Body, ContentType, ETag, LastModified } =
+        await this.s3ORM.getObject(
+          `${name}.png`,
+          `${CHART_TEMPLATE_THUMBNAILS}`
+        );
+      return {
+        imageStream: Body as Readable,
+        type: ContentType,
+        ETag,
+        LastModified,
+      };
+    } catch (error) {
+      console.error("Error in 'getChartTemplateThumbnail' service: ", error);
       throw new InternalServerErrorException(
         SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
@@ -280,7 +304,7 @@ export class ChartService {
   async getAllUserCharts(user_id: string) {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, chart_type, created_Date FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
+        `SELECT id, title, chart_type, created_date, updated_date FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
       );
 
       return items;
@@ -306,10 +330,11 @@ export class ChartService {
     }
   }
 
+  // others
   async getImageStreamByKey(key: string) {
     try {
       const { Body, ContentType, ETag, LastModified } =
-        await this.s3ORM.getObject(key);
+        await this.s3ORM.getObject(key, '');
       return {
         imageStream: Body as Readable,
         type: ContentType,

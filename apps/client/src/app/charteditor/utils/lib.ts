@@ -153,3 +153,20 @@ export function randomHexColor(): string {
       .padStart(6, '0')
   );
 }
+
+/**
+ *
+ * @param dateStr - any date object or string.
+ * @returns "24 January, 2025"
+ */
+export function generateLocaleDateString(dateStr: string | Date) {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
+}
+
+export function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

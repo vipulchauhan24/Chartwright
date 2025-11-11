@@ -1,8 +1,9 @@
 import { useAtom } from 'jotai';
 import {
-  fetchChartConfig,
+  fetchUserChartById,
   fetchChartTemplates,
   fetchAllChartsFeatures,
+  fetchAllUserCharts,
 } from '../../service/chartsApi';
 import {
   chartId,
@@ -12,11 +13,12 @@ import {
   loadingChartConfig,
   allChartFeatures,
   activeChartFeatures,
+  chartType,
 } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -26,6 +28,8 @@ import {
   CWSpinner,
 } from '@chartwright/ui-components';
 import toast from 'react-hot-toast';
+import { fetchFromLocalStorage } from './utils/lib';
+import { LOCAL_STORAGE_KEYS } from './utils/constants';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -33,7 +37,7 @@ const ChartPreview = lazy(() => import('./containers/chartPreview'));
 const GlobalOptionsEditor = lazy(
   () => import('./containers/globalOptionsEditor')
 );
-const ViewMyCharts = lazy(() => import('./containers/viewMyCharts'));
+const UserCharts = lazy(() => import('./containers/UserCharts'));
 const SaveChart = lazy(() => import('./containers/saveChart'));
 const ChartTemplates = lazy(() => import('./containers/chartTemplates'));
 const ExportChart = lazy(() => import('./containers/export'));
@@ -43,7 +47,9 @@ function ChartEditor() {
   const { id } = useParams();
   const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
+  const navigate = useNavigate();
 
+  const [, fetchUserCharts] = useAtom(fetchAllUserCharts);
   const [, fetchChartTemplatesData] = useAtom(fetchChartTemplates);
   const [, fetchChartFeaturesData] = useAtom(fetchAllChartsFeatures);
   const [exportDisabled] = useAtom(isExportDisabled);
@@ -52,16 +58,16 @@ function ChartEditor() {
   const [, setActiveChartFeatures] = useAtom(activeChartFeatures);
   const [, setActiveChartConfig] = useAtom(activeChartConfig);
   const [, setChartTitle] = useAtom(chartTitle);
+  const [, setChartType] = useAtom(chartType);
   const [, setChartId] = useAtom(chartId);
   const [isLoading] = useAtom(loadingChartConfig);
-  const [, fetchActiveChartConfig] = useAtom(fetchChartConfig);
+  const [, fetchActiveChartConfig] = useAtom(fetchUserChartById);
 
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
-  const [isMyChartModalVisible, setIsMyChartModalVisible] = useState(false);
+  const [isUserChartsVisible, setIsUserChartsVisible] = useState(false);
   const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
-  // const navigate = useNavigate();
 
   useEffect(() => {
     fetchChartTemplatesData(); // Fetch data on mount
@@ -72,11 +78,19 @@ function ChartEditor() {
   }, [fetchChartFeaturesData]);
 
   useEffect(() => {
+    const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+    if (userId) {
+      fetchUserCharts(userId);
+    }
+  }, [fetchUserCharts]);
+
+  useEffect(() => {
     if (!isLoading && !id) {
       setActiveChartConfig(chartTemplatesData[0]['config']);
       setChartTitle(chartTemplatesData[0]['name']);
       setChartId(chartTemplatesData[0]['id']);
       const chartType = chartTemplatesData[0]['type'];
+      setChartType(chartType);
       for (const features of chartFeaturesData) {
         if (features['type'] === chartType) {
           setActiveChartFeatures(features['config']);
@@ -96,6 +110,7 @@ function ChartEditor() {
     setChartTitle,
     setChartId,
     setActiveChartFeatures,
+    setChartType,
   ]);
 
   const toggleImportDataModal = useCallback((open: boolean) => {
@@ -110,8 +125,8 @@ function ChartEditor() {
     setIsChartTemplateVisible(open);
   }, []);
 
-  const toggleMyChartsModal = useCallback((open: boolean) => {
-    setIsMyChartModalVisible(open);
+  const toggleUserChartsView = useCallback((open: boolean) => {
+    setIsUserChartsVisible(open);
   }, []);
 
   const toggleSaveChartModal = useCallback((open: boolean) => {
@@ -120,31 +135,38 @@ function ChartEditor() {
 
   const onTemplateChange = useCallback(
     (name: string) => {
-      const template = chartTemplatesData.find((temp) => temp['name'] === name);
-      if (template) {
-        setActiveChartConfig(template['config']);
-        setChartTitle(template['name']);
-        setChartId(template['id']);
-        const chartType = template['type'];
-        for (const features of chartFeaturesData) {
-          if (features['type'] === chartType) {
-            setActiveChartFeatures(features['config']);
-            break;
+      navigate('/chart');
+      setTimeout(() => {
+        const template = chartTemplatesData.find(
+          (temp) => temp['name'] === name
+        );
+        if (template) {
+          setActiveChartConfig(template['config']);
+          setChartTitle(template['name']);
+          setChartId(template['id']);
+          const chartType = template['type'];
+          setChartType(chartType);
+          for (const features of chartFeaturesData) {
+            if (features['type'] === chartType) {
+              setActiveChartFeatures(features['config']);
+              break;
+            }
           }
+        } else {
+          toast.error('Oops! Chart template could not be loaded.');
         }
-      } else {
-        toast.error('Oops! Chart template could not be loaded.');
-      }
-
-      toggleChartTemplateModal(false);
+        toggleChartTemplateModal(false);
+      }, 100);
     },
     [
       chartFeaturesData,
       chartTemplatesData,
+      navigate,
       setActiveChartConfig,
       setActiveChartFeatures,
       setChartId,
       setChartTitle,
+      setChartType,
       toggleChartTemplateModal,
     ]
   );
@@ -173,6 +195,14 @@ function ChartEditor() {
     ];
   }, [exportDisabled, toggleImportDataModal, toggleExportDataModal]);
 
+  const onSavingUserChartRequest = useCallback(() => {
+    if (!isAuthenticated) {
+      redirectToLoginPage();
+      return;
+    }
+    toggleSaveChartModal(true);
+  }, [isAuthenticated, redirectToLoginPage, toggleSaveChartModal]);
+
   const chartUtitlityAuthoredBtns = useMemo(() => {
     return [
       {
@@ -188,25 +218,22 @@ function ChartEditor() {
         onClick: !isAuthenticated
           ? redirectToLoginPage
           : () => {
-              toggleMyChartsModal(true);
+              toggleUserChartsView(true);
             },
       },
       {
         tooltip: 'Save changes',
         icon: <Save className="size-4" aria-hidden={true} />,
-        onClick: !isAuthenticated
-          ? redirectToLoginPage
-          : () => {
-              toggleSaveChartModal(true);
-            },
+        isLoading: false,
+        onClick: onSavingUserChartRequest,
       },
     ];
   }, [
     isAuthenticated,
+    onSavingUserChartRequest,
     redirectToLoginPage,
-    toggleSaveChartModal,
     toggleChartTemplateModal,
-    toggleMyChartsModal,
+    toggleUserChartsView,
   ]);
 
   const modalProps = useMemo(() => {
@@ -232,12 +259,13 @@ function ChartEditor() {
         content: <ChartTemplates onTemplateChange={onTemplateChange} />,
         fullScreen: true,
       };
-    } else if (isMyChartModalVisible) {
+    } else if (isUserChartsVisible) {
       return {
-        open: isMyChartModalVisible,
-        setOpen: toggleMyChartsModal,
+        open: isUserChartsVisible,
+        setOpen: toggleUserChartsView,
         title: 'My Saved Charts',
-        content: <ViewMyCharts toggleMyChartsModal={toggleMyChartsModal} />,
+        content: <UserCharts toggleUserChartsView={toggleUserChartsView} />,
+        fullScreen: true,
       };
     } else if (showSaveChartModal) {
       return {
@@ -258,13 +286,13 @@ function ChartEditor() {
     isImportDialogVisible,
     isExportDialogVisible,
     isChartTemplateVisible,
-    isMyChartModalVisible,
+    isUserChartsVisible,
     showSaveChartModal,
     toggleImportDataModal,
     toggleExportDataModal,
     toggleChartTemplateModal,
     onTemplateChange,
-    toggleMyChartsModal,
+    toggleUserChartsView,
     toggleSaveChartModal,
   ]);
 
@@ -308,6 +336,7 @@ function ChartEditor() {
                       {...btnConfig}
                       key={btnConfig.tooltip}
                       aria-label={btnConfig.tooltip}
+                      isLoading={btnConfig.isLoading}
                     />
                   );
                 })}
@@ -319,10 +348,6 @@ function ChartEditor() {
             <ChartDataEditor />
           </aside>
         </div>
-        {/* <SaveChart
-          isOpen={showSaveChartModal}
-          setIsOpen={setShowSaveChartModal}
-        /> */}
         <CWModal {...modalProps} />
       </>
     </AppShell>

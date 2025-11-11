@@ -4,28 +4,29 @@ import clsx from 'clsx';
 interface ICWSolidIconButton
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
-  icon: React.ReactNode;
+  iconLeft?: React.ReactNode;
+  iconRight?: React.ReactNode;
   disabled?: boolean;
 }
 
 export const CWSolidIconButton = forwardRef<
   HTMLButtonElement,
   ICWSolidIconButton
->(({ disabled, label, icon, ...props }, ref) => {
+>(({ disabled, label, iconLeft, iconRight, ...props }, ref) => {
   return (
     <button
       disabled={disabled}
       ref={ref}
       {...props}
       className={clsx(
-        disabled &&
-          'opacity-50 hover:text-body pointer-events-none select-none',
-        'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative',
-        'text-surface border-primary bg-primary hover:bg-surface hover:text-primary flex items-center gap-2'
+        disabled && 'btn-disabled pointer-events-none select-none',
+        'transition duration-200 ease-in-out py-1 px-3 border rounded-md relative cursor-pointer flex items-center gap-2',
+        'text-surface border-primary-600 bg-primary-600 hover:bg-transparent hover:text-primary-600 hover:border-primary-600'
       )}
     >
-      <span>{icon}</span>
+      {iconLeft && <span>{iconLeft}</span>}
       {label}
+      {iconRight && <span>{iconRight}</span>}
     </button>
   );
 });

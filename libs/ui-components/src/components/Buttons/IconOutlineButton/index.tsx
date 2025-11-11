@@ -1,18 +1,20 @@
 import Tippy from '@tippyjs/react';
 import clsx from 'clsx';
 import React, { forwardRef, useCallback } from 'react';
+import { CWSpinner } from '../../Spinner';
 
 interface ICWIconOutlineButton
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
   tooltip?: string;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export const CWIconOutlineButton = forwardRef<
   HTMLButtonElement,
   ICWIconOutlineButton
->(({ icon, tooltip, disabled, ...props }, ref) => {
+>(({ icon, tooltip, disabled, isLoading, ...props }, ref) => {
   const buttonJSX = useCallback(() => {
     return (
       <button
@@ -20,14 +22,15 @@ export const CWIconOutlineButton = forwardRef<
         {...props}
         disabled={disabled}
         className={clsx(
-          disabled && 'btn-disabled pointer-events-none select-none',
+          (isLoading || disabled) &&
+            'btn-disabled pointer-events-none select-none',
           'transition duration-200 ease-in-out border rounded-md text-body border-default hover:btn-primary-hover hover:text-surface hover:border-primary-600 py-1 px-2 cursor-pointer'
         )}
       >
-        {icon}
+        {isLoading ? <CWSpinner /> : icon}
       </button>
     );
-  }, [disabled, icon, props, ref]);
+  }, [disabled, icon, isLoading, props, ref]);
 
   if (tooltip) {
     return <Tippy content={tooltip}>{buttonJSX()}</Tippy>;
