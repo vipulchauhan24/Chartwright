@@ -20,8 +20,9 @@ import 'dropzone/dist/dropzone.css';
 import Papa from 'papaparse';
 import { read, utils } from 'xlsx';
 import useChartConfig from '../../hooks/useChartConfig';
-
-type chart_types = 'bar' | 'line';
+import { capitalizeFirstLetter, CHART_TYPES } from '../../utils/lib';
+import { chartTitle } from '../../../../store/charts';
+import { useAtom } from 'jotai';
 
 interface IImportData {
   toggleImportDataModal: (open: boolean) => void;
@@ -40,13 +41,23 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   >([
     {
       id: 'chart-types-bar',
-      value: 'bar',
-      label: 'Bar',
+      value: CHART_TYPES.BAR,
+      label: capitalizeFirstLetter(CHART_TYPES.BAR),
+    },
+    {
+      id: 'chart-types-column',
+      value: CHART_TYPES.COLUMN,
+      label: capitalizeFirstLetter(CHART_TYPES.COLUMN),
     },
     {
       id: 'chart-types-line',
-      value: 'line',
-      label: 'Line',
+      value: CHART_TYPES.LINE,
+      label: capitalizeFirstLetter(CHART_TYPES.LINE),
+    },
+    {
+      id: 'chart-types-area',
+      value: CHART_TYPES.AREA,
+      label: capitalizeFirstLetter(CHART_TYPES.AREA),
     },
   ]);
 
@@ -58,8 +69,9 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     Array<{ id: string; value: string; label: string }>
   >([]);
   const [xColumnName, setXColumnName] = useState<string>();
-  const [chartType, setChartType] = useState<chart_types>('bar');
+  const [chartType, setChartType] = useState<CHART_TYPES>(CHART_TYPES.BAR);
   const { isProcessing, buildChartConfig } = useChartConfig();
+  const [, setChrtTitle] = useAtom(chartTitle);
 
   const processHeaders = useCallback(
     (headers: Array<string>, file: { size: number }) => {
@@ -213,7 +225,12 @@ function ImportData({ toggleImportDataModal }: IImportData) {
   }, [columnNames, uploadedFileData]);
 
   const generateChartConfig = useCallback(async () => {
-    await buildChartConfig(uploadedFileData, `${xColumnName}`, chartType);
+    const chartConfig = await buildChartConfig(
+      uploadedFileData,
+      `${xColumnName}`,
+      chartType
+    );
+    setChrtTitle(chartConfig.title.text || 'Chart');
     toggleImportDataModal(false);
   }, [
     buildChartConfig,
@@ -221,6 +238,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     toggleImportDataModal,
     uploadedFileData,
     xColumnName,
+    setChrtTitle,
   ]);
 
   const steps = useMemo(() => {
@@ -279,7 +297,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
                   defaultValue={chartType}
                   items={chartTypes.current}
                   onChange={(value: string) => {
-                    setChartType(value as chart_types);
+                    setChartType(value as CHART_TYPES);
                   }}
                   disabled={isProcessing}
                 />

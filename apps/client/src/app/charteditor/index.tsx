@@ -4,6 +4,7 @@ import {
   fetchChartTemplates,
   fetchAllChartsFeatures,
   fetchAllUserCharts,
+  fetchAllChartBaseConfig,
 } from '../../service/chartsApi';
 import {
   chartId,
@@ -14,6 +15,9 @@ import {
   allChartFeatures,
   activeChartFeatures,
   chartType,
+  allChartBaseConfig,
+  allChartBaseConfigLoading,
+  allChartBaseConfigError,
 } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
@@ -23,7 +27,7 @@ import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import {
   CWGhostLink,
-  CWIconOutlineButton,
+  CWOutlineButton,
   CWModal,
   CWSpinner,
 } from '@chartwright/ui-components';
@@ -62,6 +66,9 @@ function ChartEditor() {
   const [, setChartId] = useAtom(chartId);
   const [isLoading] = useAtom(loadingChartConfig);
   const [, fetchActiveChartConfig] = useAtom(fetchUserChartById);
+  const [, fetchAllChartBaseConfigData] = useAtom(fetchAllChartBaseConfig);
+  const [isAllChartBaseConfigLoading] = useAtom(allChartBaseConfigLoading);
+  const [isAllChartBaseConfigError] = useAtom(allChartBaseConfigError);
 
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
@@ -76,6 +83,10 @@ function ChartEditor() {
   useEffect(() => {
     fetchChartFeaturesData(); // Fetch data on mount
   }, [fetchChartFeaturesData]);
+
+  useEffect(() => {
+    fetchAllChartBaseConfigData(); // Fetch data on mount
+  }, [fetchAllChartBaseConfigData]);
 
   useEffect(() => {
     const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
@@ -105,12 +116,12 @@ function ChartEditor() {
     chartFeaturesData,
     isLoading,
     id,
-    fetchActiveChartConfig,
     setActiveChartConfig,
     setChartTitle,
     setChartId,
     setActiveChartFeatures,
     setChartType,
+    fetchActiveChartConfig,
   ]);
 
   const toggleImportDataModal = useCallback((open: boolean) => {
@@ -179,21 +190,30 @@ function ChartEditor() {
     return [
       {
         tooltip: 'Import from file',
-        icon: <FolderInput className="size-4" aria-hidden={true} />,
+        iconLeft: <FolderInput className="size-4" aria-hidden={true} />,
         onClick: () => {
           toggleImportDataModal(true);
         },
+        isLoading: isAllChartBaseConfigLoading,
+        disabled: isAllChartBaseConfigError,
       },
       {
         tooltip: 'Export',
-        icon: <Share2 className="size-4" aria-hidden={true} />,
+        iconLeft: <Share2 className="size-4" aria-hidden={true} />,
         onClick: () => {
           toggleExportDataModal(true);
         },
+        isLoading: exportDisabled,
         disabled: exportDisabled,
       },
     ];
-  }, [exportDisabled, toggleImportDataModal, toggleExportDataModal]);
+  }, [
+    isAllChartBaseConfigLoading,
+    isAllChartBaseConfigError,
+    exportDisabled,
+    toggleImportDataModal,
+    toggleExportDataModal,
+  ]);
 
   const onSavingUserChartRequest = useCallback(() => {
     if (!isAuthenticated) {
@@ -207,14 +227,14 @@ function ChartEditor() {
     return [
       {
         tooltip: 'View chart templates',
-        icon: <ChartPie className="size-4" aria-hidden={true} />,
+        iconLeft: <ChartPie className="size-4" aria-hidden={true} />,
         onClick: () => {
           toggleChartTemplateModal(true);
         },
       },
       {
         tooltip: 'View saved charts',
-        icon: <ChartArea className="size-4" aria-hidden={true} />,
+        iconLeft: <ChartArea className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated
           ? redirectToLoginPage
           : () => {
@@ -223,8 +243,7 @@ function ChartEditor() {
       },
       {
         tooltip: 'Save changes',
-        icon: <Save className="size-4" aria-hidden={true} />,
-        isLoading: false,
+        iconLeft: <Save className="size-4" aria-hidden={true} />,
         onClick: onSavingUserChartRequest,
       },
     ];
@@ -321,7 +340,7 @@ function ChartEditor() {
               <div className="flex items-center gap-2">
                 {chartUtitlityBtns.map((btnConfig) => {
                   return (
-                    <CWIconOutlineButton
+                    <CWOutlineButton
                       {...btnConfig}
                       key={btnConfig.tooltip}
                       aria-label={btnConfig.tooltip}
@@ -332,11 +351,10 @@ function ChartEditor() {
               <div className="flex items-center gap-2">
                 {chartUtitlityAuthoredBtns.map((btnConfig) => {
                   return (
-                    <CWIconOutlineButton
+                    <CWOutlineButton
                       {...btnConfig}
                       key={btnConfig.tooltip}
                       aria-label={btnConfig.tooltip}
-                      isLoading={btnConfig.isLoading}
                     />
                   );
                 })}

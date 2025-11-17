@@ -11,10 +11,11 @@ import {
   Query,
   Put,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
-import { type Response } from 'express';
+import { type Response, type Request } from 'express';
 import { EmbedChartDTO } from './validations/embedChart.dto';
 import { ChartTemplateDTO } from './validations/chartTemplate.dto';
 import { ChartFeatureAndBaseConfigDTO } from './validations/chartBaseConfig.dto';
@@ -53,6 +54,7 @@ export class ChartsController {
 
   @Get('chart-template/thumbnail/:name')
   async getChartTemplateThumbnail(
+    @Req() req: Request,
     @Param('name') name: string,
     @Res() res: Response
   ) {
@@ -62,6 +64,9 @@ export class ChartsController {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     res.setHeader('ETag', `${ETag}`);
     res.setHeader('Last-Modified', `${LastModified?.toUTCString()}`);
+    if (req.headers['if-none-match'] === `${ETag}`) {
+      res.status(304).end();
+    }
     imageStream.pipe(res);
     return imageStream;
   }
@@ -84,8 +89,8 @@ export class ChartsController {
   }
 
   @Get('chart-base-config')
-  getChartBaseConfigTemplate() {
-    return this.chartService.getChartBaseConfigTemplate();
+  getChartBaseConfigTemplates() {
+    return this.chartService.getChartBaseConfigTemplates();
   }
 
   @Delete('chart-base-config/:id')

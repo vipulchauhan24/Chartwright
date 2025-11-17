@@ -1,5 +1,3 @@
-export {};
-
 type FieldType = 'switch' | 'text' | 'lookup' | 'color';
 type DataType = 'boolean' | 'string';
 

@@ -58,7 +58,7 @@ export class ChartService {
   async getChartTemplates() {
     try {
       const items = await this.db.execute(
-        `SELECT id, name, type, config, thumbnail FROM ${TABLE_NAME.CHART_TEMPLATES};`
+        `SELECT id, name, type, config, thumbnail, version_number FROM ${TABLE_NAME.CHART_TEMPLATES};`
       );
 
       return items;
@@ -139,7 +139,7 @@ export class ChartService {
     }
   }
 
-  async getChartBaseConfigTemplate() {
+  async getChartBaseConfigTemplates() {
     try {
       const items = await this.db.execute(
         `SELECT id, type, config FROM ${TABLE_NAME.CHART_BASE_CONFIG};`
@@ -304,7 +304,7 @@ export class ChartService {
   async getAllUserCharts(user_id: string) {
     try {
       const items = await this.db.execute(
-        `SELECT id, title, chart_type, created_date, updated_date FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
+        `SELECT id, title, chart_type, created_date, updated_date, version_number FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
       );
 
       return items;

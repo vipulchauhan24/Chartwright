@@ -11,6 +11,9 @@ import {
   loadingMyCharts,
   userCharts,
   chartType,
+  allChartBaseConfig,
+  allChartBaseConfigLoading,
+  allChartBaseConfigError,
 } from '../store/charts';
 import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
 
@@ -76,14 +79,15 @@ export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
   }
 });
 
-export const getChartBaseConfig = atom(null, async (_get, _set, type) => {
+export const fetchAllChartBaseConfig = atom(null, async (_get, set) => {
   try {
-    const { data } = await axios.get(
-      `${API_ENDPOINTS.CHART_BASE_CONFIG}/${type}`
-    );
-    return JSON.parse(data.config);
+    const { data } = await axios.get(API_ENDPOINTS.CHART_BASE_CONFIG);
+    set(allChartBaseConfig, data);
   } catch (error) {
-    console.error('Error in "getChartBaseConfig":', error);
+    console.error('Error in "fetchAllChartBaseConfig":', error);
+    set(allChartBaseConfigError, true);
+  } finally {
+    set(allChartBaseConfigLoading, false);
   }
 });
 

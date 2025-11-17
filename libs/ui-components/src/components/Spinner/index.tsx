@@ -3,7 +3,7 @@ import clsx from 'clsx';
 export function CWSpinner({ solid }: { solid?: boolean }) {
   return (
     <svg
-      className="size-5 animate-spin"
+      className="size-4 animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

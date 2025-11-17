@@ -37,12 +37,5 @@
     "src/**/*.tsx",
     "src/**/*.json"
   ],
-  "references": [
-    {
-      "path": "../../libs/chart-renderer/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/ui-components/tsconfig.lib.json"
-    }
-  ]
+  "references": []
 }

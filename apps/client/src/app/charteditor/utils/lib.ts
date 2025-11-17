@@ -1,6 +1,13 @@
 import { jsPDF } from 'jspdf';
 import { LOCAL_STORAGE_KEYS, SESSION_STORAGE_KEYS } from './constants';
 
+export enum CHART_TYPES {
+  BAR = 'bar',
+  COLUMN = 'column',
+  LINE = 'line',
+  AREA = 'area',
+}
+
 export function changeBaseStringImageType(baseString: string, type: string) {
   return new Promise((resolve, reject) => {
     const img = new Image();

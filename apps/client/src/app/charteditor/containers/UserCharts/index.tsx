@@ -138,7 +138,9 @@ function ViewMyCharts(props: IViewMyCharts) {
           </table>
         </div>
       ) : (
-        <h2>No Save Charts</h2>
+        <h3 className="mt-8 text-center text-xl font-bold text-body">
+          No Saved Charts
+        </h3>
       )}
     </div>
   );

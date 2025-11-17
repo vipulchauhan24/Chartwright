@@ -1,15 +1,12 @@
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
-import { activeChartConfig } from '../../../store/charts';
-import { getChartBaseConfig } from '../../../service/chartsApi';
+import { activeChartConfig, allChartBaseConfig } from '../../../store/charts';
 import toast from 'react-hot-toast';
-import { randomHexColor } from '../utils/lib';
-
-type chart_types = 'bar' | 'line';
+import { CHART_TYPES, randomHexColor } from '../utils/lib';
 
 function useChartConfig() {
   const [, setChartDataConfig] = useAtom(activeChartConfig);
-  const [, getChartDefaultConfig] = useAtom(getChartBaseConfig);
+  const [allChartBaseConfigData] = useAtom(allChartBaseConfig);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -28,17 +25,45 @@ function useChartConfig() {
   );
 
   const setRandomColorToSeries = useCallback(
-    (series: any, type: chart_types) => {
+    (series: any, type: CHART_TYPES) => {
       const color = randomHexColor();
       switch (type) {
-        case 'line':
-          series['lineStyle']['color'] = color;
-          series['itemStyle']['color'] = color;
-          series['itemStyle']['borderColor'] = color;
+        case CHART_TYPES.LINE:
+        case CHART_TYPES.AREA:
+          if (!series.itemStyle) {
+            series.itemStyle = {};
+          }
+          series.itemStyle = {
+            ...series.itemStyle,
+            color: color,
+            borderColor: color,
+          };
+          if (!series.lineStyle) {
+            series.lineStyle = {};
+          }
+          series.lineStyle = {
+            ...series.lineStyle,
+            color: color,
+          };
+          if (!series.areaStyle) {
+            series.lineStyle = {};
+          }
+          series.areaStyle = {
+            ...series.areaStyle,
+            color: color,
+            borderColor: color,
+          };
           break;
-        case 'bar':
-          series['itemStyle']['color'] = color;
-          series['itemStyle']['borderColor'] = color;
+        case CHART_TYPES.BAR:
+        case CHART_TYPES.COLUMN:
+          if (!series.itemStyle) {
+            series.itemStyle = {};
+          }
+          series.itemStyle = {
+            ...series.itemStyle,
+            color: color,
+            borderColor: color,
+          };
           break;
 
         default:
@@ -49,16 +74,26 @@ function useChartConfig() {
   );
 
   const buildChartConfig = useCallback(
-    async (data: Array<never>, xColumnName: string, type: chart_types) => {
+    async (data: Array<never>, xColumnName: string, type: CHART_TYPES) => {
       try {
         setIsProcessing(true);
-        const chartConfig = await getChartDefaultConfig(type);
+
+        const chartConfig = allChartBaseConfigData.find(
+          (config: { type: string }) => config.type === type
+        ).config;
 
         if (!chartConfig) {
           throw new Error('Chart default config not found!');
         }
-        chartConfig.xAxis.data = getXAxisArray(xColumnName, data);
+
+        if (type === CHART_TYPES.BAR) {
+          chartConfig.yAxis.data = getXAxisArray(xColumnName, data);
+        } else {
+          chartConfig.xAxis.data = getXAxisArray(xColumnName, data);
+        }
+
         let seriesIndx = 0;
+
         Object.keys(data[0]).forEach((colName) => {
           if (colName === xColumnName || colName === '__rowNum__') return;
 
@@ -97,7 +132,7 @@ function useChartConfig() {
       }
     },
     [
-      getChartDefaultConfig,
+      allChartBaseConfigData,
       getSeriesData,
       getXAxisArray,
       setChartDataConfig,
