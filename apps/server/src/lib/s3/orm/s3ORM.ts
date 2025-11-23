@@ -1,4 +1,8 @@
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import { s3Client } from '../config';
 import { getSignedUrl, getSignedCookies } from '@aws-sdk/cloudfront-signer';
 import fs from 'fs';
@@ -31,6 +35,18 @@ export class S3ORM {
         Body: file.buffer,
         ContentType: file.mimetype,
         CacheControl: cacheControl,
+      })
+    );
+    return response;
+  }
+
+  async deleteObject(params: { key: string; bucket: string }) {
+    const { key, bucket } = params;
+
+    const response = await s3Client().send(
+      new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
       })
     );
     return response;

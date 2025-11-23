@@ -53,7 +53,7 @@ export class ChartService {
       if (query) {
         await this.db.execute(query);
         return id
-          ? { status: HttpStatus.OK, message: 'Template data updated.' }
+          ? { status: HttpStatus.NO_CONTENT, message: 'Template data updated.' }
           : { status: HttpStatus.CREATED, message: 'Template created.' };
       }
       return;
@@ -87,7 +87,7 @@ export class ChartService {
         `DELETE FROM ${TABLE_NAME.CHART_TEMPLATES} WHERE id='${id}';`
       );
 
-      return { status: HttpStatus.OK, message: 'Template deleted.' };
+      return { status: HttpStatus.NO_CONTENT, message: 'Template deleted.' };
     } catch (error) {
       console.error("Error in 'deleteChartTemplate' service: ", error);
       throw new InternalServerErrorException(
@@ -137,10 +137,13 @@ export class ChartService {
       if (query) {
         await this.db.execute(query);
         return id
-          ? { status: HttpStatus.OK, message: 'Base config data updated.' }
+          ? {
+              status: HttpStatus.NO_CONTENT,
+              message: 'Base config data updated.',
+            }
           : { status: HttpStatus.CREATED, message: 'Base config created.' };
       }
-      return;
+      throw new Error('Query not generated!');
     } catch (error: any) {
       console.error("Error in 'saveChartBaseConfigTemplate' service: ", error);
       this.dbService.validatePostgresError(error);
@@ -171,7 +174,7 @@ export class ChartService {
         `DELETE FROM ${TABLE_NAME.CHART_BASE_CONFIG} WHERE id='${id}';`
       );
 
-      return { status: HttpStatus.OK, message: 'Base config deleted.' };
+      return { status: HttpStatus.NO_CONTENT, message: 'Base config deleted.' };
     } catch (error) {
       console.error(
         "Error in 'deleteChartBaseConfigTemplate' service: ",
@@ -203,10 +206,13 @@ export class ChartService {
       if (query) {
         await this.db.execute(query);
         return id
-          ? { status: HttpStatus.OK, message: 'Chart features data updated.' }
+          ? {
+              status: HttpStatus.NO_CONTENT,
+              message: 'Chart features data updated.',
+            }
           : { status: HttpStatus.CREATED, message: 'Chart feature added.' };
       }
-      return;
+      throw new Error('Query not generated!');
     } catch (error: any) {
       console.error("Error in 'saveChartFeatureData' service: ", error);
       this.dbService.validatePostgresError(error);
@@ -237,7 +243,10 @@ export class ChartService {
         `DELETE FROM ${TABLE_NAME.CHART_FEATURE} WHERE id='${id}';`
       );
 
-      return { status: HttpStatus.OK, message: 'Chart features info deleted.' };
+      return {
+        status: HttpStatus.NO_CONTENT,
+        message: 'Chart features info deleted.',
+      };
     } catch (error) {
       console.error("Error in 'deleteChartFeatureData' service: ", error);
       throw new InternalServerErrorException(
@@ -281,14 +290,14 @@ export class ChartService {
       if (query) {
         const result = await this.db.execute(query);
         return id
-          ? { status: HttpStatus.OK, message: 'User chart updated.' }
+          ? { status: HttpStatus.NO_CONTENT, message: 'User chart updated.' }
           : {
               status: HttpStatus.CREATED,
               message: 'User chart created.',
               id: result[0].id,
             };
       }
-      return;
+      throw new Error('Query not generated!');
     } catch (error: any) {
       console.error("Error in 'saveUserChart' service: ", error);
       throw new InternalServerErrorException(
@@ -332,7 +341,7 @@ export class ChartService {
       await this.db.execute(
         `DELETE FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
       );
-      return { status: HttpStatus.OK, message: 'User chart deleted.' };
+      return { status: HttpStatus.NO_CONTENT, message: 'User chart deleted.' };
     } catch (error) {
       console.error("Error in 'deleteUserChart' service: ", error);
       throw new InternalServerErrorException(
@@ -396,7 +405,9 @@ export class ChartService {
       switch (type) {
         case EMBEDDABLES.STATIC_IMAGE:
           return {
-            'static-image': `embed/${EMBEDDABLES.STATIC_IMAGE}/${id}`,
+            'static-image': `http://localhost:3000/api/embed/${
+              EMBEDDABLES.STATIC_IMAGE
+            }/${id}?userId=${createdBy || updatedBy}`,
           };
 
         default:
@@ -468,13 +479,27 @@ export class ChartService {
     }
   }
 
-  async deleteEmbedChartURL(id: string) {
+  async deleteEmbedChartByChartIdAndType(id: string, userId: string) {
     try {
-      return await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
+      const s3DeleteRes = await this.s3ORM.deleteObject({
+        key: `user-${userId}/${id}.png`,
+        bucket: `${USER_CHART_STATIC_IMAGES}`,
+      });
+
+      if (!s3DeleteRes || s3DeleteRes['$metadata']['httpStatusCode'] !== 204) {
+        throw Error('S3 File delete failed.');
+      }
+
+      await this.db.execute(
+        `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}' and created_by='${userId}';`
       );
+
+      return {
+        status: HttpStatus.NO_CONTENT,
+        message: 'Embedded chart link deleted.',
+      };
     } catch (error) {
-      console.error('Error in deleting link: ', error);
+      console.error('Error in "deleteEmbedChartByChartIdAndType": ', error);
       throw new InternalServerErrorException(
         SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );

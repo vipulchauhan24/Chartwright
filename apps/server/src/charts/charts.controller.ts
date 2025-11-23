@@ -34,7 +34,7 @@ export class ChartsController {
 
   @Put('chart-template')
   @UsePipes(ValidationPipe)
-  saveChartTemplate(
+  async saveChartTemplate(
     @Body() chartTemplateReqBody: ChartTemplateDTO,
     @Res({ passthrough: true }) res: Response
   ) {
@@ -44,8 +44,9 @@ export class ChartsController {
       config: chartTemplateReqBody.config,
       type: chartTemplateReqBody.type,
     };
-    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.saveChartTemplate(params);
+    const response = await this.chartService.saveChartTemplate(params);
+    res.status(response?.status as HttpStatus);
+    return response;
   }
 
   @Get('chart-template')
@@ -81,7 +82,7 @@ export class ChartsController {
 
   @Put('chart-base-config')
   @UsePipes(ValidationPipe)
-  saveChartBaseConfigTemplate(
+  async saveChartBaseConfigTemplate(
     @Body() chartTemplateReqBody: ChartFeatureAndBaseConfigDTO,
     @Res({ passthrough: true }) res: Response
   ) {
@@ -90,8 +91,11 @@ export class ChartsController {
       type: chartTemplateReqBody.type,
       config: chartTemplateReqBody.config,
     };
-    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.saveChartBaseConfigTemplate(params);
+    const response = await this.chartService.saveChartBaseConfigTemplate(
+      params
+    );
+    res.status(response?.status as HttpStatus);
+    return response;
   }
 
   @Get('chart-base-config')
@@ -108,7 +112,7 @@ export class ChartsController {
 
   @Put('chart-feature')
   @UsePipes(ValidationPipe)
-  saveChartFeatureData(
+  async saveChartFeatureData(
     @Body() chartTemplateReqBody: ChartFeatureAndBaseConfigDTO,
     @Res({ passthrough: true }) res: Response
   ) {
@@ -117,8 +121,9 @@ export class ChartsController {
       type: chartTemplateReqBody.type,
       config: chartTemplateReqBody.config,
     };
-    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.saveChartFeatureData(params);
+    const response = await this.chartService.saveChartFeatureData(params);
+    res.status(response?.status as HttpStatus);
+    return response;
   }
 
   @Get('chart-feature')
@@ -135,7 +140,7 @@ export class ChartsController {
 
   @Put('user-chart')
   @UsePipes(ValidationPipe)
-  saveUserChart(
+  async saveUserChart(
     @Body() saveChartReqBody: SaveChartDTO,
     @Res({ passthrough: true }) res: Response
   ) {
@@ -150,8 +155,9 @@ export class ChartsController {
       updatedBy: saveChartReqBody.updatedBy,
       updatedDate: saveChartReqBody.updatedDate,
     };
-    res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.saveUserChart(params);
+    const response = await this.chartService.saveUserChart(params);
+    res.status(response?.status as HttpStatus);
+    return response;
   }
 
   @Get('user-chart/:id')
@@ -212,6 +218,14 @@ export class ChartsController {
     }
 
     res.redirect(url);
+  }
+
+  @Delete('embed/:id')
+  async deleteEmbedChartByChartIdAndType(
+    @Param('id') id: string,
+    @Query('userId') userId: string
+  ) {
+    return this.chartService.deleteEmbedChartByChartIdAndType(id, userId);
   }
 
   // others
