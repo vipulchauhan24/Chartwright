@@ -50,6 +50,7 @@ export class ChartRenderer extends EventTarget {
     backgroundColor: string;
     copy?: boolean;
     pdf?: boolean;
+    upload?: boolean;
   }) {
     this._sendMessage({
       type: MESSAGE_TYPES.CHART_DOWNLOAD,

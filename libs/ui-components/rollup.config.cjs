@@ -2,7 +2,7 @@ const { withNx } = require('@nx/rollup/with-nx');
 const peerDepsExternal = require('rollup-plugin-peer-deps-external');
 const commonjs = require('@rollup/plugin-commonjs');
 const resolve = require('@rollup/plugin-node-resolve').default;
-const { terser } = require('rollup-plugin-terser');
+const terser = require('@rollup/plugin-terser');
 
 module.exports = withNx(
   {

@@ -4,21 +4,27 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   UsePipes,
   ValidationPipe,
   Res,
-  Query,
   Put,
   HttpStatus,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
 import { type Response, type Request } from 'express';
-import { EmbedChartDTO } from './validations/embedChart.dto';
+import { EMBEDDABLES, EmbedChartDTO } from './validations/embedChart.dto';
 import { ChartTemplateDTO } from './validations/chartTemplate.dto';
 import { ChartFeatureAndBaseConfigDTO } from './validations/chartBaseConfig.dto';
+import { ParseFilePipe, FileTypeValidator } from '@nestjs/common/pipes';
+import { FileInterceptor } from '@nestjs/platform-express';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type multer from 'multer'; //DO NOT REMOVE
 
 @Controller()
 export class ChartsController {
@@ -137,12 +143,12 @@ export class ChartsController {
       id: saveChartReqBody.id,
       title: saveChartReqBody.title,
       config: saveChartReqBody.config,
-      created_by: saveChartReqBody.created_by,
-      created_date: saveChartReqBody.created_date,
+      createdBy: saveChartReqBody.createdBy,
+      createdDate: saveChartReqBody.createdDate,
       thumbnail: saveChartReqBody.thumbnail,
-      chart_type: saveChartReqBody.chart_type,
-      updated_by: saveChartReqBody.updated_by,
-      updated_date: saveChartReqBody.updated_date,
+      chartType: saveChartReqBody.chartType,
+      updatedBy: saveChartReqBody.updatedBy,
+      updatedDate: saveChartReqBody.updatedDate,
     };
     res.status(params.id ? HttpStatus.OK : HttpStatus.CREATED);
     return this.chartService.saveUserChart(params);
@@ -169,42 +175,75 @@ export class ChartsController {
     return this.chartService.deleteUserChart(id);
   }
 
+  // Export APIs.
+  @Put('embed')
+  @UsePipes(ValidationPipe)
+  @UseInterceptors(FileInterceptor('file'))
+  async generateEmbedableChart(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/png' })],
+        fileIsRequired: true,
+      })
+    )
+    file: Express.Multer.File,
+    @Body() reqBody: EmbedChartDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    res.status(reqBody.id ? HttpStatus.OK : HttpStatus.CREATED);
+    return this.chartService.generateEmbedableChart({ reqBody, file });
+  }
+
+  @Get('embed/:user_id')
+  async getAllEmbeddedDataByUserId(@Param('user_id') userId: string) {
+    return this.chartService.getAllEmbeddedDataByUserId(userId);
+  }
+
+  @Get(`embed/${EMBEDDABLES.STATIC_IMAGE}/:id`)
+  async getEmbeddedStaticImage(
+    @Param('id') id: string,
+    @Query('userId') userId: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const url = await this.chartService.getEmbeddedStaticImage(id, userId);
+
+    if (!url || !url.length) {
+      throw new NotFoundException('Embedable data not found!');
+    }
+
+    res.redirect(url);
+  }
+
   // others
 
-  @Get('chart/image/:key')
-  async getChartImageByKey(@Param('key') key: string, @Res() res: Response) {
-    const { imageStream, type, ETag, LastModified } =
-      await this.chartService.getImageStreamByKey(key);
-    res.setHeader('Content-Type', `${type}`);
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    res.setHeader('ETag', `${ETag}`);
-    res.setHeader('Last-Modified', `${LastModified?.toUTCString()}`);
-    imageStream.pipe(res);
-    return imageStream;
-  }
+  // @Get('chart/image/:key')
+  // async getChartImageByKey(@Param('key') key: string, @Res() res: Response) {
+  //   const { imageStream, type, ETag, LastModified } =
+  //     await this.chartService.getImageStreamByKey(key);
+  //   res.setHeader('Content-Type', `${type}`);
+  //   res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  //   res.setHeader('ETag', `${ETag}`);
+  //   res.setHeader('Last-Modified', `${LastModified?.toUTCString()}`);
+  //   imageStream.pipe(res);
+  //   return imageStream;
+  // }
 
-  @Post('embed')
-  @UsePipes(ValidationPipe)
-  async embedChart(@Body() embedChartReqBody: EmbedChartDTO) {
-    return this.chartService.embedChart(embedChartReqBody);
-  }
+  // @Get('embed')
+  // async getEmbedChartURL(@Query() query: EmbedChartDTO) {
+  //   return this.chartService.getEmbedChartURL({
+  //     chart_id: query.chart_id,
+  //     user_id: query.createdBy,
+  //     type: query.type,
+  //   });
+  // }
 
-  @Get('embed')
-  async getEmbedChartURL(@Query() query: EmbedChartDTO) {
-    return this.chartService.getEmbedChartURL({
-      chart_id: query.chart_id,
-      user_id: query.user_id,
-      type: query.type,
-    });
-  }
+  // @Delete('embed/:id')
+  // async deleteEmbedChartURL(@Param('id') id: string) {
+  //   return this.chartService.deleteEmbedChartURL(id);
+  // }
 
-  @Delete('embed/:id')
-  async deleteEmbedChartURL(@Param('id') id: string) {
-    return this.chartService.deleteEmbedChartURL(id);
-  }
-
-  @Get('embed-config/:id')
-  async getEmbedChartConfig(@Param('id') id: string) {
-    return this.chartService.getEmbedChartConfig(id);
-  }
+  // @Get('embed-config/:id')
+  // async getEmbedChartConfig(@Param('id') id: string) {
+  //   return this.chartService.getEmbedChartConfig(id);
+  // }
 }

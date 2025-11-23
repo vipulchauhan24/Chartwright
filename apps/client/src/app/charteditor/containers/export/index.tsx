@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import {
@@ -12,13 +12,19 @@ import {
 } from 'lucide-react';
 import useAuthentication from '../../hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
-import { copyToMemory, fetchFromLocalStorage } from '../../utils/lib';
+import {
+  base64ToFile,
+  copyToMemory,
+  EMBEDDABLES,
+  fetchFromLocalStorage,
+} from '../../utils/lib';
 import toast from 'react-hot-toast';
-import { chartId } from '../../../../store/charts';
+import { allEmbedChartDetails } from '../../../../store/charts';
 import { useAtom } from 'jotai';
-import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import axios from 'axios';
 import { CWGhostLink, CWIconButton, CWTabs } from '@chartwright/ui-components';
+import { useParams } from 'react-router-dom';
 
 interface IExportItem {
   onClick: () => void;
@@ -34,51 +40,125 @@ const EXPORT_ERROR_MSG = 'Oops, try again later.';
 
 function ExportChart() {
   const { isAuthenticated } = useAuthentication();
+  const { chart_id } = useParams();
   const auth = useAuth();
-  const [chrtId] = useAtom(chartId);
+  const [allEmbedChartData, setAllEmbedChartData] =
+    useAtom(allEmbedChartDetails);
   const [imageURL, setImageURL] = useState<string>('');
-  const [imageURLLoading, setImageURLLoading] = useState<boolean>(true);
   const [iframeURL, setIframeURL] = useState<string>('');
-  const [iframeURLLoading, setIframeURLLoading] = useState<boolean>(true);
+  const [isLoadingEmbedUrls, setIsLoadingEmbedUrls] = useState<boolean>(false);
+  const toastrIdRef = useRef('');
 
-  const fetchEmbedURL = useCallback(
-    async (chrtId: string, type: 'image' | 'iframe') => {
+  useEffect(() => {
+    if (chart_id && allEmbedChartData[chart_id]) {
+      setImageURL(allEmbedChartData[chart_id][EMBEDDABLES.STATIC_IMAGE]);
+      setIframeURL(allEmbedChartData[chart_id][EMBEDDABLES.DYNAMIC_IFRAME]);
+      setIsLoadingEmbedUrls(false);
+    }
+  }, [allEmbedChartData, chart_id]);
+
+  const getAllEmbeddedDataByUserId = useCallback(async () => {
+    try {
+      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+      if (!userId) {
+        throw new Error('User not logged in.');
+      }
+
+      const response = await axios.get(
+        `${API_ENDPOINTS.USER_CHARTS_EMBED}/${userId}`
+      );
+      setAllEmbedChartData((prev: any) => {
+        return {
+          ...prev,
+          ...response['data'],
+        };
+      });
+    } catch (err) {
+      console.error('Failed to embed image:', err);
+    }
+  }, [setAllEmbedChartData]);
+
+  useEffect(() => {
+    if (chart_id) {
+      setIsLoadingEmbedUrls(true);
+      getAllEmbeddedDataByUserId();
+    }
+  }, [chart_id, getAllEmbeddedDataByUserId]);
+
+  const uploadEmbeddableStaticImage = useCallback(
+    async (event: any) => {
       try {
         const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
         if (!userId) {
-          // throw new Error('User not logged in.');
-          return;
-        }
-        const response = await axios.get(
-          `/api/embed?chart_id=${chrtId}&user_id=${userId}&type=${type}`
-        );
-        if (type === 'image' && response.data.length) {
-          setImageURL(`${window.location.host}${response.data}`);
-        } else if (type === 'image' && !response.data.length) {
-          setImageURL('');
+          throw new Error('User not logged in.');
+        } else if (!chart_id) {
+          throw new Error(
+            'Chart not saved. Please save chart once or load any saved chart.'
+          );
         }
 
-        if (type === 'iframe' && response.data.length) {
-          setIframeURL(`${window.location.host}${response.data}`);
-        } else if (type === 'iframe' && !response.data.length) {
-          setIframeURL('');
+        const formData = new FormData();
+        formData.append('file', base64ToFile(event.uri));
+        formData.append('type', EMBEDDABLES.STATIC_IMAGE);
+        formData.append('chartId', chart_id);
+        formData.append('createdBy', userId);
+        formData.append('createdDate', new Date().toISOString());
+
+        const response = await axios.put(
+          `${API_ENDPOINTS.USER_CHARTS_EMBED}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setAllEmbedChartData((prev: any) => {
+          return {
+            ...prev,
+            [`${chart_id}`]: {
+              ...prev[chart_id],
+              'static-image': response['data']['static-image'],
+            },
+          };
+        });
+        toast.success(<b>Link Generated!</b>, {
+          id: toastrIdRef.current,
+        });
+      } catch (error: any) {
+        console.error(error);
+        if (error === 'User not logged in.') {
+          toast.error(<b>User not logged in!</b>, {
+            id: toastrIdRef.current,
+          });
+          return;
+        } else if (error.status === 409) {
+          toast.error(<b>Link already generated!</b>, {
+            id: toastrIdRef.current,
+          });
+          return;
         }
-      } catch (err) {
-        console.error('Failed to embed image:', err);
-      } finally {
-        setImageURLLoading(false);
-        setIframeURLLoading(false);
+        toast.error(<b>{EXPORT_ERROR_MSG}</b>, {
+          id: toastrIdRef.current,
+        });
       }
     },
-    []
+    [chart_id, setAllEmbedChartData]
   );
 
   useEffect(() => {
-    if (chrtId) {
-      fetchEmbedURL(chrtId, 'image');
-      fetchEmbedURL(chrtId, 'iframe');
+    if (!chart_id) {
+      return;
     }
-  }, [chrtId, fetchEmbedURL]);
+    emitter.on(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, uploadEmbeddableStaticImage);
+
+    return () => {
+      emitter.off(
+        EVENTS.UPLOAD_EMBED_STATIC_IMAGE,
+        uploadEmbeddableStaticImage
+      );
+    };
+  }, [uploadEmbeddableStaticImage, chart_id]);
 
   const downloadItems: Array<IExportItem> = useMemo(() => {
     return [
@@ -127,49 +207,42 @@ function ExportChart() {
     ];
   }, []);
 
-  const embedToLink = useCallback(
-    (type: 'image' | 'iframe') => {
-      toast.promise(
-        async () => {
-          try {
-            const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-            if (!userId) {
-              throw new Error('User not logged in.');
-            }
-            await axios.post('/api/embed', {
-              type: type,
-              chart_id: chrtId,
-              user_id: userId,
-              created_date: new Date().toISOString(),
-            });
-            fetchEmbedURL(chrtId, type);
-          } catch (err) {
-            console.error('Failed to embed image:', err);
-            throw err;
-          }
-        },
-        {
-          loading: 'Generating...',
-          success: <b>Link Generated!</b>,
-          error: <b>{EXPORT_ERROR_MSG}</b>,
+  const generateEmbedableCharts = useCallback(
+    (type: EMBEDDABLES) => {
+      if (type === EMBEDDABLES.STATIC_IMAGE) {
+        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
+        if (!userId) {
+          toast.error(<b>User not logged in.</b>);
+          return;
+        } else if (!chart_id) {
+          toast.error(
+            <b>
+              Chart not saved. Please save chart once or load any saved chart.
+            </b>
+          );
+          return;
         }
-      );
+        toastrIdRef.current = toast.loading('Generating embedable link...');
+        emitter.emit(EVENTS.EMBED_STATIC_IMAGE);
+
+        return;
+      }
     },
-    [chrtId, fetchEmbedURL]
+    [chart_id]
   );
 
   const embedItems: Array<IExportItem> = useMemo(() => {
     return [
       {
-        label: 'Generate Image Link',
+        label: 'Generate Static Embedable Image',
         icon: <CloudCog className="size-6" aria-hidden={true} />,
         image: <img src="/url.png" alt="Generate Link" className="h-6" />,
         onClick: () => {
-          embedToLink('image');
+          generateEmbedableCharts(EMBEDDABLES.STATIC_IMAGE);
         },
         userLoginCheck: true,
         url: imageURL,
-        loading: imageURLLoading,
+        loading: isLoadingEmbedUrls,
       },
       {
         label: 'Generate Interactive Frame',
@@ -182,14 +255,14 @@ function ExportChart() {
           />
         ),
         onClick: () => {
-          embedToLink('iframe');
+          generateEmbedableCharts(EMBEDDABLES.DYNAMIC_IFRAME);
         },
         userLoginCheck: true,
         url: iframeURL,
-        loading: iframeURLLoading,
+        loading: isLoadingEmbedUrls,
       },
     ];
-  }, [imageURL, imageURLLoading, iframeURL, iframeURLLoading, embedToLink]);
+  }, [imageURL, isLoadingEmbedUrls, iframeURL, generateEmbedableCharts]);
 
   const redirectToLoginPage = useCallback(() => {
     auth.signinRedirect();
@@ -235,7 +308,6 @@ function ExportChart() {
         try {
           const id = url.split('/')[url.split('/').length - 1];
           await axios.delete(`/api/embed/${id}`);
-          setImageURL('');
         } catch (err) {
           console.error('Failed to delete embed link:', err);
           throw err;
@@ -252,7 +324,7 @@ function ExportChart() {
   const Card = useCallback(
     (props: IExportItem) => {
       return (
-        <div className="bg-app py-6 px-4 rounded-md mb-4 border border-default relative">
+        <div className="bg-app py-3 px-4 rounded-md mb-4 border border-default relative">
           {!isAuthenticated && props.userLoginCheck && <LoginRequiredComp />}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -268,8 +340,8 @@ function ExportChart() {
           </div>
           {props.loading && (
             <>
-              <div className="h-4 w-2/3 animate-pulse bg-text-secondary rounded-xl mt-4"></div>
-              <div className="h-3 w-1/3 animate-pulse bg-text-secondary rounded-xl mt-1"></div>
+              <div className="h-4 w-2/3 animate-pulse bg-black/20 rounded-xl mt-4"></div>
+              <div className="h-3 w-1/3 animate-pulse bg-black/20 rounded-xl mt-1"></div>
             </>
           )}
           {!!props.url?.length && !props.loading && (
@@ -278,6 +350,7 @@ function ExportChart() {
                 <strong>Link: </strong>
                 <CWGhostLink
                   href={props.url}
+                  newTab={true}
                   label={<span className="truncate w-56">{props.url}</span>}
                 />
               </span>

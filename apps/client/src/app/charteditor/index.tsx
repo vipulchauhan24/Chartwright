@@ -48,7 +48,7 @@ const ExportChart = lazy(() => import('./containers/export'));
 const ImportData = lazy(() => import('./containers/importData'));
 
 function ChartEditor() {
-  const { id } = useParams();
+  const { chart_id } = useParams();
   const auth = useAuth();
   const { isAuthenticated } = useAuthentication();
   const navigate = useNavigate();
@@ -96,10 +96,10 @@ function ChartEditor() {
   }, [fetchUserCharts]);
 
   useEffect(() => {
-    if (!isLoading && !id) {
+    if (!isLoading && !chart_id) {
       setActiveChartConfig(chartTemplatesData[0]['config']);
       setChartTitle(chartTemplatesData[0]['name']);
-      setChartId(chartTemplatesData[0]['id']);
+      setChartId(chartTemplatesData[0]['chart_id']);
       const chartType = chartTemplatesData[0]['type'];
       setChartType(chartType);
       for (const features of chartFeaturesData) {
@@ -108,14 +108,14 @@ function ChartEditor() {
           break;
         }
       }
-    } else if (!isLoading && id) {
-      fetchActiveChartConfig(id);
+    } else if (!isLoading && chart_id) {
+      fetchActiveChartConfig(chart_id);
     }
   }, [
     chartTemplatesData,
     chartFeaturesData,
     isLoading,
-    id,
+    chart_id,
     setActiveChartConfig,
     setChartTitle,
     setChartId,

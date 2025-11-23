@@ -9,7 +9,7 @@ export const TABLE_NAME = Object.freeze({
   USER_CHARTS: `${schema}.user_charts`,
   USERS: `${schema}.users`,
   BILLING: `${schema}.billing`,
-  EMBED: `${schema}.embedded`,
+  EMBEDDED_CHARTS: `${schema}.embedded_charts`,
 });
 
 export enum SERVER_ERROR_MESSAGES {

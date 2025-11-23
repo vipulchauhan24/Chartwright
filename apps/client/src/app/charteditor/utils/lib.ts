@@ -8,6 +8,11 @@ export enum CHART_TYPES {
   AREA = 'area',
 }
 
+export enum EMBEDDABLES {
+  STATIC_IMAGE = 'static-image',
+  DYNAMIC_IFRAME = 'dynamic-iframe',
+}
+
 export function changeBaseStringImageType(baseString: string, type: string) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -129,6 +134,23 @@ export const copyToMemory = async (
     throw error;
   }
 };
+
+export function base64ToFile(base64: string, filename = 'image.png') {
+  const arr: string[] = base64.split(',');
+
+  let mime: RegExpMatchArray | null | string = arr[0].match(/:(.*?);/); // "image/png"
+  mime = mime ? mime[1] : 'image/png';
+
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+}
 
 export const isArray = (data: unknown) => {
   return Array.isArray(data);

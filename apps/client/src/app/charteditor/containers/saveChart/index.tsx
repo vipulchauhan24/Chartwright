@@ -25,15 +25,15 @@ interface ISaveChartPayload {
   id?: string;
   title: string;
   config: string;
-  chart_type: string;
-  created_by?: string;
-  created_date?: string;
-  updated_by?: string;
-  updated_date?: string;
+  chartType: string;
+  createdBy?: string;
+  createdDate?: string;
+  updatedBy?: string;
+  updatedDate?: string;
 }
 
 function SaveChart(props: ISaveChart) {
-  const { id } = useParams();
+  const { chart_id } = useParams();
   const { toggleSaveChartModal } = props;
   const [, fetchAllCharts] = useAtom(fetchAllUserCharts);
   const [chartDataConfig] = useAtom(activeChartConfig);
@@ -56,20 +56,20 @@ function SaveChart(props: ISaveChart) {
       let saveChartPayload: ISaveChartPayload = {
         title: chrtTitle,
         config: JSON.stringify(chartDataConfig),
-        chart_type: `${chrtType}`,
+        chartType: `${chrtType}`,
       };
-      if (id) {
+      if (chart_id) {
         saveChartPayload = {
           ...saveChartPayload,
-          id: id,
-          updated_by: userId,
-          updated_date: new Date().toISOString(),
+          id: chart_id,
+          updatedBy: userId,
+          updatedDate: new Date().toISOString(),
         };
       } else {
         saveChartPayload = {
           ...saveChartPayload,
-          created_by: userId,
-          created_date: new Date().toISOString(),
+          createdBy: userId,
+          createdDate: new Date().toISOString(),
         };
       }
       const response = await axios.put(
@@ -79,7 +79,7 @@ function SaveChart(props: ISaveChart) {
       fetchAllCharts(userId);
       closeModal();
       toast.success('Changes saved.');
-      if (!id) {
+      if (!chart_id) {
         navigate(`/chart/${response.data.id}`);
       }
     } catch (error) {
@@ -92,7 +92,7 @@ function SaveChart(props: ISaveChart) {
     chrtTitle,
     chartDataConfig,
     chrtType,
-    id,
+    chart_id,
     fetchAllCharts,
     closeModal,
     navigate,

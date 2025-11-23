@@ -15,3 +15,5 @@ export const userCharts = atom([]);
 export const allChartBaseConfig = atom<any>([]);
 export const allChartBaseConfigLoading = atom(true);
 export const allChartBaseConfigError = atom(false);
+//Data Structure of allEmbedChartDetails: {<chartId1>: {"static-image": "<url>", "dynamic-iframe": "<url>"}, <chartId2>: {"static-image": "<url>", "dynamic-iframe": "<url>"}}
+export const allEmbedChartDetails = atom<any>({});

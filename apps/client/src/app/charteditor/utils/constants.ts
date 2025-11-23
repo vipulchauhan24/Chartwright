@@ -12,4 +12,5 @@ export enum API_ENDPOINTS {
   CHART_FEATURES = '/api/chart-feature',
   CHART_BASE_CONFIG = '/api/chart-base-config',
   USER_CHARTS = '/api/user-chart',
+  USER_CHARTS_EMBED = '/api/embed',
 }

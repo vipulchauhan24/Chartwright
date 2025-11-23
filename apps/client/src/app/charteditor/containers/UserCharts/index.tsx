@@ -24,7 +24,7 @@ interface IViewMyCharts {
 function ViewMyCharts(props: IViewMyCharts) {
   const { toggleUserChartsView } = props;
   const navigate = useNavigate();
-  const params = useParams();
+  const { chart_id } = useParams();
 
   const [isLoading] = useAtom(loadingMyCharts);
   const [charts] = useAtom(userCharts);
@@ -44,7 +44,7 @@ function ViewMyCharts(props: IViewMyCharts) {
     async (chartId: string) => {
       try {
         setIsDeleting(true);
-        if (params?.id === chartId) {
+        if (chart_id === chartId) {
           toast.error('Chart in edit mode cannot be deleted.');
           return;
         }
@@ -60,7 +60,7 @@ function ViewMyCharts(props: IViewMyCharts) {
         setIsDeleting(false);
       }
     },
-    [fetchUserCharts, params?.id]
+    [fetchUserCharts, chart_id]
   );
 
   return (

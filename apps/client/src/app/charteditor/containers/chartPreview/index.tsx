@@ -34,7 +34,7 @@ function ChartPreview() {
   }, [chartDataConfig]);
 
   const downloadChart = useCallback(async (event: any) => {
-    const { uriType, copy, pdf, imageURI } = event.detail;
+    const { uriType, copy, pdf, imageURI, upload } = event.detail;
 
     const actions: Record<string, () => Promise<void>> = {
       downloadImage: async () => {
@@ -49,12 +49,18 @@ function ChartPreview() {
         const pdfBase64 = await base64ImageToBase64PDF(imageURI);
         fileDownload(`${pdfBase64}`, 'chart');
       },
+      embedImage: async () => {
+        emitter.emit(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, { uri: imageURI });
+      },
     };
 
     let actionKey: keyof typeof actions | null = null;
-    let messages = { loading: '', success: <>Success!</> };
+    let messages: { loading: string; success: React.ReactElement | null } = {
+      loading: '',
+      success: null,
+    };
 
-    if ((uriType === 'png' || uriType === 'jpeg') && !copy && !pdf) {
+    if ((uriType === 'png' || uriType === 'jpeg') && !copy && !pdf && !upload) {
       actionKey = 'downloadImage';
       messages = {
         loading: 'Downloading...',
@@ -72,6 +78,8 @@ function ChartPreview() {
         loading: 'Downloading...',
         success: <b>Image downloaded successfully!</b>,
       };
+    } else if (uriType === 'png' && upload) {
+      actionKey = 'embedImage';
     }
 
     if (!actionKey) return;
@@ -135,7 +143,17 @@ function ChartPreview() {
   }, [chartDataConfig]);
 
   const generateImage = useCallback(
-    (type: 'png' | 'jpeg', copy?: boolean, pdf?: boolean) => {
+    ({
+      type,
+      copy,
+      pdf,
+      upload,
+    }: {
+      type: 'png' | 'jpeg';
+      copy?: boolean;
+      pdf?: boolean;
+      upload?: boolean;
+    }) => {
       if (!chartRendererInst.current) {
         throw new Error('Failed to generate image.');
       }
@@ -144,6 +162,7 @@ function ChartPreview() {
         backgroundColor: '#FFFFFF',
         copy,
         pdf,
+        upload,
       });
     },
     []
@@ -151,30 +170,33 @@ function ChartPreview() {
 
   useEffect(() => {
     emitter.on(EVENTS.COPY_TO_CLIPBAORD, () => {
-      generateImage('png', true);
+      generateImage({ type: 'png', copy: true });
     });
     emitter.on(EVENTS.EXPORT_TO_PNG, () => {
-      generateImage('png');
+      generateImage({ type: 'png' });
     });
     emitter.on(EVENTS.EXPORT_TO_JPG, () => {
-      generateImage('jpeg');
+      generateImage({ type: 'jpeg' });
     });
     emitter.on(EVENTS.EXPORT_TO_PDF, () => {
-      generateImage('png', false, true);
+      generateImage({ type: 'png', pdf: true });
+    });
+    emitter.on(EVENTS.EMBED_STATIC_IMAGE, () => {
+      generateImage({ type: 'png', upload: true });
     });
 
     return () => {
       emitter.off(EVENTS.COPY_TO_CLIPBAORD, () => {
-        generateImage('png', true);
+        generateImage({ type: 'png', copy: true });
       });
       emitter.off(EVENTS.EXPORT_TO_PNG, () => {
-        generateImage('png');
+        generateImage({ type: 'png' });
       });
       emitter.off(EVENTS.EXPORT_TO_JPG, () => {
-        generateImage('jpeg');
+        generateImage({ type: 'jpeg' });
       });
-      emitter.off(EVENTS.EXPORT_TO_PDF, () => {
-        generateImage('png', false, true);
+      emitter.off(EVENTS.EMBED_STATIC_IMAGE, () => {
+        generateImage({ type: 'png', upload: true });
       });
     };
   }, [generateImage]);

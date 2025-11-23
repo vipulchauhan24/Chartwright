@@ -4,7 +4,6 @@ import {
   IsDateString,
   IsOptional,
   IsJSON,
-  IsBooleanString,
 } from 'class-validator';
 
 export class SaveChartDTO {
@@ -22,24 +21,25 @@ export class SaveChartDTO {
 
   @IsString()
   @IsOptional()
-  created_by?: string;
+  createdBy?: string;
 
   @IsNotEmpty()
   @IsOptional()
-  created_date?: string;
+  createdDate?: string;
 
   @IsString()
   @IsOptional()
   thumbnail?: string;
 
   @IsString()
-  chart_type!: string;
+  @IsNotEmpty()
+  chartType!: string;
 
   @IsOptional()
   @IsString()
-  updated_by?: string;
+  updatedBy?: string;
 
   @IsOptional()
   @IsDateString()
-  updated_date?: string;
+  updatedDate?: string;
 }

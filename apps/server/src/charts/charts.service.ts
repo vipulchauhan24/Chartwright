@@ -7,15 +7,26 @@ import {
 import { SERVER_ERROR_MESSAGES, TABLE_NAME } from '../lib/constants';
 import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
-import { EmbedChartDTO } from './validations/embedChart.dto';
+import { EMBEDDABLES, EmbedChartDTO } from './validations/embedChart.dto';
 import { DBService } from '../db/db.service';
+import { v4 as uuidv4 } from 'uuid';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { base64UrlEncode } from '../lib/lib';
 
-const { CHART_TEMPLATE_THUMBNAILS } = process.env;
+const {
+  CHART_TEMPLATE_THUMBNAILS,
+  USER_CHART_STATIC_IMAGES,
+  USER_CHART_STATIC_IMAGES_DOMAIN,
+} = process.env;
 
 @Injectable()
 export class ChartService {
   constructor(
-    @Inject('DATABASE_CONNECTION') private db: any,
+    @Inject('DATABASE_CONNECTION')
+    private db: PostgresJsDatabase<Record<string, never>> & {
+      $client: postgres.Sql;
+    },
     private dbService: DBService,
     private s3ORM: S3ORM
   ) {}
@@ -241,30 +252,30 @@ export class ChartService {
     id?: string;
     title: string;
     config: JSON;
-    chart_type?: string;
+    chartType?: string;
     thumbnail?: string;
-    created_by?: string;
-    created_date?: string;
-    updated_by?: string;
-    updated_date?: string;
+    createdBy?: string;
+    createdDate?: string;
+    updatedBy?: string;
+    updatedDate?: string;
   }) {
     try {
       const {
         id,
         title,
         config,
-        chart_type,
+        chartType,
         thumbnail,
-        created_by,
-        created_date,
-        updated_by,
-        updated_date,
+        createdBy,
+        createdDate,
+        updatedBy,
+        updatedDate,
       } = params;
 
-      let query = `INSERT INTO ${TABLE_NAME.USER_CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${config}', '${chart_type}', '${thumbnail}', '${created_by}', '${created_date}') RETURNING *;`;
+      let query = `INSERT INTO ${TABLE_NAME.USER_CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${config}', '${chartType}', '${thumbnail}', '${createdBy}', '${createdDate}') RETURNING *;`;
 
       if (id) {
-        query = `UPDATE ${TABLE_NAME.USER_CHARTS} SET title = '${title}', config='${config}', updated_by='${updated_by}', updated_date='${updated_date}' where id = '${id}' RETURNING *;`;
+        query = `UPDATE ${TABLE_NAME.USER_CHARTS} SET title = '${title}', config='${config}', updated_by='${updatedBy}', updated_date='${updatedDate}' where id = '${id}' RETURNING *;`;
       }
 
       if (query) {
@@ -330,49 +341,127 @@ export class ChartService {
     }
   }
 
-  // others
-  async getImageStreamByKey(key: string) {
-    try {
-      const { Body, ContentType, ETag, LastModified } =
-        await this.s3ORM.getObject(key, '');
-      return {
-        imageStream: Body as Readable,
-        type: ContentType,
-        ETag,
-        LastModified,
-      };
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  async embedChart(embedChartReqBody: EmbedChartDTO) {
-    try {
-      const query = `INSERT INTO ${TABLE_NAME.EMBED} (type, chart_id, created_by, created_date) VALUES ('${embedChartReqBody.type}', '${embedChartReqBody.chart_id}', '${embedChartReqBody.user_id}', '${embedChartReqBody.created_date}') RETURNING *;`;
-      const result = await this.db.execute(query);
-      return result[0];
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  async getEmbedChartURL(embedChartReqBody: {
-    type: string;
-    chart_id: string;
-    user_id: string;
+  // Export APIs.
+  async generateEmbedableChart({
+    reqBody,
+    file,
+  }: {
+    reqBody: EmbedChartDTO;
+    file: Express.Multer.File;
   }) {
     try {
-      const query = `SELECT id FROM ${TABLE_NAME.EMBED} WHERE type = '${embedChartReqBody.type}' and chart_id = '${embedChartReqBody.chart_id}' and created_by = '${embedChartReqBody.user_id}';`;
+      const { type, chartId, createdBy, createdDate, updatedBy, updatedDate } =
+        reqBody;
+      let { id } = reqBody;
+
+      if (!id) {
+        id = uuidv4();
+      }
+
+      let query = '';
+
+      if (updatedDate) {
+        query = `UPDATE ${TABLE_NAME.EMBEDDED_CHARTS} SET updated_by='${updatedBy}', updated_date='${updatedDate}' where id='${id}';`;
+      } else if (createdDate) {
+        const expirationDate = new Date(createdDate);
+        expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+        query = `INSERT INTO ${
+          TABLE_NAME.EMBEDDED_CHARTS
+        } (id, type, chart_id, created_by, created_date, expiration_date) VALUES ('${id}', '${type}', '${chartId}', '${createdBy}', '${createdDate}', '${expirationDate.toISOString()}');`;
+      }
+
+      await this.db.transaction(async (tx) => {
+        await tx.execute(query);
+        if (type == EMBEDDABLES.STATIC_IMAGE) {
+          try {
+            const s3UploadRes = await this.s3ORM.putObject({
+              key: `user-${createdBy || updatedBy}/${id}.png`,
+              bucket: `${USER_CHART_STATIC_IMAGES}`,
+              file,
+              cacheControl: 'public, max-age=31536000, immutable',
+            });
+            if (
+              !s3UploadRes ||
+              s3UploadRes['$metadata']['httpStatusCode'] !== 200
+            ) {
+              throw Error('S3 File upload failed.');
+            }
+          } catch {
+            throw Error('S3 File upload failed.');
+          }
+        }
+      });
+
+      switch (type) {
+        case EMBEDDABLES.STATIC_IMAGE:
+          return {
+            'static-image': `embed/${EMBEDDABLES.STATIC_IMAGE}/${id}`,
+          };
+
+        default:
+          return {};
+      }
+    } catch (error: any) {
+      console.error("Error in 'generateEmbedableChart' service: ", error);
+      this.dbService.validatePostgresError(error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getAllEmbeddedDataByUserId(userId: string) {
+    try {
+      const query = `SELECT id, type, chart_id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}';`;
       const result = await this.db.execute(query);
-      return result[0] ? `/render/${result[0].id}` : '';
+      const response: {
+        [key: string]: {
+          'static-image': string;
+          'dynamic-iframe': string;
+        };
+      } = {};
+
+      if (Array.isArray(result)) {
+        result.forEach((chartData) => {
+          const { type, id, chart_id } = chartData;
+
+          response[`${chart_id}`] = {
+            'static-image': '',
+            'dynamic-iframe': '',
+          };
+
+          switch (type) {
+            case EMBEDDABLES.STATIC_IMAGE:
+              response[`${chart_id}`][
+                EMBEDDABLES.STATIC_IMAGE
+              ] = `http://localhost:3000/api/embed/${EMBEDDABLES.STATIC_IMAGE}/${id}?userId=${userId}`; // Enable API gateway to this API.
+              break;
+
+            default:
+              break;
+          }
+        });
+      }
+
+      return response;
     } catch (error) {
-      console.error(error);
+      console.error("Error in 'getAllEmbeddedDataByChartId ' service: ", error);
+      throw new InternalServerErrorException(
+        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getEmbeddedStaticImage(id: string, userId: string) {
+    try {
+      const query = `SELECT version_number FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}' and id = '${id}';`;
+      const result = await this.db.execute(query);
+      const encodedPath = base64UrlEncode(`user-${userId}/${id}.png`);
+
+      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].version_number}`;
+    } catch (error) {
+      console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
       throw new InternalServerErrorException(
         SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
       );
@@ -382,7 +471,7 @@ export class ChartService {
   async deleteEmbedChartURL(id: string) {
     try {
       return await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.EMBED} WHERE id = '${id}';`
+        `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
       );
     } catch (error) {
       console.error('Error in deleting link: ', error);
@@ -392,21 +481,70 @@ export class ChartService {
     }
   }
 
-  async getEmbedChartConfig(id: string) {
-    try {
-      const items = await this.db.execute(
-        `SELECT chart_id FROM ${TABLE_NAME.EMBED} WHERE id = '${id}';`
-      );
+  // others
+  // async getImageStreamByKey(key: string) {
+  //   try {
+  //     const { Body, ContentType, ETag, LastModified } =
+  //       await this.s3ORM.getObject(key, '');
+  //     return {
+  //       imageStream: Body as Readable,
+  //       type: ContentType,
+  //       ETag,
+  //       LastModified,
+  //     };
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new InternalServerErrorException(
+  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
 
-      if (!items || !items.length) {
-        return {};
-      }
-      return await this.getUserChartById(items[0]['chart_id']);
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(
-        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
+  // async getEmbedChartURL(embedChartReqBody: {
+  //   type: string;
+  //   chart_id: string;
+  //   user_id: string;
+  // }) {
+  //   try {
+  //     const query = `SELECT id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE type = '${embedChartReqBody.type}' and chart_id = '${embedChartReqBody.chart_id}' and created_by = '${embedChartReqBody.user_id}';`;
+  //     const result = await this.db.execute(query);
+  //     return result[0] ? `/render/${result[0].id}` : '';
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new InternalServerErrorException(
+  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
+
+  // async deleteEmbedChartURL(id: string) {
+  //   try {
+  //     return await this.db.execute(
+  //       `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
+  //     );
+  //   } catch (error) {
+  //     console.error('Error in deleting link: ', error);
+  //     throw new InternalServerErrorException(
+  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
+
+  // async getEmbedChartConfig(id: string) {
+  //   try {
+  //     const items = await this.db.execute(
+  //       `SELECT chart_id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
+  //     );
+
+  //     if (!items || !items.length) {
+  //       return {};
+  //     }
+  //     return await this.getUserChartById(items[0]['chart_id']);
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new InternalServerErrorException(
+  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
 }

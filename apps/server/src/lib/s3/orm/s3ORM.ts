@@ -1,5 +1,9 @@
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../config';
+import { getSignedUrl, getSignedCookies } from '@aws-sdk/cloudfront-signer';
+import fs from 'fs';
+
+const { CF_KEYPAIR_ID, CF_PRIVATE_KEY_PATH } = process.env;
 
 export class S3ORM {
   async getObject(key: string, bucket: string) {
@@ -10,5 +14,69 @@ export class S3ORM {
       })
     );
     return response;
+  }
+
+  async putObject(params: {
+    key: string;
+    bucket: string;
+    file: Express.Multer.File;
+    cacheControl: string;
+  }) {
+    const { key, bucket, file, cacheControl } = params;
+
+    const response = await s3Client().send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        CacheControl: cacheControl,
+      })
+    );
+    return response;
+  }
+
+  generatePreSignedURL(params: { urlToSign: string; dateLessThan: string }) {
+    const { urlToSign, dateLessThan } = params;
+    const keyPairId = `${CF_KEYPAIR_ID}`;
+    const privateKey = fs.readFileSync(`${CF_PRIVATE_KEY_PATH}`, 'utf8');
+    const signedUrl = getSignedUrl({
+      url: urlToSign,
+      keyPairId,
+      privateKey,
+      dateLessThan,
+    });
+
+    return signedUrl;
+  }
+
+  generateCloudFrontSignedCookies(params: {
+    cloudfrontDomain: string;
+    expiry: number;
+  }) {
+    const { expiry, cloudfrontDomain } = params;
+    const keyPairId = `${CF_KEYPAIR_ID}`;
+    const privateKey = fs.readFileSync(`${CF_PRIVATE_KEY_PATH}`, 'utf8');
+
+    const cookies = getSignedCookies({
+      policy: JSON.stringify({
+        Statement: [
+          {
+            Resource: `${cloudfrontDomain}/*`, // protect all paths
+            Condition: {
+              DateLessThan: { 'AWS:EpochTime': expiry },
+            },
+          },
+        ],
+      }),
+      privateKey,
+      keyPairId,
+    });
+
+    return {
+      policy: cookies['CloudFront-Policy'],
+      signature: cookies['CloudFront-Signature'],
+      keyPairId: cookies['CloudFront-Key-Pair-Id'],
+    };
   }
 }
