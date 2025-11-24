@@ -101,7 +101,7 @@ function ChartDataEditor() {
     }
   }, []);
 
-  const getChildrens = useCallback(
+  const getChildren = useCallback(
     (option: any, indx: number) => {
       return option.children
         ? option.children.map((childComp: any) => {
@@ -141,7 +141,7 @@ function ChartDataEditor() {
           title: option.title,
           panelComponent: [
             ...getInputRenderedComp(option, -1),
-            ...getChildrens(option, -1),
+            ...getChildren(option, -1),
           ],
         };
       }),
@@ -154,7 +154,7 @@ function ChartDataEditor() {
             title: item.name || `${option.title} ${indx + 1}`,
             panelComponent: [
               ...getInputRenderedComp(option, indx),
-              ...getChildrens(option, indx),
+              ...getChildren(option, indx),
             ],
           };
         })
@@ -165,7 +165,7 @@ function ChartDataEditor() {
   }, [
     chartDataConfig,
     chartEditableFeatures,
-    getChildrens,
+    getChildren,
     getInputRenderedComp,
   ]);
 

@@ -72,7 +72,7 @@ export class ChartsController {
     res.setHeader('ETag', `${ETag}`);
     res.setHeader('Last-Modified', `${LastModified?.toUTCString()}`);
     if (req.headers['if-none-match'] === `${ETag}`) {
-      res.status(304).end();
+      res.status(HttpStatus.NOT_MODIFIED).end();
     }
     imageStream.pipe(res);
     return imageStream;

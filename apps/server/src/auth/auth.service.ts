@@ -45,11 +45,11 @@ export class AuthService {
   }) {
     try {
       const { email, cognito_id, created_date } = params;
-      const user = await this.db.execute(
-        `SELECT * FROM ${TABLE_NAME.USERS} WHERE cognito_id = '${cognito_id}';`
+      const users = await this.db.execute(
+        `SELECT id, email, super_user, user_name, user_privileges FROM ${TABLE_NAME.USERS} WHERE cognito_id = '${cognito_id}';`
       );
 
-      if (user.length) {
+      if (users.length) {
         // let billingDetails = await this.db.execute(
         //   `SELECT * FROM ${TABLE_NAME.BILLING} WHERE user_id = '${user[0].id}';`
         // );
@@ -58,12 +58,14 @@ export class AuthService {
         //     `INSERT INTO ${TABLE_NAME.BILLING} (user_id, plan, status, created_date) VALUES ('${user[0].id}', 'free', 'active', '${created_date}');`
         //   );
         // }
-        return user[0];
+        return { status: HttpStatus.OK, userData: users[0] };
       }
 
-      return await this.db.execute(
-        `INSERT INTO ${TABLE_NAME.USERS} (user_name, email, cognito_id, created_date) VALUES ('${email}', '${email}', '${cognito_id}', '${created_date}');`
+      const result = await this.db.execute(
+        `INSERT INTO ${TABLE_NAME.USERS} (user_name, email, cognito_id, created_date) VALUES ('${email}', '${email}', '${cognito_id}', '${created_date}') Returning (id, email, super_user, user_name, user_privileges);`
       );
+
+      return { status: HttpStatus.CREATED, userData: result[0] };
     } catch (error) {
       console.error('User sign-in error:', error);
       throw new HttpException(

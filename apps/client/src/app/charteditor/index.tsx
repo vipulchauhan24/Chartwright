@@ -15,7 +15,6 @@ import {
   allChartFeatures,
   activeChartFeatures,
   chartType,
-  allChartBaseConfig,
   allChartBaseConfigLoading,
   allChartBaseConfigError,
 } from '../../store/charts';
@@ -23,7 +22,6 @@ import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
 import { ChartArea, ChartPie, FolderInput, Save, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import useAuthentication from './hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
 import {
   CWGhostLink,
@@ -34,6 +32,7 @@ import {
 import toast from 'react-hot-toast';
 import { fetchFromLocalStorage } from './utils/lib';
 import { LOCAL_STORAGE_KEYS } from './utils/constants';
+import useEmbedCharts from './hooks/useEmbedCharts';
 
 const AppShell = lazy(() => import('./layout/appshell'));
 const ChartDataEditor = lazy(() => import('./containers/chartDataEditor'));
@@ -49,8 +48,7 @@ const ImportData = lazy(() => import('./containers/importData'));
 
 function ChartEditor() {
   const { chart_id } = useParams();
-  const auth = useAuth();
-  const { isAuthenticated } = useAuthentication();
+  const { isAuthenticated, signinRedirect } = useAuth();
   const navigate = useNavigate();
 
   const [, fetchUserCharts] = useAtom(fetchAllUserCharts);
@@ -70,6 +68,8 @@ function ChartEditor() {
   const [isAllChartBaseConfigLoading] = useAtom(allChartBaseConfigLoading);
   const [isAllChartBaseConfigError] = useAtom(allChartBaseConfigError);
 
+  const [getAllEmbeddedDataByUserId] = useEmbedCharts();
+
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
   const [showSaveChartModal, setShowSaveChartModal] = useState(false);
@@ -77,23 +77,30 @@ function ChartEditor() {
   const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
 
   useEffect(() => {
-    fetchChartTemplatesData(); // Fetch data on mount
-  }, [fetchChartTemplatesData]);
-
-  useEffect(() => {
-    fetchChartFeaturesData(); // Fetch data on mount
-  }, [fetchChartFeaturesData]);
-
-  useEffect(() => {
-    fetchAllChartBaseConfigData(); // Fetch data on mount
-  }, [fetchAllChartBaseConfigData]);
+    if (
+      !fetchAllChartBaseConfigData ||
+      !fetchChartFeaturesData ||
+      !fetchChartTemplatesData
+    ) {
+      return;
+    }
+    // Fetch data on mount
+    fetchChartTemplatesData();
+    fetchChartFeaturesData();
+    fetchAllChartBaseConfigData();
+  }, [
+    fetchAllChartBaseConfigData,
+    fetchChartFeaturesData,
+    fetchChartTemplatesData,
+  ]);
 
   useEffect(() => {
     const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
     if (userId) {
       fetchUserCharts(userId);
+      getAllEmbeddedDataByUserId();
     }
-  }, [fetchUserCharts]);
+  }, [fetchUserCharts, getAllEmbeddedDataByUserId, isAuthenticated]);
 
   useEffect(() => {
     if (!isLoading && !chart_id) {
@@ -182,10 +189,6 @@ function ChartEditor() {
     ]
   );
 
-  const redirectToLoginPage = useCallback(() => {
-    auth.signinRedirect();
-  }, [auth]);
-
   const chartUtitlityBtns = useMemo(() => {
     return [
       {
@@ -217,11 +220,11 @@ function ChartEditor() {
 
   const onSavingUserChartRequest = useCallback(() => {
     if (!isAuthenticated) {
-      redirectToLoginPage();
+      signinRedirect();
       return;
     }
     toggleSaveChartModal(true);
-  }, [isAuthenticated, redirectToLoginPage, toggleSaveChartModal]);
+  }, [isAuthenticated, signinRedirect, toggleSaveChartModal]);
 
   const chartUtitlityAuthoredBtns = useMemo(() => {
     return [
@@ -236,7 +239,9 @@ function ChartEditor() {
         tooltip: 'View saved charts',
         iconLeft: <ChartArea className="size-4" aria-hidden={true} />,
         onClick: !isAuthenticated
-          ? redirectToLoginPage
+          ? () => {
+              signinRedirect();
+            }
           : () => {
               toggleUserChartsView(true);
             },
@@ -250,7 +255,7 @@ function ChartEditor() {
   }, [
     isAuthenticated,
     onSavingUserChartRequest,
-    redirectToLoginPage,
+    signinRedirect,
     toggleChartTemplateModal,
     toggleUserChartsView,
   ]);

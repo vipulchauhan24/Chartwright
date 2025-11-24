@@ -1,10 +1,11 @@
-import { lazy } from 'react';
+import { lazy, useMemo, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
 import { User } from 'oidc-client-ts';
 import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
 import { EMBEDDABLES } from './charteditor/utils/lib';
+import toast from 'react-hot-toast';
 
 const ChartEditor = lazy(() => import('./charteditor'));
 const Home = lazy(() => import('./home'));
@@ -18,6 +19,9 @@ const Toaster = lazy(() =>
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
+  const [serverUserSigninInProgress, setServerUserSigninInProgress] =
+    useState(true);
+
   const userSignin = async (user: User) => {
     try {
       const loginPayload = {
@@ -27,8 +31,11 @@ export function App() {
       };
       const { userLogin } = await import('../service/userAPI');
       await userLogin(loginPayload);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      console.log('User signin failed');
+      toast.error('User login failed!');
+    } finally {
+      setServerUserSigninInProgress(false);
     }
   };
 
@@ -38,12 +45,15 @@ export function App() {
     redirect_uri: window.location.origin,
     response_type: 'code',
     scope: VITE_SCOPE,
-    onSigninCallback: (user: User | undefined) => {
-      if (user) {
-        userSignin(user);
-      }
-    },
   };
+
+  const authGaurdProps = useMemo(() => {
+    return {
+      serverUserSigninInProgress,
+      setServerUserSigninInProgress,
+      userSignin,
+    };
+  }, [serverUserSigninInProgress]);
 
   const ChartRoutes = () => {
     return (
@@ -51,7 +61,7 @@ export function App() {
         <Route
           path="/"
           element={
-            <AuthGaurd>
+            <AuthGaurd {...authGaurdProps}>
               <Home />
             </AuthGaurd>
           }
@@ -59,7 +69,7 @@ export function App() {
         <Route
           path="/chart/:chart_id?"
           element={
-            <AuthGaurd>
+            <AuthGaurd {...authGaurdProps}>
               <ChartEditor />
             </AuthGaurd>
           }
@@ -67,7 +77,7 @@ export function App() {
         <Route
           path={`embed/${EMBEDDABLES.STATIC_IMAGE}/:embed_id`}
           element={
-            <AuthGaurd>
+            <AuthGaurd {...authGaurdProps}>
               <EmbeddedCharts />
             </AuthGaurd>
           }

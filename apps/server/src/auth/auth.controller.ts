@@ -1,12 +1,16 @@
 import {
   Body,
   Controller,
+  HttpStatus,
   Post,
+  Put,
+  Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserLoginDTO } from '../charts/validations/userLogin.dto';
+import { type Response } from 'express';
 
 @Controller()
 export class AuthController {
@@ -17,9 +21,16 @@ export class AuthController {
     return this.authService.signinAsGuest();
   }
 
-  @Post('/user-signin')
+  @Put('/user-signin')
   @UsePipes(ValidationPipe)
-  signinAsUser(@Body() userLoginReqBody: UserLoginDTO) {
-    return this.authService.signinAsUser(userLoginReqBody);
+  async signinAsUser(
+    @Body() userLoginReqBody: UserLoginDTO,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const response = await this.authService.signinAsUser(userLoginReqBody);
+
+    res.status(response?.status as HttpStatus);
+
+    return response.userData;
   }
 }

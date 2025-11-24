@@ -57,33 +57,11 @@ function ExportChart() {
     }
   }, [allEmbedChartData, chart_id]);
 
-  const getAllEmbeddedDataByUserId = useCallback(async () => {
-    try {
-      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-      if (!userId) {
-        throw new Error('User not logged in.');
-      }
-
-      const response = await axios.get(
-        `${API_ENDPOINTS.USER_CHARTS_EMBED}/${userId}`
-      );
-      setAllEmbedChartData((prev: any) => {
-        return {
-          ...prev,
-          ...response['data'],
-        };
-      });
-    } catch (err) {
-      console.error('Failed to embed image:', err);
-    }
-  }, [setAllEmbedChartData]);
-
   useEffect(() => {
     if (chart_id) {
       setIsLoadingEmbedUrls(true);
-      getAllEmbeddedDataByUserId();
     }
-  }, [chart_id, getAllEmbeddedDataByUserId]);
+  }, [chart_id]);
 
   const uploadEmbeddableStaticImage = useCallback(
     async (event: any) => {

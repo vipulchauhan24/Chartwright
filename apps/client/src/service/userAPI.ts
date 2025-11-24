@@ -7,7 +7,7 @@ export const userLogin = async (loginPayload: {
   cognito_id: string | undefined;
   created_date: string;
 }) => {
-  const response = await axios.post('/api/user-signin', loginPayload);
+  const response = await axios.put('/api/user-signin', loginPayload);
   const userId = response.data.id;
   storeInLocalStorage(LOCAL_STORAGE_KEYS.USER_ID, userId);
 };
