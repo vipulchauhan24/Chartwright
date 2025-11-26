@@ -68,7 +68,7 @@ function ChartEditor() {
   const [isAllChartBaseConfigLoading] = useAtom(allChartBaseConfigLoading);
   const [isAllChartBaseConfigError] = useAtom(allChartBaseConfigError);
 
-  const [getAllEmbeddedDataByUserId] = useEmbedCharts();
+  const { getAllEmbeddedDataByUserId } = useEmbedCharts();
 
   const [isExportDialogVisible, setIsExportDialogVisible] = useState(false);
   const [isChartTemplateVisible, setIsChartTemplateVisible] = useState(false);
@@ -301,10 +301,12 @@ function ChartEditor() {
     }
 
     return {
-      open: isImportDialogVisible,
-      setOpen: toggleImportDataModal,
-      title: 'Import Data',
-      content: <ImportData toggleImportDataModal={toggleImportDataModal} />,
+      open: false,
+      setOpen: () => {
+        return;
+      },
+      title: '',
+      content: '',
     };
   }, [
     isImportDialogVisible,

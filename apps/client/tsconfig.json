@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/chart-renderer"
+    },
+    {
       "path": "../../libs/ui-components"
     },
     {

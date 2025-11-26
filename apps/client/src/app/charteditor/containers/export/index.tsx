@@ -2,143 +2,127 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
 import {
-  Asterisk,
   ChevronsLeftRightEllipsis,
   CloudCog,
   Copy,
   Download,
-  LogIn,
-  Trash,
 } from 'lucide-react';
-import useAuthentication from '../../hooks/useAuthentication';
 import { useAuth } from 'react-oidc-context';
-import {
-  base64ToFile,
-  copyToMemory,
-  EMBEDDABLES,
-  fetchFromLocalStorage,
-} from '../../utils/lib';
+import { EMBEDDABLES, fetchFromLocalStorage } from '../../utils/lib';
 import toast from 'react-hot-toast';
 import { allEmbedChartDetails } from '../../../../store/charts';
 import { useAtom } from 'jotai';
-import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
-import axios from 'axios';
-import { CWGhostLink, CWIconButton, CWTabs } from '@chartwright/ui-components';
+import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { CWTabs } from '@chartwright/ui-components';
 import { useParams } from 'react-router-dom';
-
-interface IExportItem {
-  onClick: () => void;
-  label: string;
-  icon: React.ReactNode;
-  image: React.ReactNode;
-  userLoginCheck?: boolean;
-  url?: string;
-  loading?: boolean;
-}
-
-const EXPORT_ERROR_MSG = 'Oops, try again later.';
+import EmbedChartCard, { IEmbedChartCard } from './EmbedChartCard';
+import useEmbedCharts from '../../hooks/useEmbedCharts';
 
 function ExportChart() {
-  const { isAuthenticated } = useAuthentication();
   const { chart_id } = useParams();
-  const auth = useAuth();
-  const [allEmbedChartData, setAllEmbedChartData] =
-    useAtom(allEmbedChartDetails);
-  const [imageURL, setImageURL] = useState<string>('');
-  const [iframeURL, setIframeURL] = useState<string>('');
-  const [isLoadingEmbedUrls, setIsLoadingEmbedUrls] = useState<boolean>(false);
+  const { isAuthenticated, signinRedirect } = useAuth();
+  const [allEmbedChartData] = useAtom(allEmbedChartDetails);
+  const [embedLinks, setEmbedLinks] = useState({
+    image: {
+      url: '',
+      loading: true,
+      disabled: false,
+    },
+    iframe: {
+      url: '',
+      loading: true,
+      disabled: false,
+    },
+  });
   const toastrIdRef = useRef('');
+  const { savingChanges, uploadEmbeddableStaticImage } = useEmbedCharts();
 
   useEffect(() => {
     if (chart_id && allEmbedChartData[chart_id]) {
-      setImageURL(allEmbedChartData[chart_id][EMBEDDABLES.STATIC_IMAGE]);
-      setIframeURL(allEmbedChartData[chart_id][EMBEDDABLES.DYNAMIC_IFRAME]);
-      setIsLoadingEmbedUrls(false);
+      const imageUrl = allEmbedChartData[chart_id][EMBEDDABLES.STATIC_IMAGE];
+      const iFrameUrl = allEmbedChartData[chart_id][EMBEDDABLES.DYNAMIC_IFRAME];
+
+      setEmbedLinks((prev) => {
+        return {
+          ...prev,
+          image: {
+            ...prev.image,
+            url: imageUrl,
+            loading: !imageUrl?.length,
+          },
+          iframe: {
+            ...prev.iframe,
+            url: iFrameUrl,
+            loading: !iFrameUrl?.length,
+          },
+        };
+      });
     }
+
+    return () => {
+      setEmbedLinks((prev) => {
+        return {
+          ...prev,
+          image: {
+            url: '',
+            loading: false,
+            disabled: false,
+          },
+          iframe: {
+            url: '',
+            loading: false,
+            disabled: false,
+          },
+        };
+      });
+    };
   }, [allEmbedChartData, chart_id]);
 
   useEffect(() => {
-    if (chart_id) {
-      setIsLoadingEmbedUrls(true);
-    }
-  }, [chart_id]);
+    setEmbedLinks((prev) => {
+      return {
+        ...prev,
+        image: {
+          ...prev.image,
+          disabled: savingChanges.staticImage,
+        },
+        iframe: {
+          ...prev.iframe,
+          disabled: savingChanges.iframe,
+        },
+      };
+    });
+  }, [savingChanges]);
 
-  const uploadEmbeddableStaticImage = useCallback(
-    async (event: any) => {
-      try {
-        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-        if (!userId) {
-          throw new Error('User not logged in.');
-        } else if (!chart_id) {
-          throw new Error(
-            'Chart not saved. Please save chart once or load any saved chart.'
-          );
-        }
-
-        const formData = new FormData();
-        formData.append('file', base64ToFile(event.uri));
-        formData.append('type', EMBEDDABLES.STATIC_IMAGE);
-        formData.append('chartId', chart_id);
-        formData.append('createdBy', userId);
-        formData.append('createdDate', new Date().toISOString());
-
-        const response = await axios.put(
-          `${API_ENDPOINTS.USER_CHARTS_EMBED}`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        setAllEmbedChartData((prev: any) => {
-          return {
-            ...prev,
-            [`${chart_id}`]: {
-              ...prev[chart_id],
-              'static-image': response['data']['static-image'],
-            },
-          };
-        });
-        toast.success(<b>Link Generated!</b>, {
-          id: toastrIdRef.current,
-        });
-      } catch (error: any) {
-        console.error(error);
-        if (error === 'User not logged in.') {
-          toast.error(<b>User not logged in!</b>, {
-            id: toastrIdRef.current,
-          });
-          return;
-        } else if (error.status === 409) {
-          toast.error(<b>Link already generated!</b>, {
-            id: toastrIdRef.current,
-          });
-          return;
-        }
-        toast.error(<b>{EXPORT_ERROR_MSG}</b>, {
-          id: toastrIdRef.current,
-        });
-      }
+  const uploadStaticImage = useCallback(
+    (event: any) => {
+      uploadEmbeddableStaticImage(event, chart_id as string, {
+        id: toastrIdRef.current,
+        success: <b>Link Generated!</b>,
+        apiError: <b>Oops, try again later.</b>,
+        loginError: <b>User not logged in!</b>,
+        error: <b>Link already generated!</b>,
+      });
     },
-    [chart_id, setAllEmbedChartData]
+    [uploadEmbeddableStaticImage, chart_id]
   );
 
   useEffect(() => {
     if (!chart_id) {
       return;
     }
-    emitter.on(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, uploadEmbeddableStaticImage);
+    emitter.on(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, uploadStaticImage);
 
     return () => {
-      emitter.off(
-        EVENTS.UPLOAD_EMBED_STATIC_IMAGE,
-        uploadEmbeddableStaticImage
-      );
+      emitter.off(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, uploadStaticImage);
     };
-  }, [uploadEmbeddableStaticImage, chart_id]);
+  }, [uploadStaticImage, chart_id]);
 
-  const downloadItems: Array<IExportItem> = useMemo(() => {
+  const redirectToLoginPage = useCallback(() => {
+    signinRedirect();
+  }, [signinRedirect]);
+
+  const downloadItems: Array<IEmbedChartCard> = useMemo(() => {
     return [
       {
         label: 'Copy To Clipboard',
@@ -149,6 +133,8 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.COPY_TO_CLIPBAORD);
         },
+        isAuthenticated,
+        redirectToLoginPage,
       },
       {
         label: 'Download PNG',
@@ -157,15 +143,9 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_PNG);
         },
+        isAuthenticated,
+        redirectToLoginPage,
       },
-      // {
-      //   label: 'Download SVG',
-      //   icon: <Download className="size-6" aria-hidden={true} />,
-      //   image: <img src="/svg.png" alt="Export To SVG" className="h-6" />,
-      //   onClick: () => {
-      //     emitter.emit(EVENTS.EXPORT_TO_SVG);
-      //   },
-      // },
       {
         label: 'Download JPG',
         icon: <Download className="size-6" aria-hidden={true} />,
@@ -173,6 +153,8 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_JPG);
         },
+        isAuthenticated,
+        redirectToLoginPage,
       },
       {
         label: 'Download PDF',
@@ -181,9 +163,11 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_PDF);
         },
+        isAuthenticated,
+        redirectToLoginPage,
       },
     ];
-  }, []);
+  }, [isAuthenticated, redirectToLoginPage]);
 
   const generateEmbedableCharts = useCallback(
     (type: EMBEDDABLES) => {
@@ -209,7 +193,7 @@ function ExportChart() {
     [chart_id]
   );
 
-  const embedItems: Array<IExportItem> = useMemo(() => {
+  const embedItems: Array<IEmbedChartCard> = useMemo(() => {
     return [
       {
         label: 'Generate Static Embedable Image',
@@ -219,8 +203,13 @@ function ExportChart() {
           generateEmbedableCharts(EMBEDDABLES.STATIC_IMAGE);
         },
         userLoginCheck: true,
-        url: imageURL,
-        loading: isLoadingEmbedUrls,
+        url: embedLinks.image.url,
+        loading: embedLinks.image.loading, //!chart_id || imageURL?.length > 0 ? false : true,
+        disabled: embedLinks.image.disabled,
+        isAuthenticated,
+        redirectToLoginPage,
+        chart_id,
+        linkType: EMBEDDABLES.STATIC_IMAGE,
       },
       {
         label: 'Generate Interactive Frame',
@@ -236,123 +225,26 @@ function ExportChart() {
           generateEmbedableCharts(EMBEDDABLES.DYNAMIC_IFRAME);
         },
         userLoginCheck: true,
-        url: iframeURL,
-        loading: isLoadingEmbedUrls,
+        url: embedLinks.iframe.url,
+        loading: embedLinks.iframe.loading, //!chart_id || iframeURL?.length > 0 ? false : true,
+        disabled: embedLinks.image.disabled,
+        isAuthenticated,
+        redirectToLoginPage,
+        chart_id,
+        linkType: EMBEDDABLES.DYNAMIC_IFRAME,
       },
     ];
-  }, [imageURL, isLoadingEmbedUrls, iframeURL, generateEmbedableCharts]);
-
-  const redirectToLoginPage = useCallback(() => {
-    auth.signinRedirect();
-  }, [auth]);
-
-  const LoginRequiredComp = useCallback(() => {
-    return (
-      <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.7)] flex items-center justify-between px-4 z-10 opacity-0 hover:opacity-100">
-        <div className="flex items-center gap-1">
-          <Asterisk className="size-4 text-surface mb-3" aria-hidden={true} />
-          <p className="font-semibold text-surface">Login Required</p>
-        </div>
-        <CWIconButton
-          icon={<LogIn className="size-6" aria-hidden={true} />}
-          onClick={redirectToLoginPage}
-        />
-      </div>
-    );
-  }, [redirectToLoginPage]);
-
-  const copyToClipboard = useCallback(async (url: string) => {
-    toast.promise(
-      async () => {
-        try {
-          const blob = new Blob([url], { type: 'text/plain' });
-          await copyToMemory({ 'text/plain': blob });
-        } catch (err) {
-          console.error('Failed to copy link:', err);
-          throw err;
-        }
-      },
-      {
-        loading: 'Copying...',
-        success: <b>Link Copied!</b>,
-        error: <b>{EXPORT_ERROR_MSG}</b>,
-      }
-    );
-  }, []);
-
-  const deleteEmbedURL = useCallback(async (url: string) => {
-    toast.promise(
-      async () => {
-        try {
-          const id = url.split('/')[url.split('/').length - 1];
-          await axios.delete(`/api/embed/${id}`);
-        } catch (err) {
-          console.error('Failed to delete embed link:', err);
-          throw err;
-        }
-      },
-      {
-        loading: 'Deleting Link...',
-        success: <b>Deleted Successfully!</b>,
-        error: <b>{EXPORT_ERROR_MSG}</b>,
-      }
-    );
-  }, []);
-
-  const Card = useCallback(
-    (props: IExportItem) => {
-      return (
-        <div className="bg-app py-3 px-4 rounded-md mb-4 border border-default relative">
-          {!isAuthenticated && props.userLoginCheck && <LoginRequiredComp />}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {props.image}
-              <p className="font-semibold">{props.label}</p>
-            </div>
-            <CWIconButton
-              icon={props.icon}
-              onClick={props.onClick}
-              disabled={!!props.url}
-              aria-label={props.label}
-            />
-          </div>
-          {props.loading && (
-            <>
-              <div className="h-4 w-2/3 animate-pulse bg-black/20 rounded-xl mt-4"></div>
-              <div className="h-3 w-1/3 animate-pulse bg-black/20 rounded-xl mt-1"></div>
-            </>
-          )}
-          {!!props.url?.length && !props.loading && (
-            <div className="flex items-center gap-4 mt-4">
-              <span className="flex items-center gap-1">
-                <strong>Link: </strong>
-                <CWGhostLink
-                  href={props.url}
-                  newTab={true}
-                  label={<span className="truncate w-56">{props.url}</span>}
-                />
-              </span>
-              <CWIconButton
-                tooltip="Copy link"
-                icon={<Copy className="size-4" aria-hidden={true} />}
-                onClick={() => {
-                  copyToClipboard(`${props.url}`);
-                }}
-              />
-              <CWIconButton
-                tooltip="Delete link"
-                icon={<Trash className="size-4" aria-hidden={true} />}
-                onClick={async () => {
-                  deleteEmbedURL(`${props.url}`);
-                }}
-              />
-            </div>
-          )}
-        </div>
-      );
-    },
-    [LoginRequiredComp, copyToClipboard, deleteEmbedURL, isAuthenticated]
-  );
+  }, [
+    embedLinks.image.url,
+    embedLinks.image.loading,
+    embedLinks.image.disabled,
+    embedLinks.iframe.url,
+    embedLinks.iframe.loading,
+    isAuthenticated,
+    redirectToLoginPage,
+    chart_id,
+    generateEmbedableCharts,
+  ]);
 
   const tabList = useMemo(() => {
     return [
@@ -368,8 +260,8 @@ function ExportChart() {
         ),
         content: (
           <>
-            {downloadItems.map((item: IExportItem) => (
-              <Card key={item.label} {...item} />
+            {downloadItems.map((item: IEmbedChartCard) => (
+              <EmbedChartCard key={item.label} {...item} />
             ))}
           </>
         ),
@@ -386,14 +278,14 @@ function ExportChart() {
         ),
         content: (
           <>
-            {embedItems.map((item: IExportItem) => (
-              <Card key={item.label} {...item} />
+            {embedItems.map((item: IEmbedChartCard) => (
+              <EmbedChartCard key={item.label} {...item} />
             ))}
           </>
         ),
       },
     ];
-  }, [Card, downloadItems, embedItems]);
+  }, [downloadItems, embedItems]);
 
   return (
     <div className="mt-4">
