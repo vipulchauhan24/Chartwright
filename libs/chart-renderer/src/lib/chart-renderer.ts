@@ -51,6 +51,7 @@ export class ChartRenderer extends EventTarget {
     copy?: boolean;
     pdf?: boolean;
     upload?: boolean;
+    embedId?: string;
   }) {
     this._sendMessage({
       type: MESSAGE_TYPES.CHART_DOWNLOAD,

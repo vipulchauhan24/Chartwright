@@ -34,7 +34,7 @@ function ChartPreview() {
   }, [chartDataConfig]);
 
   const downloadChart = useCallback(async (event: any) => {
-    const { uriType, copy, pdf, imageURI, upload } = event.detail;
+    const { uriType, copy, pdf, imageURI, upload, embedId } = event.detail;
 
     const actions: Record<string, () => Promise<void>> = {
       downloadImage: async () => {
@@ -50,7 +50,10 @@ function ChartPreview() {
         fileDownload(`${pdfBase64}`, 'chart');
       },
       embedImage: async () => {
-        emitter.emit(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, { uri: imageURI });
+        emitter.emit(EVENTS.UPLOAD_EMBED_STATIC_IMAGE, {
+          uri: imageURI,
+          embedId,
+        });
       },
     };
 
@@ -148,11 +151,13 @@ function ChartPreview() {
       copy,
       pdf,
       upload,
+      embedId,
     }: {
       type: 'png' | 'jpeg';
       copy?: boolean;
       pdf?: boolean;
       upload?: boolean;
+      embedId?: string;
     }) => {
       if (!chartRendererInst.current) {
         throw new Error('Failed to generate image.');
@@ -163,6 +168,7 @@ function ChartPreview() {
         copy,
         pdf,
         upload,
+        embedId,
       });
     },
     []
@@ -181,8 +187,12 @@ function ChartPreview() {
     emitter.on(EVENTS.EXPORT_TO_PDF, () => {
       generateImage({ type: 'png', pdf: true });
     });
-    emitter.on(EVENTS.EMBED_STATIC_IMAGE, () => {
-      generateImage({ type: 'png', upload: true });
+    emitter.on(EVENTS.EMBED_STATIC_IMAGE, (event) => {
+      generateImage({
+        type: 'png',
+        upload: true,
+        embedId: (event as { embedId: string }).embedId,
+      });
     });
 
     return () => {
@@ -195,8 +205,12 @@ function ChartPreview() {
       emitter.off(EVENTS.EXPORT_TO_JPG, () => {
         generateImage({ type: 'jpeg' });
       });
-      emitter.off(EVENTS.EMBED_STATIC_IMAGE, () => {
-        generateImage({ type: 'png', upload: true });
+      emitter.on(EVENTS.EMBED_STATIC_IMAGE, (event) => {
+        generateImage({
+          type: 'png',
+          upload: true,
+          embedId: (event as { embedId: string }).embedId,
+        });
       });
     };
   }, [generateImage]);

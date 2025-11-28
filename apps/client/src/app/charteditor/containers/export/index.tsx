@@ -95,13 +95,18 @@ function ExportChart() {
   }, [savingChanges]);
 
   const uploadStaticImage = useCallback(
-    (event: any) => {
-      uploadEmbeddableStaticImage(event, chart_id as string, {
-        id: toastrIdRef.current,
-        success: <b>Link Generated!</b>,
-        apiError: <b>Oops, try again later.</b>,
-        loginError: <b>User not logged in!</b>,
-        error: <b>Link already generated!</b>,
+    (event: unknown) => {
+      uploadEmbeddableStaticImage({
+        event: event as { uri: string },
+        chartId: chart_id as string,
+        toastrConfig: {
+          id: toastrIdRef.current,
+          success: <b>Link Generated!</b>,
+          apiError: <b>Oops, try again later.</b>,
+          loginError: <b>User not logged in!</b>,
+          error: <b>Link already generated!</b>,
+        },
+        embedId: (event as { embedId: string }).embedId,
       });
     },
     [uploadEmbeddableStaticImage, chart_id]
@@ -210,6 +215,7 @@ function ExportChart() {
         redirectToLoginPage,
         chart_id,
         linkType: EMBEDDABLES.STATIC_IMAGE,
+        toastrIdRef,
       },
       {
         label: 'Generate Interactive Frame',
@@ -232,6 +238,7 @@ function ExportChart() {
         redirectToLoginPage,
         chart_id,
         linkType: EMBEDDABLES.DYNAMIC_IFRAME,
+        toastrIdRef,
       },
     ];
   }, [

@@ -15,24 +15,31 @@ function useEmbedCharts() {
   });
 
   const uploadEmbeddableStaticImage = useCallback(
-    async (
-      event: any,
-      chart_id: string,
+    async (params: {
+      event: { uri: string };
+      embedId: string;
+      chartId: string;
       toastrConfig: {
         id: string;
         success: ValueOrFunction<Renderable, Toast>;
         loginError: ValueOrFunction<Renderable, Toast>;
         apiError: ValueOrFunction<Renderable, Toast>;
         error: ValueOrFunction<Renderable, Toast>;
-      }
-    ) => {
-      setSavingChanges((prev: any) => ({ ...prev, staticImage: true }));
+      };
+    }) => {
+      const { event, embedId, chartId, toastrConfig } = params;
+
+      setSavingChanges((prev: { staticImage: boolean; iframe: boolean }) => ({
+        ...prev,
+        staticImage: true,
+      }));
+
       const { id, success, apiError, loginError, error } = toastrConfig;
       try {
         const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
         if (!userId) {
           throw new Error('User not logged in.');
-        } else if (!chart_id) {
+        } else if (!chartId) {
           throw new Error(
             'Chart not saved. Please save chart once or load any saved chart.'
           );
@@ -41,9 +48,16 @@ function useEmbedCharts() {
         const formData = new FormData();
         formData.append('file', base64ToFile(event.uri));
         formData.append('type', EMBEDDABLES.STATIC_IMAGE);
-        formData.append('chartId', chart_id);
-        formData.append('createdBy', userId);
-        formData.append('createdDate', new Date().toISOString());
+        formData.append('chartId', chartId);
+
+        if (!embedId) {
+          formData.append('createdBy', userId);
+          formData.append('createdDate', new Date().toISOString());
+        } else {
+          formData.append('id', embedId.split('?')[0]);
+          formData.append('updatedBy', userId);
+          formData.append('updatedDate', new Date().toISOString());
+        }
 
         const response = await axios.put(
           `${API_ENDPOINTS.USER_CHARTS_EMBED}`,
@@ -57,8 +71,8 @@ function useEmbedCharts() {
         setAllEmbedChartData((prev: any) => {
           return {
             ...prev,
-            [`${chart_id}`]: {
-              ...prev[chart_id],
+            [`${chartId}`]: {
+              ...prev[chartId],
               'static-image': response['data']['static-image'],
             },
           };
@@ -83,7 +97,10 @@ function useEmbedCharts() {
           id: id,
         });
       } finally {
-        setSavingChanges((prev: any) => ({ ...prev, staticImage: false }));
+        setSavingChanges((prev: { staticImage: boolean; iframe: boolean }) => ({
+          ...prev,
+          staticImage: false,
+        }));
       }
     },
     [setAllEmbedChartData]
