@@ -14,6 +14,7 @@ export const TABLE_NAME = Object.freeze({
 
 export enum SERVER_ERROR_MESSAGES {
   INTERNAL_SERVER_ERROR = 'Internal server error.',
+  FORRBIDDEN_ERROR = 'Access to the resource if either revoked or expired.',
 }
 
 export const POSTGRES_ERROR_CODES = Object.freeze({

@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   HttpStatus,
   Inject,
   Injectable,
@@ -466,16 +467,34 @@ export class ChartService {
 
   async getEmbeddedStaticImage(id: string, userId: string) {
     try {
-      const query = `SELECT version_number FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}' and id = '${id}';`;
+      const query = `SELECT version_number, expiration_date FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}' and id = '${id}';`;
       const result = await this.db.execute(query);
+      const expiryDate = new Date(`${result[0].expiration_date}`);
+      expiryDate.setDate(expiryDate.getDate() + 1);
+
+      if (new Date() > expiryDate) {
+        throw new Error('User access expired!');
+      }
+
       const encodedPath = base64UrlEncode(`user-${userId}/${id}.png`);
+
+      await this.db.execute(
+        `UPDATE ${
+          TABLE_NAME.EMBEDDED_CHARTS
+        } SET last_accessed='${new Date().toISOString()}' WHERE created_by = '${userId}' and id = '${id}';`
+      );
 
       return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].version_number}`;
     } catch (error) {
       console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
-      throw new InternalServerErrorException(
-        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-      );
+
+      if (`${error}`.includes('User access expired!')) {
+        throw new ForbiddenException(SERVER_ERROR_MESSAGES.FORRBIDDEN_ERROR);
+      } else {
+        throw new InternalServerErrorException(
+          SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 
