@@ -28,7 +28,7 @@ function ChartTemplates(props: IChartTemplates) {
           >
             <img
               className="w-full h-full object-cover rounded-md"
-              src={`${API_ENDPOINTS.CHART_TEMPLATE}/thumbnail/${chart['thumbnail']}?v=${chart['version_number']}`}
+              src={`${API_ENDPOINTS.CHART_TEMPLATE}/thumbnail/${chart['thumbnail']}?v=${chart['versionNumber']}`}
               alt={chart['name']}
               onError={handleImgError}
               loading="lazy"

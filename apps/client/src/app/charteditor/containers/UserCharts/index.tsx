@@ -99,14 +99,14 @@ function ViewMyCharts(props: IViewMyCharts) {
                   >
                     <td className="px-6 py-4">{chart['title']}</td>
                     <td className="px-6 py-4">
-                      {capitalizeFirstLetter(chart['chart_type'])}
+                      {capitalizeFirstLetter(chart['chartType'])}
                     </td>
                     <td className="px-6 py-4">
-                      {generateLocaleDateString(chart['created_date'])}
+                      {generateLocaleDateString(chart['createdDate'])}
                     </td>
                     <td className="px-6 py-4">
-                      {chart['updated_date']
-                        ? generateLocaleDateString(chart['updated_date'])
+                      {chart['updatedDate']
+                        ? generateLocaleDateString(chart['updatedDate'])
                         : '-'}
                     </td>
                     <td className="px-6 py-4">

@@ -14,6 +14,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { base64UrlEncode } from '../lib/lib';
 import { DRIZZLE_PROVIDER } from '../db/db.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import {
+  chartBaseConfig,
+  chartFeatures,
+  chartTemplates,
+  userCharts,
+} from '../db/db.schema';
+import { eq } from 'drizzle-orm';
 
 const {
   CHART_TEMPLATE_THUMBNAILS,
@@ -41,21 +48,26 @@ export class ChartService {
     try {
       const { id, name, config, type } = params;
       const thumbnail = name.toLocaleLowerCase().split(' ').join('_');
-      let query = '';
 
       if (id) {
-        query = `UPDATE ${TABLE_NAME.CHART_TEMPLATES} SET name = '${name}', config='${config}', thumbnail='${thumbnail}' where id = '${id}';`;
-      } else {
-        query = `INSERT INTO ${TABLE_NAME.CHART_TEMPLATES} (name, config, type, thumbnail) VALUES ('${name}', '${config}', '${type}', '${type}');`;
+        await this.db
+          .update(chartTemplates)
+          .set({
+            name: name,
+            config: config,
+            thumbnail: thumbnail,
+          })
+          .where(eq(chartTemplates.id, id));
+        return { status: HttpStatus.OK, message: 'Template data updated.' };
       }
 
-      if (query) {
-        await this.db.execute(query);
-        return id
-          ? { status: HttpStatus.NO_CONTENT, message: 'Template data updated.' }
-          : { status: HttpStatus.CREATED, message: 'Template created.' };
-      }
-      return;
+      await this.db.insert(chartTemplates).values({
+        name: name,
+        config: config,
+        type: type as 'bar' | 'line' | 'area' | 'column',
+        thumbnail: thumbnail,
+      });
+      return { status: HttpStatus.CREATED, message: 'Template created.' };
     } catch (error: any) {
       console.error("Error in 'saveChartTemplate' service: ", error);
       this.dbService.validatePostgresError(error);
@@ -67,11 +79,16 @@ export class ChartService {
 
   async getChartTemplates() {
     try {
-      const items = await this.db.execute(
-        `SELECT id, name, type, config, thumbnail, version_number FROM ${TABLE_NAME.CHART_TEMPLATES};`
-      );
-
-      return items;
+      return await this.db
+        .select({
+          id: chartTemplates.id,
+          name: chartTemplates.name,
+          type: chartTemplates.type,
+          config: chartTemplates.config,
+          thumbnail: chartTemplates.thumbnail,
+          versionNumber: chartTemplates.versionNumber,
+        })
+        .from(chartTemplates);
     } catch (error) {
       console.error("Error in 'getChartTemplates' service: ", error);
       throw new InternalServerErrorException(
@@ -82,9 +99,7 @@ export class ChartService {
 
   async deleteChartTemplate(id: string) {
     try {
-      await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.CHART_TEMPLATES} WHERE id='${id}';`
-      );
+      await this.db.delete(chartTemplates).where(eq(chartTemplates.id, id));
 
       return { status: HttpStatus.NO_CONTENT, message: 'Template deleted.' };
     } catch (error) {
@@ -125,24 +140,27 @@ export class ChartService {
   }) {
     try {
       const { id, type, config } = params;
-      let query = '';
 
       if (id) {
-        query = `UPDATE ${TABLE_NAME.CHART_BASE_CONFIG} SET type = '${type}', config='${config}' where id = '${id}';`;
-      } else {
-        query = `INSERT INTO ${TABLE_NAME.CHART_BASE_CONFIG} (type, config) VALUES ('${type}', '${config}');`;
+        await this.db
+          .update(chartBaseConfig)
+          .set({
+            type: type as 'bar' | 'line' | 'area' | 'column',
+            config: config,
+          })
+          .where(eq(chartBaseConfig.id, id));
+        return {
+          status: HttpStatus.OK,
+          message: 'Base config data updated.',
+        };
       }
 
-      if (query) {
-        await this.db.execute(query);
-        return id
-          ? {
-              status: HttpStatus.NO_CONTENT,
-              message: 'Base config data updated.',
-            }
-          : { status: HttpStatus.CREATED, message: 'Base config created.' };
-      }
-      throw new Error('Query not generated!');
+      await this.db.insert(chartBaseConfig).values({
+        type: type as 'bar' | 'line' | 'area' | 'column',
+        config: config,
+      });
+
+      return { status: HttpStatus.CREATED, message: 'Base config created.' };
     } catch (error: any) {
       console.error("Error in 'saveChartBaseConfigTemplate' service: ", error);
       this.dbService.validatePostgresError(error);
@@ -154,11 +172,13 @@ export class ChartService {
 
   async getChartBaseConfigTemplates() {
     try {
-      const items = await this.db.execute(
-        `SELECT id, type, config FROM ${TABLE_NAME.CHART_BASE_CONFIG};`
-      );
-
-      return items;
+      return await this.db
+        .select({
+          id: chartBaseConfig.id,
+          type: chartBaseConfig.type,
+          config: chartBaseConfig.config,
+        })
+        .from(chartBaseConfig);
     } catch (error) {
       console.error("Error in 'getChartBaseConfigTemplate' service: ", error);
       throw new InternalServerErrorException(
@@ -169,9 +189,7 @@ export class ChartService {
 
   async deleteChartBaseConfigTemplate(id: string) {
     try {
-      await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.CHART_BASE_CONFIG} WHERE id='${id}';`
-      );
+      await this.db.delete(chartBaseConfig).where(eq(chartBaseConfig.id, id));
 
       return { status: HttpStatus.NO_CONTENT, message: 'Base config deleted.' };
     } catch (error) {
@@ -194,24 +212,27 @@ export class ChartService {
   }) {
     try {
       const { id, type, config } = params;
-      let query = '';
 
       if (id) {
-        query = `UPDATE ${TABLE_NAME.CHART_FEATURE} SET type = '${type}', config='${config}' where id = '${id}';`;
-      } else {
-        query = `INSERT INTO ${TABLE_NAME.CHART_FEATURE} (type, config) VALUES ('${type}', '${config}');`;
+        await this.db
+          .update(chartFeatures)
+          .set({
+            type: type as 'bar' | 'line' | 'area' | 'column',
+            config: config,
+          })
+          .where(eq(chartFeatures.id, id));
+        return {
+          status: HttpStatus.OK,
+          message: 'Chart feature data updated.',
+        };
       }
 
-      if (query) {
-        await this.db.execute(query);
-        return id
-          ? {
-              status: HttpStatus.NO_CONTENT,
-              message: 'Chart features data updated.',
-            }
-          : { status: HttpStatus.CREATED, message: 'Chart feature added.' };
-      }
-      throw new Error('Query not generated!');
+      await this.db.insert(chartFeatures).values({
+        type: type as 'bar' | 'line' | 'area' | 'column',
+        config: config,
+      });
+
+      return { status: HttpStatus.CREATED, message: 'Chart feature created.' };
     } catch (error: any) {
       console.error("Error in 'saveChartFeatureData' service: ", error);
       this.dbService.validatePostgresError(error);
@@ -223,11 +244,13 @@ export class ChartService {
 
   async getAllChartFeatures() {
     try {
-      const items = await this.db.execute(
-        `SELECT id, type, config FROM ${TABLE_NAME.CHART_FEATURE};`
-      );
-
-      return items;
+      return await this.db
+        .select({
+          id: chartFeatures.id,
+          type: chartFeatures.type,
+          config: chartFeatures.config,
+        })
+        .from(chartFeatures);
     } catch (error) {
       console.error("Error in 'getAllChartFeatures' service: ", error);
       throw new InternalServerErrorException(
@@ -238,9 +261,7 @@ export class ChartService {
 
   async deleteChartFeatureData(id: string) {
     try {
-      await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.CHART_FEATURE} WHERE id='${id}';`
-      );
+      await this.db.delete(chartFeatures).where(eq(chartFeatures.id, id));
 
       return {
         status: HttpStatus.NO_CONTENT,
@@ -280,23 +301,41 @@ export class ChartService {
         updatedDate,
       } = params;
 
-      let query = `INSERT INTO ${TABLE_NAME.USER_CHARTS} (title, config, chart_type, thumbnail, created_by, created_date) VALUES ('${title}', '${config}', '${chartType}', '${thumbnail}', '${createdBy}', '${createdDate}') RETURNING *;`;
-
       if (id) {
-        query = `UPDATE ${TABLE_NAME.USER_CHARTS} SET title = '${title}', config='${config}', updated_by='${updatedBy}', updated_date='${updatedDate}' where id = '${id}' RETURNING *;`;
+        await this.db
+          .update(userCharts)
+          .set({
+            title,
+            config,
+            updatedBy,
+            updatedDate,
+          })
+          .where(eq(userCharts.id, id));
+        return {
+          status: HttpStatus.OK,
+          message: 'User chart updated.',
+        };
       }
 
-      if (query) {
-        const result = await this.db.execute(query);
-        return id
-          ? { status: HttpStatus.NO_CONTENT, message: 'User chart updated.' }
-          : {
-              status: HttpStatus.CREATED,
-              message: 'User chart created.',
-              id: (result as any).id,
-            };
-      }
-      throw new Error('Query not generated!');
+      const res = await this.db
+        .insert(userCharts)
+        .values({
+          title: title,
+          config: config,
+          chartType: chartType as 'bar' | 'line' | 'area' | 'column',
+          createdBy: `${createdBy}`,
+          createdDate: `${createdDate}`,
+          thumbnail: thumbnail,
+        })
+        .returning({
+          id: userCharts.id,
+        });
+
+      return {
+        status: HttpStatus.CREATED,
+        message: 'User chart saved.',
+        id: res[0].id,
+      };
     } catch (error: any) {
       console.error("Error in 'saveUserChart' service: ", error);
       throw new InternalServerErrorException(
@@ -307,11 +346,16 @@ export class ChartService {
 
   async getUserChartById(id: string) {
     try {
-      const items = await this.db.execute(
-        `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
-      );
-
-      return items ? items : {};
+      return await this.db
+        .select({
+          id: userCharts.id,
+          title: userCharts.title,
+          config: userCharts.config,
+          chartType: userCharts.chartType,
+          thumbnail: userCharts.thumbnail,
+        })
+        .from(userCharts)
+        .where(eq(userCharts.id, id));
     } catch (error) {
       console.error("Error in 'getUserChartById' service: ", error);
       throw new InternalServerErrorException(
@@ -320,13 +364,19 @@ export class ChartService {
     }
   }
 
-  async getAllUserCharts(user_id: string) {
+  async getAllUserCharts(userId: string) {
     try {
-      const items = await this.db.execute(
-        `SELECT id, title, chart_type, created_date, updated_date, version_number FROM ${TABLE_NAME.USER_CHARTS} WHERE created_by = '${user_id}';`
-      );
-
-      return items;
+      return await this.db
+        .select({
+          id: userCharts.id,
+          title: userCharts.title,
+          chartType: userCharts.chartType,
+          createdDate: userCharts.createdDate,
+          updatedDate: userCharts.updatedDate,
+          versionNumber: userCharts.versionNumber,
+        })
+        .from(userCharts)
+        .where(eq(userCharts.createdBy, userId));
     } catch (error) {
       console.error("Error in 'getAllUserCharts' service: ", error);
       throw new InternalServerErrorException(
@@ -337,9 +387,7 @@ export class ChartService {
 
   async deleteUserChart(id: string) {
     try {
-      await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
-      );
+      await this.db.delete(userCharts).where(eq(userCharts.id, id));
       return { status: HttpStatus.NO_CONTENT, message: 'User chart deleted.' };
     } catch (error) {
       console.error("Error in 'deleteUserChart' service: ", error);

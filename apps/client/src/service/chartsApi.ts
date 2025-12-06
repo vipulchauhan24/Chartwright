@@ -58,7 +58,7 @@ export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
     const userChart = response.data;
     const chartFeatures = get(allChartFeatures);
     for (const idx in chartFeatures) {
-      if (userChart['chart_type'] === chartFeatures[idx]['type']) {
+      if (userChart['chartType'] === chartFeatures[idx]['type']) {
         set(activeChartFeatures, chartFeatures[idx]['config']);
         break;
       }
@@ -66,7 +66,7 @@ export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
 
     set(activeChartConfig, userChart['config']);
     set(chartTitle, userChart['title']);
-    set(chartType, userChart['chart_type']);
+    set(chartType, userChart['chartType']);
     set(chartId, userChart['id']);
   } catch (error) {
     console.error('Error in "fetchUserChartById":', error);

@@ -166,9 +166,9 @@ export class ChartsController {
     @Res({ passthrough: true }) res: Response
   ) {
     const chart = await this.chartService.getUserChartById(id);
-    res.status(chart.id ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    res.status(chart[0].id ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 
-    return chart.id ? chart : `Chart not found!`;
+    return chart[0].id ? chart[0] : `Chart not found!`;
   }
 
   @Get('user-chart/all/:user_id')
