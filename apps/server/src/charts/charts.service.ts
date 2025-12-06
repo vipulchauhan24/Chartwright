@@ -18,6 +18,7 @@ import {
   chartBaseConfig,
   chartFeatures,
   chartTemplates,
+  embeddedCharts,
   userCharts,
 } from '../db/db.schema';
 import { eq } from 'drizzle-orm';
@@ -101,7 +102,7 @@ export class ChartService {
     try {
       await this.db.delete(chartTemplates).where(eq(chartTemplates.id, id));
 
-      return { status: HttpStatus.NO_CONTENT, message: 'Template deleted.' };
+      return { status: HttpStatus.OK, message: 'Template deleted.' };
     } catch (error) {
       console.error("Error in 'deleteChartTemplate' service: ", error);
       throw new InternalServerErrorException(
@@ -191,7 +192,7 @@ export class ChartService {
     try {
       await this.db.delete(chartBaseConfig).where(eq(chartBaseConfig.id, id));
 
-      return { status: HttpStatus.NO_CONTENT, message: 'Base config deleted.' };
+      return { status: HttpStatus.OK, message: 'Base config deleted.' };
     } catch (error) {
       console.error(
         "Error in 'deleteChartBaseConfigTemplate' service: ",
@@ -264,7 +265,7 @@ export class ChartService {
       await this.db.delete(chartFeatures).where(eq(chartFeatures.id, id));
 
       return {
-        status: HttpStatus.NO_CONTENT,
+        status: HttpStatus.OK,
         message: 'Chart features info deleted.',
       };
     } catch (error) {
@@ -388,7 +389,7 @@ export class ChartService {
   async deleteUserChart(id: string) {
     try {
       await this.db.delete(userCharts).where(eq(userCharts.id, id));
-      return { status: HttpStatus.NO_CONTENT, message: 'User chart deleted.' };
+      return { status: HttpStatus.OK, message: 'User chart deleted.' };
     } catch (error) {
       console.error("Error in 'deleteUserChart' service: ", error);
       throw new InternalServerErrorException(
@@ -414,21 +415,27 @@ export class ChartService {
         id = uuidv4();
       }
 
-      let query = '';
-
-      if (updatedDate) {
-        query = `UPDATE ${TABLE_NAME.EMBEDDED_CHARTS} SET updated_by='${updatedBy}', updated_date='${updatedDate}' where id='${id}';`;
-      } else if (createdDate) {
-        const expirationDate = new Date(createdDate);
-        expirationDate.setFullYear(expirationDate.getFullYear() + 1);
-
-        query = `INSERT INTO ${
-          TABLE_NAME.EMBEDDED_CHARTS
-        } (id, type, chart_id, created_by, created_date, expiration_date) VALUES ('${id}', '${type}', '${chartId}', '${createdBy}', '${createdDate}', '${expirationDate.toISOString()}');`;
-      }
-
       await this.db.transaction(async (tx) => {
-        await tx.execute(query);
+        if (updatedDate) {
+          await tx
+            .update(embeddedCharts)
+            .set({
+              updatedBy: updatedBy,
+              updatedDate: updatedDate,
+            })
+            .where(eq(embeddedCharts.id, id));
+        } else if (createdDate) {
+          const expirationDate = new Date(createdDate);
+          expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+          await tx.insert(embeddedCharts).values({
+            id: id,
+            type: type,
+            chartId: chartId,
+            createdBy: createdBy as string,
+            createdDate: createdDate,
+            expirationDate: expirationDate.toISOString(),
+          });
+        }
         if (type == EMBEDDABLES.STATIC_IMAGE) {
           try {
             const s3UploadRes = await this.s3ORM.putObject({
@@ -452,9 +459,7 @@ export class ChartService {
       switch (type) {
         case EMBEDDABLES.STATIC_IMAGE:
           return {
-            'static-image': `http://localhost:3000/api/embed/${
-              EMBEDDABLES.STATIC_IMAGE
-            }/${id}?userId=${createdBy || updatedBy}`,
+            'static-image': `${EMBEDDABLES.STATIC_IMAGE}/${id}`,
           };
 
         default:
@@ -471,8 +476,15 @@ export class ChartService {
 
   async getAllEmbeddedDataByUserId(userId: string) {
     try {
-      const query = `SELECT id, type, chart_id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}';`;
-      const result = await this.db.execute(query);
+      const result = await this.db
+        .select({
+          id: embeddedCharts.id,
+          type: embeddedCharts.type,
+          chartId: embeddedCharts.chartId,
+        })
+        .from(embeddedCharts)
+        .where(eq(embeddedCharts.createdBy, userId));
+
       const response: {
         [key: string]: {
           'static-image': string;
@@ -482,18 +494,18 @@ export class ChartService {
 
       if (Array.isArray(result)) {
         result.forEach((chartData) => {
-          const { type, id, chart_id } = chartData;
+          const { type, id, chartId } = chartData;
 
-          response[`${chart_id}`] = {
+          response[chartId] = {
             'static-image': '',
             'dynamic-iframe': '',
           };
 
           switch (type) {
             case EMBEDDABLES.STATIC_IMAGE:
-              response[`${chart_id}`][
+              response[chartId][
                 EMBEDDABLES.STATIC_IMAGE
-              ] = `http://localhost:3000/api/embed/${EMBEDDABLES.STATIC_IMAGE}/${id}?userId=${userId}`; // Enable API gateway to this API.
+              ] = `${EMBEDDABLES.STATIC_IMAGE}/${id}`; // Enable API gateway to this API.
               break;
 
             default:
@@ -511,28 +523,34 @@ export class ChartService {
     }
   }
 
-  async getEmbeddedStaticImage(id: string, userId: string) {
+  async getEmbeddedStaticImage(id: string) {
     try {
-      const query = `SELECT version_number, expiration_date FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}' and id = '${id}';`;
-      const result = await this.db.execute(query);
-      const expiryDate = new Date(`${(result as any).expiration_date}`);
+      const result = await this.db
+        .select({
+          versionNumber: embeddedCharts.versionNumber,
+          expirationDate: embeddedCharts.expirationDate,
+          userId: embeddedCharts.createdBy,
+        })
+        .from(embeddedCharts)
+        .where(eq(embeddedCharts.id, id));
+
+      const expiryDate = new Date(`${result[0].expirationDate}`);
       expiryDate.setDate(expiryDate.getDate() + 1);
 
       if (new Date() > expiryDate) {
         throw new Error('User access expired!');
       }
 
-      const encodedPath = base64UrlEncode(`user-${userId}/${id}.png`);
+      const encodedPath = base64UrlEncode(`user-${result[0].userId}/${id}.png`);
 
-      await this.db.execute(
-        `UPDATE ${
-          TABLE_NAME.EMBEDDED_CHARTS
-        } SET last_accessed='${new Date().toISOString()}' WHERE created_by = '${userId}' and id = '${id}';`
-      );
+      await this.db
+        .update(embeddedCharts)
+        .set({
+          lastAccessed: new Date().toISOString(),
+        })
+        .where(eq(embeddedCharts.id, id));
 
-      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${
-        (result as any).version_number
-      }`;
+      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].versionNumber}`;
     } catch (error) {
       console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
 
@@ -546,7 +564,7 @@ export class ChartService {
     }
   }
 
-  async deleteEmbedChartByChartIdAndType(id: string, userId: string) {
+  async deleteEmbedChartById(id: string, userId: string) {
     try {
       const s3DeleteRes = await this.s3ORM.deleteObject({
         key: `user-${userId}/${id}.png`,
@@ -557,12 +575,10 @@ export class ChartService {
         throw Error('S3 File delete failed.');
       }
 
-      await this.db.execute(
-        `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}' and created_by='${userId}';`
-      );
+      await this.db.delete(embeddedCharts).where(eq(embeddedCharts.id, id));
 
       return {
-        status: HttpStatus.NO_CONTENT,
+        status: HttpStatus.OK,
         message: 'Embedded chart link deleted.',
       };
     } catch (error) {

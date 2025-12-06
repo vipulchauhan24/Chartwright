@@ -208,10 +208,9 @@ export class ChartsController {
   @Get(`embed/${EMBEDDABLES.STATIC_IMAGE}/:id`)
   async getEmbeddedStaticImage(
     @Param('id') id: string,
-    @Query('userId') userId: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const url = await this.chartService.getEmbeddedStaticImage(id, userId);
+    const url = await this.chartService.getEmbeddedStaticImage(id);
 
     if (!url || !url.length) {
       throw new NotFoundException('Embedable data not found!');
@@ -221,11 +220,11 @@ export class ChartsController {
   }
 
   @Delete('embed/:id')
-  async deleteEmbedChartByChartIdAndType(
+  async deleteEmbedChartById(
     @Param('id') id: string,
     @Query('userId') userId: string
   ) {
-    return this.chartService.deleteEmbedChartByChartIdAndType(id, userId);
+    return this.chartService.deleteEmbedChartById(id, userId);
   }
 
   // others

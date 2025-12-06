@@ -191,7 +191,7 @@ function ChartPreview() {
       generateImage({
         type: 'png',
         upload: true,
-        embedId: (event as { embedId: string }).embedId,
+        embedId: (event as { embedId: string })?.embedId,
       });
     });
 
