@@ -1,73 +1,113 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  CognitoIdentityClient,
-  GetIdCommand,
-  GetCredentialsForIdentityCommand,
-} from '@aws-sdk/client-cognito-identity';
-import { SERVER_ERROR_MESSAGES, TABLE_NAME } from '../lib/constants';
-
-const identityPoolId = 'ap-south-1:19fd0fac-1d23-4626-a81d-83f3594fbc9d'; // Replace with your Identity Pool ID
-const region = 'ap-south-1'; // Replace with your AWS region
+import { SERVER_ERROR_MESSAGES } from '../lib/constants';
+import { subscriptionPlans, users, userSubscriptions } from '../db/db.schema';
+import { DRIZZLE_PROVIDER } from '../db/db.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject('DATABASE_CONNECTION') private db: any) {}
+  constructor(
+    @Inject(DRIZZLE_PROVIDER)
+    private db: NodePgDatabase
+  ) {}
 
-  async signinAsGuest() {
-    try {
-      const client = new CognitoIdentityClient({ region });
-
-      // Step 1: Get an Identity ID for the guest user
-      const getIdCommand = new GetIdCommand({ IdentityPoolId: identityPoolId });
-      const identityResponse = await client.send(getIdCommand);
-      const identityId = identityResponse.IdentityId;
-
-      // Step 2: Get temporary AWS credentials
-      const getCredentialsCommand = new GetCredentialsForIdentityCommand({
-        IdentityId: identityId,
-      });
-      const credentialsResponse = await client.send(getCredentialsCommand);
-
-      return credentialsResponse.Credentials;
-    } catch (error) {
-      console.error('Guest sign-in error:', error);
-      throw new HttpException(
-        SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  async signinAsUser(params: {
+  async login(params: {
     email: string;
-    cognito_id: string;
-    created_date: string;
+    cognitoId: string;
+    createdDate: string;
   }) {
     try {
-      const { email, cognito_id, created_date } = params;
-      const users = await this.db.execute(
-        `SELECT id, email, super_user, user_name, user_privileges FROM ${TABLE_NAME.USERS} WHERE cognito_id = '${cognito_id}';`
-      );
+      const { email, cognitoId, createdDate } = params;
 
-      if (users.length) {
-        // let billingDetails = await this.db.execute(
-        //   `SELECT * FROM ${TABLE_NAME.BILLING} WHERE user_id = '${user[0].id}';`
-        // );
-        // if (!billingDetails || !billingDetails.length) {
-        //   billingDetails = await this.db.execute(
-        //     `INSERT INTO ${TABLE_NAME.BILLING} (user_id, plan, status, created_date) VALUES ('${user[0].id}', 'free', 'active', '${created_date}');`
-        //   );
-        // }
-        return { status: HttpStatus.OK, userData: users[0] };
+      const userDetails = await this.db
+        .select({
+          id: users.id,
+          userName: users.userName,
+          email: users.email,
+          superUser: users.superUser,
+          userPrivileges: users.userPrivileges,
+          userStatus: userSubscriptions.userStatus,
+          userPlan: subscriptionPlans.userPlan,
+        })
+        .from(users)
+        .fullJoin(userSubscriptions, eq(users.id, userSubscriptions.userId))
+        .fullJoin(
+          subscriptionPlans,
+          eq(userSubscriptions.planId, subscriptionPlans.id)
+        );
+
+      const userData = userDetails[0]; //TBD - strict type def.
+
+      if (userData?.id) {
+        return { status: HttpStatus.OK, userData: userData };
       }
 
-      const result = await this.db.execute(
-        `INSERT INTO ${TABLE_NAME.USERS} (user_name, email, cognito_id, created_date) VALUES ('${email}', '${email}', '${cognito_id}', '${created_date}') Returning (id, email, super_user, user_name, user_privileges);`
-      );
+      let result: {
+        id: string;
+        userName: string;
+        email: string;
+        superUser: boolean | null;
+        userPrivileges: (
+          | 'exports_embed_image_5'
+          | 'exports_embed_image_unlimited'
+          | 'exports_embed_iframe_5'
+          | 'exports_embed_iframe_unlimited'
+          | 'save_as_pdf_unlimited'
+          | 'save_as_image_unlimited'
+          | 'save_charts_10'
+          | 'save_charts_unlimited'
+        )[];
+      }[] = [];
 
-      return { status: HttpStatus.CREATED, userData: result[0] };
+      await this.db.transaction(async (tx) => {
+        tx.insert(users).values({
+          userName: email,
+          email: email,
+          cognitoId: cognitoId,
+          createdDate: createdDate,
+        });
+        result = await tx
+          .insert(users)
+          .values({
+            userName: email,
+            email: email,
+            cognitoId: cognitoId,
+            createdDate: createdDate,
+          })
+          .returning({
+            id: users.id,
+            userName: users.userName,
+            email: users.email,
+            superUser: users.superUser,
+            userPrivileges: users.userPrivileges,
+          });
+
+        const freeSubscriptionPlanDetails = await this.db
+          .select({ id: subscriptionPlans.id })
+          .from(subscriptionPlans)
+          .where(eq(subscriptionPlans.userPlan, 'FREE')); // default subscription on signup.
+
+        if (!freeSubscriptionPlanDetails.length) {
+          throw new Error('Subscription plan not found!');
+        }
+
+        await tx.insert(userSubscriptions).values({
+          userId: result[0].id,
+          planId: freeSubscriptionPlanDetails[0].id,
+          createdDate: createdDate,
+        });
+      });
+
+      if (!result.length) {
+        throw new Error('Save failed!');
+      }
+      return {
+        status: HttpStatus.CREATED,
+        userData: { ...result[0], userStatus: 'ACTIVE', userPlan: 'FREE' },
+      };
     } catch (error) {
-      console.error('User sign-in error:', error);
+      console.error('User login error:', error);
       throw new HttpException(
         SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR

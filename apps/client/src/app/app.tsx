@@ -26,8 +26,8 @@ export function App() {
     try {
       const loginPayload = {
         email: user.profile.email,
-        cognito_id: user.profile.sub,
-        created_date: new Date().toISOString(),
+        cognitoId: user.profile.sub,
+        createdDate: new Date().toISOString(),
       };
       const { userLogin } = await import('../service/userAPI');
       await userLogin(loginPayload);

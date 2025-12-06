@@ -16,18 +16,13 @@ import { type Response } from 'express';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/guest-signin')
-  signinAsGuest() {
-    return this.authService.signinAsGuest();
-  }
-
-  @Put('/user-signin')
+  @Put('/login')
   @UsePipes(ValidationPipe)
-  async signinAsUser(
+  async login(
     @Body() userLoginReqBody: UserLoginDTO,
     @Res({ passthrough: true }) res: Response
   ) {
-    const response = await this.authService.signinAsUser(userLoginReqBody);
+    const response = await this.authService.login(userLoginReqBody);
 
     res.status(response?.status as HttpStatus);
 

@@ -11,9 +11,9 @@ import { Readable } from 'stream';
 import { EMBEDDABLES, EmbedChartDTO } from './validations/embedChart.dto';
 import { DBService } from '../db/db.service';
 import { v4 as uuidv4 } from 'uuid';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
 import { base64UrlEncode } from '../lib/lib';
+import { DRIZZLE_PROVIDER } from '../db/db.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 const {
   CHART_TEMPLATE_THUMBNAILS,
@@ -24,10 +24,8 @@ const {
 @Injectable()
 export class ChartService {
   constructor(
-    @Inject('DATABASE_CONNECTION')
-    private db: PostgresJsDatabase<Record<string, never>> & {
-      $client: postgres.Sql;
-    },
+    @Inject(DRIZZLE_PROVIDER)
+    private db: NodePgDatabase,
     private dbService: DBService,
     private s3ORM: S3ORM
   ) {}
@@ -295,7 +293,7 @@ export class ChartService {
           : {
               status: HttpStatus.CREATED,
               message: 'User chart created.',
-              id: result[0].id,
+              id: (result as any).id,
             };
       }
       throw new Error('Query not generated!');
@@ -313,7 +311,7 @@ export class ChartService {
         `SELECT id, title, config, chart_type, thumbnail FROM ${TABLE_NAME.USER_CHARTS} WHERE id = '${id}';`
       );
 
-      return items.length ? items[0] : {};
+      return items ? items : {};
     } catch (error) {
       console.error("Error in 'getUserChartById' service: ", error);
       throw new InternalServerErrorException(
@@ -469,7 +467,7 @@ export class ChartService {
     try {
       const query = `SELECT version_number, expiration_date FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE created_by = '${userId}' and id = '${id}';`;
       const result = await this.db.execute(query);
-      const expiryDate = new Date(`${result[0].expiration_date}`);
+      const expiryDate = new Date(`${(result as any).expiration_date}`);
       expiryDate.setDate(expiryDate.getDate() + 1);
 
       if (new Date() > expiryDate) {
@@ -484,7 +482,9 @@ export class ChartService {
         } SET last_accessed='${new Date().toISOString()}' WHERE created_by = '${userId}' and id = '${id}';`
       );
 
-      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].version_number}`;
+      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${
+        (result as any).version_number
+      }`;
     } catch (error) {
       console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
 

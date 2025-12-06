@@ -7,10 +7,10 @@ export class UserLoginDTO {
 
   @IsString()
   @IsNotEmpty()
-  cognito_id!: string;
+  cognitoId!: string;
 
   @IsString()
   @IsNotEmpty()
   @IsDateString()
-  created_date!: string;
+  createdDate!: string;
 }

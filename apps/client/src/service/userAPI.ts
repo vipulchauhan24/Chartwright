@@ -4,10 +4,10 @@ import { LOCAL_STORAGE_KEYS } from '../app/charteditor/utils/constants';
 
 export const userLogin = async (loginPayload: {
   email: string | undefined;
-  cognito_id: string | undefined;
-  created_date: string;
+  cognitoId: string | undefined;
+  createdDate: string;
 }) => {
-  const response = await axios.put('/api/user-signin', loginPayload);
+  const response = await axios.put('/api/login', loginPayload);
   const userId = response.data.id;
   storeInLocalStorage(LOCAL_STORAGE_KEYS.USER_ID, userId);
 };
