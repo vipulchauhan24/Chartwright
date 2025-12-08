@@ -13,7 +13,6 @@ import {
   UseInterceptors,
   UploadedFile,
   NotFoundException,
-  Query,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
@@ -220,11 +219,8 @@ export class ChartsController {
   }
 
   @Delete('embed/:id')
-  async deleteEmbedChartById(
-    @Param('id') id: string,
-    @Query('userId') userId: string
-  ) {
-    return this.chartService.deleteEmbedChartById(id, userId);
+  async deleteEmbedChartById(@Param('id') id: string) {
+    return this.chartService.deleteEmbedChartById(id);
   }
 
   // others

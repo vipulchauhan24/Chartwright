@@ -1,5 +1,6 @@
 import {
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
@@ -52,7 +53,21 @@ export class S3ORM {
     return response;
   }
 
-  generatePreSignedURL(params: { urlToSign: string; dateLessThan: string }) {
+  async deleteManyObject(params: { keys: string[]; bucket: string }) {
+    const { keys, bucket } = params;
+
+    const response = await s3Client().send(
+      new DeleteObjectsCommand({
+        Bucket: bucket,
+        Delete: {
+          Objects: keys.map((k) => ({ Key: k })), // up to 1000 keys
+        },
+      })
+    );
+    return response;
+  }
+
+  generatePreSignedURL(params: { urlToSign: string; dateLessThan: number }) {
     const { urlToSign, dateLessThan } = params;
     const keyPairId = `${CF_KEYPAIR_ID}`;
     const privateKey = fs.readFileSync(`${CF_PRIVATE_KEY_PATH}`, 'utf8');

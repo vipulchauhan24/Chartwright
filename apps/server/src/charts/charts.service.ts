@@ -27,6 +27,7 @@ const {
   CHART_TEMPLATE_THUMBNAILS,
   USER_CHART_STATIC_IMAGES,
   USER_CHART_STATIC_IMAGES_DOMAIN,
+  S3_TTL,
 } = process.env;
 
 @Injectable()
@@ -388,7 +389,40 @@ export class ChartService {
 
   async deleteUserChart(id: string) {
     try {
+      // TODO: JWT Implementation
+      const embedCharts = await this.db
+        .select({
+          embedChartId: embeddedCharts.id,
+          userId: embeddedCharts.createdBy,
+        })
+        .from(embeddedCharts)
+        .where(eq(embeddedCharts.chartId, id));
+
+      if (embedCharts?.length) {
+        const keys = embedCharts.map(
+          (embedData: { embedChartId: string; userId: string }) => {
+            return `user-${embedData.userId}/${embedData.embedChartId}.png`;
+          }
+        );
+        const s3DeleteRes = await this.s3ORM.deleteManyObject({
+          keys: keys,
+          bucket: `${USER_CHART_STATIC_IMAGES}`,
+        });
+
+        if (
+          !s3DeleteRes ||
+          s3DeleteRes['$metadata']['httpStatusCode'] !== 200
+        ) {
+          throw Error('S3 File delete failed.');
+        }
+
+        await this.db
+          .delete(embeddedCharts)
+          .where(eq(embeddedCharts.chartId, id));
+      }
+
       await this.db.delete(userCharts).where(eq(userCharts.id, id));
+
       return { status: HttpStatus.OK, message: 'User chart deleted.' };
     } catch (error) {
       console.error("Error in 'deleteUserChart' service: ", error);
@@ -442,7 +476,9 @@ export class ChartService {
               key: `user-${createdBy || updatedBy}/${id}.png`,
               bucket: `${USER_CHART_STATIC_IMAGES}`,
               file,
-              cacheControl: 'public, max-age=31536000, immutable',
+              cacheControl: `public, max-age=${S3_TTL}, s-maxage=${
+                Number(S3_TTL) * 7
+              }, immutable`,
             });
             if (
               !s3UploadRes ||
@@ -534,6 +570,10 @@ export class ChartService {
         .from(embeddedCharts)
         .where(eq(embeddedCharts.id, id));
 
+      if (!result?.length) {
+        throw Error('Chart details not found!');
+      }
+
       const expiryDate = new Date(`${result[0].expirationDate}`);
       expiryDate.setDate(expiryDate.getDate() + 1);
 
@@ -550,7 +590,16 @@ export class ChartService {
         })
         .where(eq(embeddedCharts.id, id));
 
-      return `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].versionNumber}`;
+      const cdnURL = `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].versionNumber}`;
+
+      const expireTime = Math.floor((Date.now() + 24 * 60 * 60 * 1000) / 1000); // 24 hours.
+
+      const signedUrl = this.s3ORM.generatePreSignedURL({
+        urlToSign: cdnURL,
+        dateLessThan: expireTime,
+      });
+
+      return signedUrl;
     } catch (error) {
       console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
 
@@ -564,10 +613,22 @@ export class ChartService {
     }
   }
 
-  async deleteEmbedChartById(id: string, userId: string) {
+  async deleteEmbedChartById(id: string) {
     try {
+      // TODO: JWT Implementation
+      const embedCharts = await this.db
+        .select({
+          userId: embeddedCharts.createdBy,
+        })
+        .from(embeddedCharts)
+        .where(eq(embeddedCharts.id, id));
+
+      if (!embedCharts?.length) {
+        throw Error('Chart details not found!');
+      }
+
       const s3DeleteRes = await this.s3ORM.deleteObject({
-        key: `user-${userId}/${id}.png`,
+        key: `user-${embedCharts[0].userId}/${id}.png`,
         bucket: `${USER_CHART_STATIC_IMAGES}`,
       });
 
