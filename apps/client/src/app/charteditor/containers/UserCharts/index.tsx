@@ -3,13 +3,21 @@ import {
   CWSolidIconButton,
   CWSpinner,
   CWFullscreenLoading,
+  CWModal,
+  CWOutlineButton,
+  CWSolidLoadingButton,
 } from '@chartwright/ui-components';
 import { useAtom } from 'jotai';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { loadingMyCharts, userCharts } from '../../../../store/charts';
+import {
+  allEmbedChartDetails,
+  loadingMyCharts,
+  userCharts,
+} from '../../../../store/charts';
 import {
   capitalizeFirstLetter,
+  EMBEDDABLES,
   fetchFromLocalStorage,
   generateLocaleDateString,
 } from '../../utils/lib';
@@ -18,10 +26,11 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import { fetchAllUserCharts } from '../../../../service/chartsApi';
-interface IViewMyCharts {
+interface IUserCharts {
   toggleUserChartsView: (open: boolean) => void;
 }
-function ViewMyCharts(props: IViewMyCharts) {
+
+function UserCharts(props: IUserCharts) {
   const { toggleUserChartsView } = props;
   const navigate = useNavigate();
   const { chart_id } = useParams();
@@ -29,8 +38,13 @@ function ViewMyCharts(props: IViewMyCharts) {
   const [isLoading] = useAtom(loadingMyCharts);
   const [charts] = useAtom(userCharts);
   const [, fetchUserCharts] = useAtom(fetchAllUserCharts);
+  const [allEmbedChartData, setAllEmbedChartData] =
+    useAtom(allEmbedChartDetails);
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isChartEmbedded, setIsChartEmbedded] = useState<boolean>(false);
+
+  const deleteReqChartId = useRef<string>('');
 
   const loadUserChart = useCallback(
     (chartId: string) => {
@@ -41,9 +55,24 @@ function ViewMyCharts(props: IViewMyCharts) {
   );
 
   const deleteUserChart = useCallback(
-    async (chartId: string) => {
+    async (chartId: string, ingoreEmbedChart = false) => {
       try {
+        if (!chartId.length) {
+          toast.error('Oops! something went wrong.');
+          return;
+        }
         setIsDeleting(true);
+        const chartEmbedded = allEmbedChartData[chartId];
+
+        if (
+          (chartEmbedded[EMBEDDABLES.DYNAMIC_IFRAME]?.length ||
+            chartEmbedded[EMBEDDABLES.STATIC_IMAGE]?.length) &&
+          !ingoreEmbedChart
+        ) {
+          setIsChartEmbedded(true);
+          deleteReqChartId.current = chartId;
+          return;
+        }
         if (chart_id === chartId) {
           toast.error('Chart in edit mode cannot be deleted.');
           return;
@@ -53,6 +82,16 @@ function ViewMyCharts(props: IViewMyCharts) {
         if (userId) {
           fetchUserCharts(userId);
         }
+        setAllEmbedChartData((prev: any) => {
+          return {
+            ...prev,
+            [`${chart_id}`]: {
+              'dynamic-iframe': '',
+              'static-image': '',
+            },
+          };
+        });
+        setIsChartEmbedded(false);
       } catch (error) {
         console.log('Error deleting user chart: ', error);
         toast.error('Chart cannot be deleted.');
@@ -60,7 +99,7 @@ function ViewMyCharts(props: IViewMyCharts) {
         setIsDeleting(false);
       }
     },
-    [fetchUserCharts, chart_id]
+    [allEmbedChartData, chart_id, fetchUserCharts, setAllEmbedChartData]
   );
 
   return (
@@ -142,8 +181,42 @@ function ViewMyCharts(props: IViewMyCharts) {
           No Saved Charts
         </h3>
       )}
+      <CWModal
+        {...{
+          open: isChartEmbedded,
+          setOpen: (open: boolean) => {
+            setIsChartEmbedded(open);
+          },
+          title: 'Confirm deletion',
+          content: (
+            <div>
+              <p className="mt-4">
+                This chart is embedded. Do you want to continue?
+              </p>
+              <div className="flex gap-4 mt-6 justify-end">
+                <CWOutlineButton
+                  label="No"
+                  onClick={() => {
+                    setIsChartEmbedded(false);
+                  }}
+                  disabled={isDeleting}
+                />
+                <CWSolidLoadingButton
+                  label="Yes"
+                  onClick={() => {
+                    deleteUserChart(deleteReqChartId.current, true);
+                  }}
+                  loadingLabel="Processing"
+                  loading={isDeleting}
+                  disabled={isDeleting}
+                />
+              </div>
+            </div>
+          ),
+        }}
+      />
     </div>
   );
 }
 
-export default React.memo(ViewMyCharts);
+export default React.memo(UserCharts);

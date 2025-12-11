@@ -104,6 +104,9 @@ function ChartEditor() {
 
   useEffect(() => {
     if (!isLoading && !chart_id) {
+      if (!chartTemplatesData?.length) {
+        return;
+      }
       setActiveChartConfig(chartTemplatesData[0]['config']);
       setChartTitle(chartTemplatesData[0]['name']);
       setChartId(chartTemplatesData[0]['chart_id']);
