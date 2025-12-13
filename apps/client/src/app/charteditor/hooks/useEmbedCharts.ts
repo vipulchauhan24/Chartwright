@@ -3,8 +3,8 @@ import { useCallback, useState } from 'react';
 import { allEmbedChartDetails } from '../../../store/charts';
 import { base64ToFile, EMBEDDABLES, fetchFromLocalStorage } from '../utils/lib';
 import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../utils/constants';
-import axios from 'axios';
 import toast, { Renderable, Toast, ValueOrFunction } from 'react-hot-toast';
+import { api } from '../../api-client';
 
 function useEmbedCharts() {
   const [, setAllEmbedChartData] = useAtom(allEmbedChartDetails);
@@ -59,7 +59,7 @@ function useEmbedCharts() {
           formData.append('updatedDate', new Date().toISOString());
         }
 
-        const response = await axios.put(
+        const response = await api.instance.put(
           `${API_ENDPOINTS.USER_CHARTS_EMBED}`,
           formData,
           {
@@ -113,7 +113,7 @@ function useEmbedCharts() {
         throw new Error('User not logged in.');
       }
 
-      const response = await axios.get(
+      const response = await api.instance.get(
         `${API_ENDPOINTS.USER_CHARTS_EMBED}/${userId}`
       );
 
@@ -142,7 +142,7 @@ function useEmbedCharts() {
       toast.promise(async () => {
         try {
           const id = `${url}`.split('/')[`${url}`.split('/').length - 1];
-          await axios.delete(`/api/embed/${id}`);
+          await api.instance.delete(`/api/embed/${id}`);
           switch (linkType) {
             case EMBEDDABLES.STATIC_IMAGE:
               setAllEmbedChartData((prev: any) => {

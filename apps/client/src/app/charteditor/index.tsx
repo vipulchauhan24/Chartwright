@@ -95,9 +95,8 @@ function ChartEditor() {
   ]);
 
   useEffect(() => {
-    const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-    if (userId) {
-      fetchUserCharts(userId);
+    if (isAuthenticated) {
+      fetchUserCharts();
       getAllEmbeddedDataByUserId();
     }
   }, [fetchUserCharts, getAllEmbeddedDataByUserId, isAuthenticated]);

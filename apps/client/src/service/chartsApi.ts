@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import axios from 'axios';
 import {
   chartTemplates,
   allChartFeatures,
@@ -16,10 +15,11 @@ import {
   allChartBaseConfigError,
 } from '../store/charts';
 import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
+import { api } from '../app/api-client';
 
 export const fetchChartTemplates = atom(null, async (_get, set) => {
   try {
-    const { data } = await axios.get(API_ENDPOINTS.CHART_TEMPLATE);
+    const { data } = await api.instance.get(API_ENDPOINTS.CHART_TEMPLATE);
     set(chartTemplates, data);
   } catch (error) {
     console.error('Error in "fetchChartTemplates":', error);
@@ -28,7 +28,7 @@ export const fetchChartTemplates = atom(null, async (_get, set) => {
 
 export const fetchAllChartsFeatures = atom(null, async (_get, set) => {
   try {
-    const { data } = await axios.get(API_ENDPOINTS.CHART_FEATURES);
+    const { data } = await api.instance.get(API_ENDPOINTS.CHART_FEATURES);
     set(allChartFeatures, data);
   } catch (error) {
     console.error('Error in "fetchChartFeatures":', error);
@@ -37,10 +37,10 @@ export const fetchAllChartsFeatures = atom(null, async (_get, set) => {
   }
 });
 
-export const fetchAllUserCharts = atom(null, async (_get, set, userId) => {
+export const fetchAllUserCharts = atom(null, async (_get, set) => {
   try {
-    const response = await axios.get(
-      `${API_ENDPOINTS.USER_CHARTS}/all/${userId}`
+    const response = await api.instance.get(
+      `${API_ENDPOINTS.USER_CHARTS}/all/charts`
     );
     set(userCharts, response.data);
   } catch {
@@ -52,7 +52,7 @@ export const fetchAllUserCharts = atom(null, async (_get, set, userId) => {
 
 export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
   try {
-    const response = await axios.get(
+    const response = await api.instance.get(
       `${API_ENDPOINTS.USER_CHARTS}/${userChartId}`
     );
     const userChart = response.data;
@@ -81,7 +81,7 @@ export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
 
 export const fetchAllChartBaseConfig = atom(null, async (_get, set) => {
   try {
-    const { data } = await axios.get(API_ENDPOINTS.CHART_BASE_CONFIG);
+    const { data } = await api.instance.get(API_ENDPOINTS.CHART_BASE_CONFIG);
     set(allChartBaseConfig, data);
   } catch (error) {
     console.error('Error in "fetchAllChartBaseConfig":', error);
@@ -93,7 +93,7 @@ export const fetchAllChartBaseConfig = atom(null, async (_get, set) => {
 
 export const fetchEmbedChartConfig = atom(null, async (get, set, embedId) => {
   try {
-    const response = await axios.get(`/api/embed-config/${embedId}`);
+    const response = await api.instance.get(`/api/embed-config/${embedId}`);
     const chartConfig = response.data;
     // set(activeChartConfig, JSON.parse(chartConfig['config']));
   } catch {

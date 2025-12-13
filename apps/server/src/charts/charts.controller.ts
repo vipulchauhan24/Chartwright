@@ -13,6 +13,8 @@ import {
   UseInterceptors,
   UploadedFile,
   NotFoundException,
+  UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ChartService } from './charts.service';
 import { SaveChartDTO } from './validations/saveChart.dto';
@@ -24,6 +26,7 @@ import { ParseFilePipe, FileTypeValidator } from '@nestjs/common/pipes';
 import { FileInterceptor } from '@nestjs/platform-express';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type multer from 'multer'; //DO NOT REMOVE
+import { AuthGaurd } from '../auth/auth.gaurd';
 
 @Controller()
 export class ChartsController {
@@ -138,6 +141,7 @@ export class ChartsController {
   // USER CHARTS API.
 
   @Put('user-chart')
+  @UseGuards(AuthGaurd)
   @UsePipes(ValidationPipe)
   async saveUserChart(
     @Body() saveChartReqBody: SaveChartDTO,
@@ -160,28 +164,39 @@ export class ChartsController {
   }
 
   @Get('user-chart/:id')
+  @UseGuards(AuthGaurd)
   async getUserChartById(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response
   ) {
     const chart = await this.chartService.getUserChartById(id);
-    res.status(chart[0].id ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    res.status(
+      chart.length && chart[0].id ? HttpStatus.OK : HttpStatus.NOT_FOUND
+    );
 
-    return chart[0].id ? chart[0] : `Chart not found!`;
+    return chart.length && chart[0].id ? chart[0] : `Chart not found!`;
   }
 
-  @Get('user-chart/all/:user_id')
-  getAllUserCharts(@Param('user_id') user_id: string) {
-    return this.chartService.getAllUserCharts(user_id);
+  @Get('user-chart/all/charts')
+  @UseGuards(AuthGaurd)
+  getAllUserCharts(@Req() req: Request) {
+    const userId = (req as any).user.userDbId;
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in!');
+    }
+    console.log(userId);
+    return this.chartService.getAllUserCharts(userId);
   }
 
   @Delete('user-chart/:id')
+  @UseGuards(AuthGaurd)
   deleteChart(@Param('id') id: string) {
     return this.chartService.deleteUserChart(id);
   }
 
   // Export APIs.
   @Put('embed')
+  @UseGuards(AuthGaurd)
   @UsePipes(ValidationPipe)
   @UseInterceptors(FileInterceptor('file'))
   async generateEmbedableChart(
@@ -200,11 +215,13 @@ export class ChartsController {
   }
 
   @Get('embed/:user_id')
+  @UseGuards(AuthGaurd)
   async getAllEmbeddedDataByUserId(@Param('user_id') userId: string) {
     return this.chartService.getAllEmbeddedDataByUserId(userId);
   }
 
   @Get(`embed/${EMBEDDABLES.STATIC_IMAGE}/:id`)
+  @UseGuards(AuthGaurd)
   async getEmbeddedStaticImage(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response
@@ -219,6 +236,7 @@ export class ChartsController {
   }
 
   @Delete('embed/:id')
+  @UseGuards(AuthGaurd)
   async deleteEmbedChartById(@Param('id') id: string) {
     return this.chartService.deleteEmbedChartById(id);
   }

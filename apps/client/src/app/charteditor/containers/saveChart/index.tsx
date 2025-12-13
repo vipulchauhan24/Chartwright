@@ -5,7 +5,6 @@ import {
 } from '../../../../store/charts';
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchFromLocalStorage } from '../../utils/lib';
 import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
@@ -16,6 +15,7 @@ import {
   CWTextInput,
 } from '@chartwright/ui-components';
 import toast from 'react-hot-toast';
+import { api } from '../../../api-client';
 
 interface ISaveChart {
   toggleSaveChartModal: (open: boolean) => void;
@@ -72,11 +72,11 @@ function SaveChart(props: ISaveChart) {
           createdDate: new Date().toISOString(),
         };
       }
-      const response = await axios.put(
+      const response = await api.instance.put(
         API_ENDPOINTS.USER_CHARTS,
         saveChartPayload
       );
-      fetchAllCharts(userId);
+      fetchAllCharts();
       closeModal();
       toast.success('Changes saved.');
       if (!chart_id) {

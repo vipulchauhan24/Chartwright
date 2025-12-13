@@ -4,13 +4,52 @@ import { subscriptionPlans, users, userSubscriptions } from '../db/db.schema';
 import { DRIZZLE_PROVIDER } from '../db/db.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
+// import {
+//   CognitoIdentityProviderClient,
+//   GetUserCommand,
+// } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
+
+const { COGNITO_USER_POOL_ID, VITE_CLIENT_ID } = process.env;
 
 @Injectable()
 export class AuthService {
+  private _verifier: CognitoJwtVerifierSingleUserPool<{
+    userPoolId: string;
+    tokenUse: 'access';
+    clientId: string;
+  }>;
+  // private _cognitoClient: CognitoIdentityProviderClient;
+
   constructor(
     @Inject(DRIZZLE_PROVIDER)
     private db: NodePgDatabase
-  ) {}
+  ) {
+    this._verifier = CognitoJwtVerifier.create({
+      userPoolId: `${COGNITO_USER_POOL_ID}`,
+      tokenUse: 'access',
+      clientId: `${VITE_CLIENT_ID}`,
+    });
+    // this._cognitoClient = new CognitoIdentityProviderClient({
+    //   region: AWS_REGION,
+    // });
+  }
+
+  async verifyToken(token: string) {
+    try {
+      const payload = await this._verifier.verify(token);
+      return { username: payload.username, sub: payload.sub };
+    } catch {
+      return null;
+    }
+  }
+
+  // async getUserAttributes(accessToken: string) {
+  //   const command = new GetUserCommand({ AccessToken: accessToken });
+  //   const response = await this._cognitoClient.send(command);
+  //   return response.UserAttributes;
+  // }
 
   async login(params: {
     email: string;

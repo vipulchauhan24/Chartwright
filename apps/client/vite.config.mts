@@ -15,7 +15,11 @@ export default defineConfig(({ mode }) => {
       port: 4200,
       host: 'localhost',
       proxy: {
-        '/api': 'http://localhost:3000',
+        '/api': {
+          target: 'http://localhost:3000', // Your NestJS port
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/api'),
+        },
       },
     },
     preview: {

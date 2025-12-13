@@ -1,4 +1,4 @@
-import { lazy, useMemo, useState } from 'react';
+import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
 import { User } from 'oidc-client-ts';
@@ -12,6 +12,9 @@ const Home = lazy(() => import('./home'));
 const EmbeddedCharts = lazy(() => import('./embeddedCharts'));
 const PageNotFound = lazy(() => import('./pageNotFound'));
 const AuthGaurd = lazy(() => import('./authGaurd'));
+const Login = lazy(() => import('./auth/login'));
+const AuthTokenSync = lazy(() => import('./auth/tokenSync'));
+
 const Toaster = lazy(() =>
   import('react-hot-toast').then((mod) => ({ default: mod.Toaster }))
 );
@@ -19,9 +22,6 @@ const Toaster = lazy(() =>
 const { VITE_AUTHORITY, VITE_CLIENT_ID, VITE_SCOPE } = import.meta.env;
 
 export function App() {
-  const [serverUserSigninInProgress, setServerUserSigninInProgress] =
-    useState(true);
-
   const userSignin = async (user: User) => {
     try {
       const loginPayload = {
@@ -34,8 +34,6 @@ export function App() {
     } catch {
       console.log('User signin failed');
       toast.error('User login failed!');
-    } finally {
-      setServerUserSigninInProgress(false);
     }
   };
 
@@ -47,21 +45,14 @@ export function App() {
     scope: VITE_SCOPE,
   };
 
-  const authGaurdProps = useMemo(() => {
-    return {
-      serverUserSigninInProgress,
-      setServerUserSigninInProgress,
-      userSignin,
-    };
-  }, [serverUserSigninInProgress]);
-
   const ChartRoutes = () => {
     return (
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route
           path="/"
           element={
-            <AuthGaurd {...authGaurdProps}>
+            <AuthGaurd>
               <Home />
             </AuthGaurd>
           }
@@ -69,7 +60,7 @@ export function App() {
         <Route
           path="/chart/:chart_id?"
           element={
-            <AuthGaurd {...authGaurdProps}>
+            <AuthGaurd>
               <ChartEditor />
             </AuthGaurd>
           }
@@ -77,7 +68,7 @@ export function App() {
         <Route
           path={`embed/${EMBEDDABLES.STATIC_IMAGE}/:embed_id`}
           element={
-            <AuthGaurd {...authGaurdProps}>
+            <AuthGaurd>
               <EmbeddedCharts />
             </AuthGaurd>
           }
@@ -89,6 +80,7 @@ export function App() {
 
   return (
     <AuthProvider {...cognitoAuthConfig}>
+      <AuthTokenSync />
       <DevTools />
       <Toaster position="bottom-center" reverseOrder={false} />
       <ChartRoutes />

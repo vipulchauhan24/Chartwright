@@ -23,9 +23,9 @@ import {
 } from '../../utils/lib';
 import { ExternalLink, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import { fetchAllUserCharts } from '../../../../service/chartsApi';
+import { api } from '../../../api-client';
 interface IUserCharts {
   toggleUserChartsView: (open: boolean) => void;
 }
@@ -77,7 +77,7 @@ function UserCharts(props: IUserCharts) {
           toast.error('Chart in edit mode cannot be deleted.');
           return;
         }
-        await axios.delete(`${API_ENDPOINTS.USER_CHARTS}/${chartId}`);
+        await api.instance.delete(`${API_ENDPOINTS.USER_CHARTS}/${chartId}`);
         const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
         if (userId) {
           fetchUserCharts(userId);
