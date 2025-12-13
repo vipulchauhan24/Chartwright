@@ -8,11 +8,10 @@ import {
   Download,
 } from 'lucide-react';
 import { useAuth } from 'react-oidc-context';
-import { EMBEDDABLES, fetchFromLocalStorage } from '../../utils/lib';
+import { EMBEDDABLES } from '../../utils/lib';
 import toast from 'react-hot-toast';
 import { allEmbedChartDetails } from '../../../../store/charts';
 import { useAtom } from 'jotai';
-import { LOCAL_STORAGE_KEYS } from '../../utils/constants';
 import { CWTabs } from '@chartwright/ui-components';
 import { useParams } from 'react-router-dom';
 import EmbedChartCard, { IEmbedChartCard } from './EmbedChartCard';
@@ -177,8 +176,7 @@ function ExportChart() {
   const generateEmbedableCharts = useCallback(
     (type: EMBEDDABLES) => {
       if (type === EMBEDDABLES.STATIC_IMAGE) {
-        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-        if (!userId) {
+        if (!isAuthenticated) {
           toast.error(<b>User not logged in.</b>);
           return;
         } else if (!chart_id) {
@@ -195,7 +193,7 @@ function ExportChart() {
         return;
       }
     },
-    [chart_id]
+    [chart_id, isAuthenticated]
   );
 
   const embedItems: Array<IEmbedChartCard> = useMemo(() => {

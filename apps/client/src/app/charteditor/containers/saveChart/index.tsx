@@ -6,8 +6,7 @@ import {
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchFromLocalStorage } from '../../utils/lib';
-import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { API_ENDPOINTS } from '../../utils/constants';
 import { fetchAllUserCharts } from '../../../../service/chartsApi';
 import {
   CWOutlineButton,
@@ -16,6 +15,7 @@ import {
 } from '@chartwright/ui-components';
 import toast from 'react-hot-toast';
 import { api } from '../../../api-client';
+import { useAuth } from 'react-oidc-context';
 
 interface ISaveChart {
   toggleSaveChartModal: (open: boolean) => void;
@@ -33,14 +33,18 @@ interface ISaveChartPayload {
 }
 
 function SaveChart(props: ISaveChart) {
-  const { chart_id } = useParams();
   const { toggleSaveChartModal } = props;
+
+  const { chart_id } = useParams();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const [, fetchAllCharts] = useAtom(fetchAllUserCharts);
   const [chartDataConfig] = useAtom(activeChartConfig);
   const [chrtTitle, setChrtTitle] = useAtom(chartTitle);
   const [chrtType] = useAtom(chartType);
+
   const [isSaving, setIsSaving] = useState(false);
-  const navigate = useNavigate();
 
   const closeModal = useCallback(() => {
     toggleSaveChartModal(false);
@@ -49,8 +53,7 @@ function SaveChart(props: ISaveChart) {
   const saveChartChanges = useCallback(async () => {
     try {
       setIsSaving(true);
-      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-      if (!userId) {
+      if (!isAuthenticated) {
         throw new Error('User not logged in.');
       }
       let saveChartPayload: ISaveChartPayload = {
@@ -62,13 +65,11 @@ function SaveChart(props: ISaveChart) {
         saveChartPayload = {
           ...saveChartPayload,
           id: chart_id,
-          updatedBy: userId,
           updatedDate: new Date().toISOString(),
         };
       } else {
         saveChartPayload = {
           ...saveChartPayload,
-          createdBy: userId,
           createdDate: new Date().toISOString(),
         };
       }
@@ -89,6 +90,7 @@ function SaveChart(props: ISaveChart) {
       setIsSaving(false);
     }
   }, [
+    isAuthenticated,
     chrtTitle,
     chartDataConfig,
     chrtType,

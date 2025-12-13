@@ -18,14 +18,14 @@ import {
 import {
   capitalizeFirstLetter,
   EMBEDDABLES,
-  fetchFromLocalStorage,
   generateLocaleDateString,
 } from '../../utils/lib';
 import { ExternalLink, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../../utils/constants';
+import { API_ENDPOINTS } from '../../utils/constants';
 import { fetchAllUserCharts } from '../../../../service/chartsApi';
 import { api } from '../../../api-client';
+import { useAuth } from 'react-oidc-context';
 interface IUserCharts {
   toggleUserChartsView: (open: boolean) => void;
 }
@@ -34,6 +34,7 @@ function UserCharts(props: IUserCharts) {
   const { toggleUserChartsView } = props;
   const navigate = useNavigate();
   const { chart_id } = useParams();
+  const { isAuthenticated } = useAuth();
 
   const [isLoading] = useAtom(loadingMyCharts);
   const [charts] = useAtom(userCharts);
@@ -78,9 +79,8 @@ function UserCharts(props: IUserCharts) {
           return;
         }
         await api.instance.delete(`${API_ENDPOINTS.USER_CHARTS}/${chartId}`);
-        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-        if (userId) {
-          fetchUserCharts(userId);
+        if (isAuthenticated) {
+          fetchUserCharts();
         }
         setAllEmbedChartData((prev: any) => {
           return {
@@ -99,7 +99,13 @@ function UserCharts(props: IUserCharts) {
         setIsDeleting(false);
       }
     },
-    [allEmbedChartData, chart_id, fetchUserCharts, setAllEmbedChartData]
+    [
+      allEmbedChartData,
+      chart_id,
+      fetchUserCharts,
+      isAuthenticated,
+      setAllEmbedChartData,
+    ]
   );
 
   return (

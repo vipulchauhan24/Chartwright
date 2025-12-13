@@ -3,8 +3,6 @@ import { DropdownMenu, Avatar } from 'radix-ui';
 import useAuthentication from '../../charteditor/hooks/useAuthentication';
 import { CWSGhostIconButton, CWSolidButton } from '@chartwright/ui-components';
 import { LogOut, User } from 'lucide-react';
-import { removeFromLocalStorage } from '../../charteditor/utils/lib';
-import { LOCAL_STORAGE_KEYS } from '../../charteditor/utils/constants';
 
 const { VITE_CLIENT_ID } = import.meta.env;
 
@@ -17,7 +15,6 @@ function UserProfile() {
   }, [signinRedirect]);
 
   const logout = useCallback(async () => {
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
     await signoutRedirect({
       extraQueryParams: {
         client_id: VITE_CLIENT_ID,

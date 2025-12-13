@@ -30,8 +30,6 @@ import {
   CWSpinner,
 } from '@chartwright/ui-components';
 import toast from 'react-hot-toast';
-import { fetchFromLocalStorage } from './utils/lib';
-import { LOCAL_STORAGE_KEYS } from './utils/constants';
 import useEmbedCharts from './hooks/useEmbedCharts';
 
 const AppShell = lazy(() => import('./layout/appshell'));

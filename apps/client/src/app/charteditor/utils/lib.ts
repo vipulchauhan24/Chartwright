@@ -1,5 +1,4 @@
 import { jsPDF } from 'jspdf';
-import { LOCAL_STORAGE_KEYS, SESSION_STORAGE_KEYS } from './constants';
 
 export enum CHART_TYPES {
   BAR = 'bar',
@@ -83,33 +82,6 @@ export function generateSeriesForBubbleChart(
     data: matrix,
   };
 }
-
-export const storeInLocalStorage = (key: LOCAL_STORAGE_KEYS, data: string) => {
-  localStorage.setItem(key, data);
-};
-
-export const fetchFromLocalStorage = (key: LOCAL_STORAGE_KEYS) => {
-  return localStorage.getItem(key) || null;
-};
-
-export const removeFromLocalStorage = (key: LOCAL_STORAGE_KEYS) => {
-  localStorage.removeItem(key);
-};
-
-export const storeInSessionStorage = (
-  key: SESSION_STORAGE_KEYS,
-  data: string
-) => {
-  sessionStorage.setItem(key, data);
-};
-
-export const fetchFromSessionStorage = (key: SESSION_STORAGE_KEYS) => {
-  return sessionStorage.getItem(key) || null;
-};
-
-export const removeFromSessionStorage = (key: SESSION_STORAGE_KEYS) => {
-  sessionStorage.removeItem(key);
-};
 
 export const fileDownload = (uri: string, name: string) => {
   try {

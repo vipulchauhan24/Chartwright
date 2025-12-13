@@ -1,12 +1,15 @@
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 import { allEmbedChartDetails } from '../../../store/charts';
-import { base64ToFile, EMBEDDABLES, fetchFromLocalStorage } from '../utils/lib';
-import { API_ENDPOINTS, LOCAL_STORAGE_KEYS } from '../utils/constants';
+import { base64ToFile, EMBEDDABLES } from '../utils/lib';
+import { API_ENDPOINTS } from '../utils/constants';
 import toast, { Renderable, Toast, ValueOrFunction } from 'react-hot-toast';
 import { api } from '../../api-client';
+import { useAuth } from 'react-oidc-context';
 
 function useEmbedCharts() {
+  const { isAuthenticated } = useAuth();
+
   const [, setAllEmbedChartData] = useAtom(allEmbedChartDetails);
 
   const [savingChanges, setSavingChanges] = useState({
@@ -36,8 +39,7 @@ function useEmbedCharts() {
 
       const { id, success, apiError, loginError, error } = toastrConfig;
       try {
-        const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-        if (!userId) {
+        if (!isAuthenticated) {
           throw new Error('User not logged in.');
         } else if (!chartId) {
           throw new Error(
@@ -51,11 +53,9 @@ function useEmbedCharts() {
         formData.append('chartId', chartId);
 
         if (!embedId) {
-          formData.append('createdBy', userId);
           formData.append('createdDate', new Date().toISOString());
         } else {
           formData.append('id', embedId.split('?')[0]);
-          formData.append('updatedBy', userId);
           formData.append('updatedDate', new Date().toISOString());
         }
 
@@ -103,18 +103,17 @@ function useEmbedCharts() {
         }));
       }
     },
-    [setAllEmbedChartData]
+    [isAuthenticated, setAllEmbedChartData]
   );
 
   const getAllEmbeddedDataByUserId = useCallback(async () => {
     try {
-      const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-      if (!userId) {
+      if (!isAuthenticated) {
         throw new Error('User not logged in.');
       }
 
       const response = await api.instance.get(
-        `${API_ENDPOINTS.USER_CHARTS_EMBED}/${userId}`
+        `${API_ENDPOINTS.USER_CHARTS_EMBED}`
       );
 
       setAllEmbedChartData((prev: any) => {
@@ -126,7 +125,7 @@ function useEmbedCharts() {
     } catch (err) {
       console.error('Failed to embed image:', err);
     }
-  }, [setAllEmbedChartData]);
+  }, [setAllEmbedChartData, isAuthenticated]);
 
   const deleteEmbeddedLink = useCallback(
     async (

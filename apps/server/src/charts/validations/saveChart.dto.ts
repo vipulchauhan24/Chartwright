@@ -19,10 +19,6 @@ export class SaveChartDTO {
   @IsNotEmpty()
   config!: JSON;
 
-  @IsString()
-  @IsOptional()
-  createdBy?: string;
-
   @IsNotEmpty()
   @IsOptional()
   createdDate?: string;
@@ -34,10 +30,6 @@ export class SaveChartDTO {
   @IsString()
   @IsNotEmpty()
   chartType!: string;
-
-  @IsOptional()
-  @IsString()
-  updatedBy?: string;
 
   @IsOptional()
   @IsDateString()

@@ -2,15 +2,10 @@ import { CWGhostLink, CWIconButton } from '@chartwright/ui-components';
 import { Asterisk, Copy, LogIn, RefreshCw, Trash } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import {
-  copyToMemory,
-  EMBEDDABLES,
-  fetchFromLocalStorage,
-} from '../../../utils/lib';
+import { copyToMemory, EMBEDDABLES } from '../../../utils/lib';
 import useEmbedCharts from '../../../hooks/useEmbedCharts';
 import { EVENTS } from '../../../utils/events';
 import emitter from '../../../../../service/eventBus';
-import { LOCAL_STORAGE_KEYS } from '../../../utils/constants';
 
 export interface IEmbedChartCard {
   onClick: () => void;
@@ -114,30 +109,27 @@ function EmbedChartCard(props: IEmbedChartCard) {
   const regenerateLink = useCallback(() => {
     switch (linkType) {
       case EMBEDDABLES.STATIC_IMAGE:
-        {
-          const userId = fetchFromLocalStorage(LOCAL_STORAGE_KEYS.USER_ID);
-          if (!userId) {
-            toast.error(<b>User not logged in.</b>);
-            return;
-          } else if (!chart_id) {
-            toast.error(
-              <b>
-                Chart not saved. Please save chart once or load any saved chart.
-              </b>
-            );
-            return;
-          }
+        if (!isAuthenticated) {
+          toast.error(<b>User not logged in.</b>);
+          return;
+        } else if (!chart_id) {
+          toast.error(
+            <b>
+              Chart not saved. Please save chart once or load any saved chart.
+            </b>
+          );
+          return;
+        }
 
-          if (toastrIdRef) {
-            toastrIdRef.current = toast.loading('Generating embedable link...');
-          }
+        if (toastrIdRef) {
+          toastrIdRef.current = toast.loading('Generating embedable link...');
+        }
 
-          if (url?.length) {
-            const embedId = url.split('/')[url.split('/').length - 1];
-            emitter.emit(EVENTS.EMBED_STATIC_IMAGE, { embedId });
-          } else {
-            toast.error(<b>Opps, Please try later!</b>);
-          }
+        if (url?.length) {
+          const embedId = url.split('/')[url.split('/').length - 1];
+          emitter.emit(EVENTS.EMBED_STATIC_IMAGE, { embedId });
+        } else {
+          toast.error(<b>Opps, Please try later!</b>);
         }
 
         break;
@@ -145,7 +137,7 @@ function EmbedChartCard(props: IEmbedChartCard) {
       default:
         break;
     }
-  }, [chart_id, linkType, toastrIdRef, url]);
+  }, [chart_id, linkType, toastrIdRef, url, isAuthenticated]);
 
   return (
     <div className="bg-app py-3 px-4 rounded-md mb-4 border border-default relative">

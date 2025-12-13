@@ -144,18 +144,23 @@ export class ChartsController {
   @UseGuards(AuthGaurd)
   @UsePipes(ValidationPipe)
   async saveUserChart(
+    @Req() req: Request,
     @Body() saveChartReqBody: SaveChartDTO,
     @Res({ passthrough: true }) res: Response
   ) {
+    const userId = (req as any).user.userDbId;
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in!');
+    }
     const params = {
       id: saveChartReqBody.id,
       title: saveChartReqBody.title,
       config: saveChartReqBody.config,
-      createdBy: saveChartReqBody.createdBy,
+      createdBy: userId,
       createdDate: saveChartReqBody.createdDate,
       thumbnail: saveChartReqBody.thumbnail,
       chartType: saveChartReqBody.chartType,
-      updatedBy: saveChartReqBody.updatedBy,
+      updatedBy: userId,
       updatedDate: saveChartReqBody.updatedDate,
     };
     const response = await this.chartService.saveUserChart(params);
@@ -184,7 +189,6 @@ export class ChartsController {
     if (!userId) {
       throw new UnauthorizedException('User not logged in!');
     }
-    console.log(userId);
     return this.chartService.getAllUserCharts(userId);
   }
 
@@ -200,6 +204,7 @@ export class ChartsController {
   @UsePipes(ValidationPipe)
   @UseInterceptors(FileInterceptor('file'))
   async generateEmbedableChart(
+    @Req() req: Request,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: 'image/png' })],
@@ -210,18 +215,28 @@ export class ChartsController {
     @Body() reqBody: EmbedChartDTO,
     @Res({ passthrough: true }) res: Response
   ) {
+    const userId = (req as any).user.userDbId;
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in!');
+    }
     res.status(reqBody.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.generateEmbedableChart({ reqBody, file });
+    return this.chartService.generateEmbedableChart({
+      reqBody: { ...reqBody, createdBy: userId, updatedBy: userId },
+      file,
+    });
   }
 
-  @Get('embed/:user_id')
+  @Get('embed')
   @UseGuards(AuthGaurd)
-  async getAllEmbeddedDataByUserId(@Param('user_id') userId: string) {
+  async getAllEmbeddedDataByUserId(@Req() req: Request) {
+    const userId = (req as any).user.userDbId;
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in!');
+    }
     return this.chartService.getAllEmbeddedDataByUserId(userId);
   }
 
   @Get(`embed/${EMBEDDABLES.STATIC_IMAGE}/:id`)
-  @UseGuards(AuthGaurd)
   async getEmbeddedStaticImage(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response
