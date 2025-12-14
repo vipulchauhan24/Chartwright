@@ -83,9 +83,16 @@ function SaveChart(props: ISaveChart) {
       if (!chart_id) {
         navigate(`/chart/${response.data.id}`);
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Oops! Chart could not be saved.');
+    } catch (error: any) {
+      switch (error.status) {
+        case 429:
+          toast.error('Usage limit reached.');
+          break;
+
+        default:
+          toast.error('Oops! Chart could not be saved.');
+          break;
+      }
     } finally {
       setIsSaving(false);
     }

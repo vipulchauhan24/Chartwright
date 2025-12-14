@@ -20,8 +20,9 @@ import {
   chartTemplates,
   embeddedCharts,
   userCharts,
+  users,
 } from '../db/db.schema';
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 
 const {
   CHART_TEMPLATE_THUMBNAILS,
@@ -316,6 +317,28 @@ export class ChartService {
         return {
           status: HttpStatus.OK,
           message: 'User chart updated.',
+        };
+      }
+
+      const userData = await this.db
+        .select({ privileges: users.userPrivileges })
+        .from(users)
+        .where(eq(users.id, `${createdBy}`));
+
+      const userPrivileges = userData[0].privileges;
+
+      const userChartsData = await this.db
+        .select({ count: count() })
+        .from(userCharts)
+        .where(eq(userCharts.createdBy, `${createdBy}`));
+
+      if (
+        userPrivileges.includes('save_charts_10') &&
+        userChartsData[0].count === 10
+      ) {
+        return {
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          message: 'Usage limit reached.',
         };
       }
 
