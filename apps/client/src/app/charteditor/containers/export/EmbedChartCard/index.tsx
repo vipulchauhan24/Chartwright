@@ -7,6 +7,7 @@ import useEmbedCharts from '../../../hooks/useEmbedCharts';
 import { EVENTS } from '../../../utils/events';
 import emitter from '../../../../../service/eventBus';
 
+const { VITE_API_BASE_URL } = import.meta.env;
 export interface IEmbedChartCard {
   onClick: () => void;
   label: string;
@@ -76,7 +77,7 @@ function EmbedChartCard(props: IEmbedChartCard) {
     toast.promise(
       async () => {
         try {
-          const blob = new Blob([`http://localhost:3000/api/embed/${url}`], {
+          const blob = new Blob([`${VITE_API_BASE_URL}/api/embed/${url}`], {
             type: 'text/plain',
           });
           await copyToMemory({ 'text/plain': blob });
@@ -165,7 +166,7 @@ function EmbedChartCard(props: IEmbedChartCard) {
           <span className="flex items-center gap-1 flex-1">
             <strong>Link: </strong>
             <CWGhostLink
-              href={`http://localhost:3000/api/embed/${url}`}
+              href={`${VITE_API_BASE_URL}/api/embed/${url}`}
               newTab={true}
               label={<span className="truncate w-56">{url}</span>}
             />
