@@ -48,7 +48,7 @@ export function CWModal({
               {description}
             </Dialog.Description>
           )}
-          <div>{content}</div>
+          <div className="h-[calc(100%_-_32px)]">{content}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

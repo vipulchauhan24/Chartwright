@@ -109,14 +109,14 @@ function UserCharts(props: IUserCharts) {
   );
 
   return (
-    <div>
+    <div className="h-full">
       {isDeleting && <CWFullscreenLoading />}
       {isLoading ? (
         <div className="py-10 px-40 flex items-center justify-center">
           <CWSpinner />
         </div>
       ) : charts.length ? (
-        <div className=" mt-4 relative overflow-x-auto">
+        <div className="h-full mt-4 relative overflow-y-auto">
           <table className="w-full text-sm text-left text-body">
             <thead className="text-xs uppercase bg-app">
               <tr>
