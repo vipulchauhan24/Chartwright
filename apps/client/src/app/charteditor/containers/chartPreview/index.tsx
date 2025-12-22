@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
-import { activeChartConfig } from '../../../../store/charts';
+import {
+  activeChartConfig,
+  loadingActiveUserChart,
+} from '../../../../store/charts';
 import { isExportDisabled } from '../../../../store/app';
 import emitter from '../../../../service/eventBus';
 import { EVENTS } from '../../utils/events';
@@ -23,6 +26,7 @@ function ChartPreview() {
   const chartRendererInst = useRef<ChartRenderer>(undefined);
   const [, setIsExportChartDisabled] = useAtom(isExportDisabled);
   const [isChartRendered, setIsChartRendered] = useState(false);
+  const [isLoadingActiveUserChart] = useAtom(loadingActiveUserChart);
 
   const chartRenderFinished = useCallback(() => {
     setIsExportChartDisabled(false);
@@ -218,6 +222,14 @@ function ChartPreview() {
   return (
     <div className="w-full h-[calc(100%_-_58px)] pt-3 relative">
       {!isChartRendered && (
+        <div className="h-full w-full flex items-center justify-center z-10 bg-axis/50 absolute top-3 left-0 rounded-lg">
+          <ChartNoAxesCombined
+            className="size-10 stroke-border animate-pulse"
+            aria-hidden={true}
+          />
+        </div>
+      )}
+      {isLoadingActiveUserChart && (
         <div className="h-full w-full flex items-center justify-center z-10 bg-axis/50 absolute top-3 left-0 rounded-lg">
           <ChartNoAxesCombined
             className="size-10 stroke-border animate-pulse"

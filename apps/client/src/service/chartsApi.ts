@@ -7,12 +7,13 @@ import {
   activeChartConfig,
   activeChartFeatures,
   loadingChartConfig,
-  loadingMyCharts,
+  loadingUserCharts,
   userCharts,
   chartType,
   allChartBaseConfig,
   allChartBaseConfigLoading,
   allChartBaseConfigError,
+  loadingActiveUserChart,
 } from '../store/charts';
 import { API_ENDPOINTS } from '../app/charteditor/utils/constants';
 import { api } from '../app/api-client';
@@ -46,12 +47,13 @@ export const fetchAllUserCharts = atom(null, async (_get, set) => {
   } catch {
     set(userCharts, []);
   } finally {
-    set(loadingMyCharts, false);
+    set(loadingUserCharts, false);
   }
 });
 
 export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
   try {
+    set(loadingActiveUserChart, true);
     const response = await api.instance.get(
       `${API_ENDPOINTS.USER_CHARTS}/${userChartId}`
     );
@@ -75,7 +77,7 @@ export const fetchUserChartById = atom(null, async (get, set, userChartId) => {
     set(chartTitle, '');
     set(chartId, '');
   } finally {
-    set(loadingChartConfig, false);
+    set(loadingActiveUserChart, false);
   }
 });
 

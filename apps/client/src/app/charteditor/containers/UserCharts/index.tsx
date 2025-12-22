@@ -12,7 +12,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   allEmbedChartDetails,
-  loadingMyCharts,
+  loadingUserCharts,
   userCharts,
 } from '../../../../store/charts';
 import {
@@ -36,7 +36,7 @@ function UserCharts(props: IUserCharts) {
   const { chart_id } = useParams();
   const { isAuthenticated } = useAuth();
 
-  const [isLoading] = useAtom(loadingMyCharts);
+  const [isLoading] = useAtom(loadingUserCharts);
   const [charts] = useAtom(userCharts);
   const [, fetchUserCharts] = useAtom(fetchAllUserCharts);
   const [allEmbedChartData, setAllEmbedChartData] =
