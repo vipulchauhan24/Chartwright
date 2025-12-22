@@ -281,26 +281,6 @@ export class ChartService {
 
   // USER CHARTS API.
 
-  async validateSaveChartUsageLimit(userId: string) {
-    const userPrivileges = await this.authService.getUserPrivelegesFromDB(
-      userId
-    );
-
-    const userChartsData = await this.db
-      .select({ count: count() })
-      .from(userCharts)
-      .where(eq(userCharts.createdBy, userId));
-
-    if (
-      userPrivileges.includes('save_charts_10') &&
-      userChartsData[0].count === 10
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
   async saveUserChart(params: {
     id?: string;
     title: string;
@@ -341,7 +321,7 @@ export class ChartService {
         };
       }
 
-      if (!(await this.validateSaveChartUsageLimit(`${createdBy}`))) {
+      if (!(await this._validateSaveChartUsageLimit(`${createdBy}`))) {
         return {
           status: HttpStatus.TOO_MANY_REQUESTS,
           message: 'Usage limit reached.',
@@ -462,6 +442,7 @@ export class ChartService {
   }
 
   // Export APIs.
+
   async generateEmbedableChart({
     reqBody,
     file,
@@ -476,6 +457,16 @@ export class ChartService {
 
       if (!id) {
         id = uuidv4();
+      }
+
+      if (
+        createdDate &&
+        !(await this._validateEmbedChartUsageLimit(`${createdBy}`, type))
+      ) {
+        return {
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          message: 'Usage limit reached.',
+        };
       }
 
       await this.db.transaction(async (tx) => {
@@ -679,70 +670,63 @@ export class ChartService {
     }
   }
 
-  // others
-  // async getImageStreamByKey(key: string) {
-  //   try {
-  //     const { Body, ContentType, ETag, LastModified } =
-  //       await this.s3ORM.getObject(key, '');
-  //     return {
-  //       imageStream: Body as Readable,
-  //       type: ContentType,
-  //       ETag,
-  //       LastModified,
-  //     };
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(
-  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // }
+  // PRIVATE METHODS.
 
-  // async getEmbedChartURL(embedChartReqBody: {
-  //   type: string;
-  //   chart_id: string;
-  //   user_id: string;
-  // }) {
-  //   try {
-  //     const query = `SELECT id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE type = '${embedChartReqBody.type}' and chart_id = '${embedChartReqBody.chart_id}' and created_by = '${embedChartReqBody.user_id}';`;
-  //     const result = await this.db.execute(query);
-  //     return result[0] ? `/render/${result[0].id}` : '';
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(
-  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // }
+  private async _validateSaveChartUsageLimit(userId: string) {
+    const userPrivileges = await this.authService.getUserPrivelegesFromDB(
+      userId
+    );
 
-  // async deleteEmbedChartURL(id: string) {
-  //   try {
-  //     return await this.db.execute(
-  //       `DELETE FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
-  //     );
-  //   } catch (error) {
-  //     console.error('Error in deleting link: ', error);
-  //     throw new InternalServerErrorException(
-  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // }
+    const userChartsData = await this.db
+      .select({ count: count() })
+      .from(userCharts)
+      .where(eq(userCharts.createdBy, userId));
 
-  // async getEmbedChartConfig(id: string) {
-  //   try {
-  //     const items = await this.db.execute(
-  //       `SELECT chart_id FROM ${TABLE_NAME.EMBEDDED_CHARTS} WHERE id = '${id}';`
-  //     );
+    if (
+      userPrivileges.includes('save_charts_10') &&
+      userChartsData[0].count === 10
+    ) {
+      return false;
+    }
 
-  //     if (!items || !items.length) {
-  //       return {};
-  //     }
-  //     return await this.getUserChartById(items[0]['chart_id']);
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw new InternalServerErrorException(
-  //       SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // }
+    return true;
+  }
+
+  private async _validateEmbedChartUsageLimit(
+    userId: string,
+    type: EMBEDDABLES
+  ) {
+    const userPrivileges = await this.authService.getUserPrivelegesFromDB(
+      userId
+    );
+
+    const embedChartsData = await this.db
+      .select({ count: count() })
+      .from(embeddedCharts)
+      .where(eq(embeddedCharts.createdBy, userId));
+
+    switch (type) {
+      case EMBEDDABLES.STATIC_IMAGE:
+        if (
+          userPrivileges.includes('exports_embed_image_5') &&
+          embedChartsData[0].count === 5
+        ) {
+          return false;
+        }
+        break;
+      case EMBEDDABLES.DYNAMIC_IFRAME:
+        if (
+          userPrivileges.includes('exports_embed_iframe_5') &&
+          embedChartsData[0].count === 5
+        ) {
+          return false;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return true;
+  }
 }

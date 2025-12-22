@@ -17,6 +17,7 @@ import {
   chartType,
   allChartBaseConfigLoading,
   allChartBaseConfigError,
+  loadingActiveUserChart,
 } from '../../store/charts';
 import React, { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { isExportDisabled } from '../../store/app';
@@ -61,6 +62,7 @@ function ChartEditor() {
   const [, setChartType] = useAtom(chartType);
   const [, setChartId] = useAtom(chartId);
   const [isLoading] = useAtom(loadingChartConfig);
+  const [isLoadingActiveUserChart] = useAtom(loadingActiveUserChart);
   const [, fetchActiveChartConfig] = useAtom(fetchUserChartById);
   const [, fetchAllChartBaseConfigData] = useAtom(fetchAllChartBaseConfig);
   const [isAllChartBaseConfigLoading] = useAtom(allChartBaseConfigLoading);
@@ -206,14 +208,15 @@ function ChartEditor() {
         onClick: () => {
           toggleExportDataModal(true);
         },
-        isLoading: exportDisabled,
-        disabled: exportDisabled,
+        isLoading: exportDisabled || isLoadingActiveUserChart,
+        disabled: exportDisabled || isLoadingActiveUserChart,
       },
     ];
   }, [
     isAllChartBaseConfigLoading,
     isAllChartBaseConfigError,
     exportDisabled,
+    isLoadingActiveUserChart,
     toggleImportDataModal,
     toggleExportDataModal,
   ]);

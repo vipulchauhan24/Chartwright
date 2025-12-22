@@ -82,20 +82,30 @@ function useEmbedCharts() {
         });
       } catch (err: any) {
         console.error('Error in uploadEmbeddableStaticImage:', err);
-        if (err === loginError) {
-          toast.error(loginError, {
-            id: id,
-          });
-          return;
-        } else if (err.status === 409) {
-          toast.error(error, {
-            id: id,
-          });
-          return;
+        switch (err.status) {
+          case 429:
+            toast.error('Usage limit reached.', {
+              id: id,
+            });
+            break;
+          case 409:
+            toast.error(error, {
+              id: id,
+            });
+            break;
+
+          default:
+            if (err === loginError) {
+              toast.error(loginError, {
+                id: id,
+              });
+              return;
+            }
+            toast.error(apiError, {
+              id: id,
+            });
+            break;
         }
-        toast.error(apiError, {
-          id: id,
-        });
       } finally {
         setSavingChanges((prev: { staticImage: boolean; iframe: boolean }) => ({
           ...prev,

@@ -219,11 +219,19 @@ export class ChartsController {
     if (!userId) {
       throw new UnauthorizedException('User not logged in!');
     }
-    res.status(reqBody.id ? HttpStatus.OK : HttpStatus.CREATED);
-    return this.chartService.generateEmbedableChart({
+
+    const response = await this.chartService.generateEmbedableChart({
       reqBody: { ...reqBody, createdBy: userId, updatedBy: userId },
       file,
     });
+
+    if (response?.status) {
+      res.status(response?.status as HttpStatus);
+    } else {
+      res.status(reqBody.id ? HttpStatus.OK : HttpStatus.CREATED);
+    }
+
+    return response;
   }
 
   @Get('embed')
