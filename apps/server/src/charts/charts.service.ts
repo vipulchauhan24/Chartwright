@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { SERVER_ERROR_MESSAGES, TABLE_NAME } from '../lib/constants';
+import { SERVER_ERROR_MESSAGES } from '../lib/constants';
 import { S3ORM } from '../lib/s3/orm/s3ORM';
 import { Readable } from 'stream';
 import { EMBEDDABLES, EmbedChartDTO } from './validations/embedChart.dto';
@@ -20,9 +20,9 @@ import {
   chartTemplates,
   embeddedCharts,
   userCharts,
-  users,
 } from '../db/db.schema';
 import { count, eq } from 'drizzle-orm';
+import { AuthService } from '../auth/auth.service';
 
 const {
   CHART_TEMPLATE_THUMBNAILS,
@@ -37,7 +37,8 @@ export class ChartService {
     @Inject(DRIZZLE_PROVIDER)
     private db: NodePgDatabase,
     private dbService: DBService,
-    private s3ORM: S3ORM
+    private s3ORM: S3ORM,
+    private authService: AuthService
   ) {}
 
   // CHART TEMPLATE APIS.
@@ -280,6 +281,26 @@ export class ChartService {
 
   // USER CHARTS API.
 
+  async validateSaveChartUsageLimit(userId: string) {
+    const userPrivileges = await this.authService.getUserPrivelegesFromDB(
+      userId
+    );
+
+    const userChartsData = await this.db
+      .select({ count: count() })
+      .from(userCharts)
+      .where(eq(userCharts.createdBy, userId));
+
+    if (
+      userPrivileges.includes('save_charts_10') &&
+      userChartsData[0].count === 10
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   async saveUserChart(params: {
     id?: string;
     title: string;
@@ -320,22 +341,7 @@ export class ChartService {
         };
       }
 
-      const userData = await this.db
-        .select({ privileges: users.userPrivileges })
-        .from(users)
-        .where(eq(users.id, `${createdBy}`));
-
-      const userPrivileges = userData[0].privileges;
-
-      const userChartsData = await this.db
-        .select({ count: count() })
-        .from(userCharts)
-        .where(eq(userCharts.createdBy, `${createdBy}`));
-
-      if (
-        userPrivileges.includes('save_charts_10') &&
-        userChartsData[0].count === 10
-      ) {
+      if (!(await this.validateSaveChartUsageLimit(`${createdBy}`))) {
         return {
           status: HttpStatus.TOO_MANY_REQUESTS,
           message: 'Usage limit reached.',

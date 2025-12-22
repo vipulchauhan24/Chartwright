@@ -153,4 +153,20 @@ export class AuthService {
       );
     }
   }
+
+  async getUserPrivelegesFromDB(userId: string) {
+    try {
+      const userData = await this.db
+        .select({ privileges: users.userPrivileges })
+        .from(users)
+        .where(eq(users.id, userId));
+
+      const userPrivileges = userData[0].privileges;
+
+      return userPrivileges;
+    } catch (error) {
+      console.error("Error in 'getUserPrivelegesFromDB' service: ", error);
+      throw error;
+    }
+  }
 }

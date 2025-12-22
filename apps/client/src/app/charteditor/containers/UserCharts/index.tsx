@@ -66,6 +66,7 @@ function UserCharts(props: IUserCharts) {
         const chartEmbedded = allEmbedChartData[chartId];
 
         if (
+          chartEmbedded &&
           (chartEmbedded[EMBEDDABLES.DYNAMIC_IFRAME]?.length ||
             chartEmbedded[EMBEDDABLES.STATIC_IMAGE]?.length) &&
           !ingoreEmbedChart
