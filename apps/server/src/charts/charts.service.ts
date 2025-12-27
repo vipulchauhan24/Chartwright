@@ -21,7 +21,7 @@ import {
   embeddedCharts,
   userCharts,
 } from '../db/db.schema';
-import { count, eq } from 'drizzle-orm';
+import { and, count, eq } from 'drizzle-orm';
 import { AuthService } from '../auth/auth.service';
 
 const {
@@ -448,7 +448,7 @@ export class ChartService {
     file,
   }: {
     reqBody: EmbedChartDTO;
-    file: Express.Multer.File;
+    file?: Express.Multer.File;
   }) {
     try {
       const { type, chartId, createdBy, createdDate, updatedBy, updatedDate } =
@@ -495,7 +495,7 @@ export class ChartService {
             const s3UploadRes = await this.s3ORM.putObject({
               key: `user-${createdBy || updatedBy}/${id}.png`,
               bucket: `${USER_CHART_STATIC_IMAGES}`,
-              file,
+              file: file as Express.Multer.File,
               cacheControl: `public, max-age=${S3_TTL}, s-maxage=${
                 Number(S3_TTL) * 7
               }, immutable`,
@@ -515,7 +515,11 @@ export class ChartService {
       switch (type) {
         case EMBEDDABLES.STATIC_IMAGE:
           return {
-            'static-image': `${EMBEDDABLES.STATIC_IMAGE}/${id}`,
+            [`${EMBEDDABLES.STATIC_IMAGE}`]: id,
+          };
+        case EMBEDDABLES.DYNAMIC_IFRAME:
+          return {
+            [`${EMBEDDABLES.DYNAMIC_IFRAME}`]: id,
           };
 
         default:
@@ -552,16 +556,19 @@ export class ChartService {
         result.forEach((chartData) => {
           const { type, id, chartId } = chartData;
 
-          response[chartId] = {
-            'static-image': '',
-            'dynamic-iframe': '',
-          };
+          if (!response[chartId]) {
+            response[chartId] = {
+              [`${EMBEDDABLES.STATIC_IMAGE}`]: '',
+              [`${EMBEDDABLES.DYNAMIC_IFRAME}`]: '',
+            };
+          }
 
           switch (type) {
             case EMBEDDABLES.STATIC_IMAGE:
-              response[chartId][
-                EMBEDDABLES.STATIC_IMAGE
-              ] = `${EMBEDDABLES.STATIC_IMAGE}/${id}`; // Enable API gateway to this API.
+              response[chartId][EMBEDDABLES.STATIC_IMAGE] = id; // Enable API gateway to this API.
+              break;
+            case EMBEDDABLES.DYNAMIC_IFRAME:
+              response[chartId][EMBEDDABLES.DYNAMIC_IFRAME] = id;
               break;
 
             default:
@@ -588,7 +595,12 @@ export class ChartService {
           userId: embeddedCharts.createdBy,
         })
         .from(embeddedCharts)
-        .where(eq(embeddedCharts.id, id));
+        .where(
+          and(
+            eq(embeddedCharts.id, id),
+            eq(embeddedCharts.type, EMBEDDABLES.STATIC_IMAGE)
+          )
+        );
 
       if (!result?.length) {
         throw Error('Chart details not found!');
@@ -601,8 +613,7 @@ export class ChartService {
         throw new Error('User access expired!');
       }
 
-      const encodedPath = base64UrlEncode(`user-${result[0].userId}/${id}.png`);
-
+      // Update last access date.
       await this.db
         .update(embeddedCharts)
         .set({
@@ -610,6 +621,7 @@ export class ChartService {
         })
         .where(eq(embeddedCharts.id, id));
 
+      const encodedPath = base64UrlEncode(`user-${result[0].userId}/${id}.png`);
       const cdnURL = `${USER_CHART_STATIC_IMAGES_DOMAIN}/${encodedPath}?v=${result[0].versionNumber}`;
 
       const expireTime = Math.floor((Date.now() + 24 * 60 * 60 * 1000) / 1000); // 24 hours.
@@ -622,6 +634,57 @@ export class ChartService {
       return signedUrl;
     } catch (error) {
       console.error("Error in 'getEmbeddedStaticImage ' service: ", error);
+
+      if (`${error}`.includes('User access expired!')) {
+        throw new ForbiddenException(SERVER_ERROR_MESSAGES.FORRBIDDEN_ERROR);
+      } else {
+        throw new InternalServerErrorException(
+          SERVER_ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
+
+  async getEmbeddedIframe(id: string) {
+    try {
+      const result = await this.db
+        .select({
+          expirationDate: embeddedCharts.expirationDate,
+          config: userCharts.config,
+          features: chartFeatures.config,
+        })
+        .from(embeddedCharts)
+        .innerJoin(userCharts, eq(userCharts.id, embeddedCharts.chartId))
+        .innerJoin(chartFeatures, eq(chartFeatures.type, userCharts.chartType))
+        .where(
+          and(
+            eq(embeddedCharts.id, id),
+            eq(embeddedCharts.type, EMBEDDABLES.DYNAMIC_IFRAME)
+          )
+        );
+
+      if (!result?.length) {
+        throw Error('Chart details not found!');
+      }
+
+      const expiryDate = new Date(`${result[0].expirationDate}`);
+      expiryDate.setDate(expiryDate.getDate() + 1);
+
+      if (new Date() > expiryDate) {
+        throw new Error('User access expired!');
+      }
+
+      // Update last access date.
+      await this.db
+        .update(embeddedCharts)
+        .set({
+          lastAccessed: new Date().toISOString(),
+        })
+        .where(eq(embeddedCharts.id, id));
+
+      return result[0].config;
+    } catch (error) {
+      console.error("Error in 'getEmbeddedStaticImage' service: ", error);
 
       if (`${error}`.includes('User access expired!')) {
         throw new ForbiddenException(SERVER_ERROR_MESSAGES.FORRBIDDEN_ERROR);
@@ -703,7 +766,9 @@ export class ChartService {
     const embedChartsData = await this.db
       .select({ count: count() })
       .from(embeddedCharts)
-      .where(eq(embeddedCharts.createdBy, userId));
+      .where(
+        and(eq(embeddedCharts.createdBy, userId), eq(embeddedCharts.type, type))
+      );
 
     switch (type) {
       case EMBEDDABLES.STATIC_IMAGE:

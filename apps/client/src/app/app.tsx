@@ -3,11 +3,9 @@ import { Route, Routes } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
 import { DevTools } from 'jotai-devtools';
 import 'jotai-devtools/styles.css';
-import { EMBEDDABLES } from './charteditor/utils/lib';
 
 const ChartEditor = lazy(() => import('./charteditor'));
 const Home = lazy(() => import('./home'));
-const EmbeddedCharts = lazy(() => import('./embeddedCharts'));
 const PageNotFound = lazy(() => import('./pageNotFound'));
 const AuthGaurd = lazy(() => import('./authGaurd'));
 const Login = lazy(() => import('./auth/login'));
@@ -48,14 +46,6 @@ export function App() {
           element={
             <AuthGaurd>
               <ChartEditor />
-            </AuthGaurd>
-          }
-        />
-        <Route
-          path={`embed/${EMBEDDABLES.STATIC_IMAGE}/:embed_id`}
-          element={
-            <AuthGaurd>
-              <EmbeddedCharts />
             </AuthGaurd>
           }
         />

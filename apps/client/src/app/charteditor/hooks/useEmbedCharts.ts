@@ -55,7 +55,7 @@ function useEmbedCharts() {
         if (!embedId) {
           formData.append('createdDate', new Date().toISOString());
         } else {
-          formData.append('id', embedId.split('?')[0]);
+          formData.append('id', embedId);
           formData.append('updatedDate', new Date().toISOString());
         }
 
@@ -73,7 +73,8 @@ function useEmbedCharts() {
             ...prev,
             [`${chartId}`]: {
               ...prev[chartId],
-              'static-image': response['data']['static-image'],
+              [`${EMBEDDABLES.STATIC_IMAGE}`]:
+                response['data'][EMBEDDABLES.STATIC_IMAGE],
             },
           };
         });
@@ -116,6 +117,104 @@ function useEmbedCharts() {
     [isAuthenticated, setAllEmbedChartData]
   );
 
+  const embedAsIframe = useCallback(
+    async (params: {
+      embedId?: string;
+      chartId: string;
+      toastrConfig: {
+        id: string;
+        success: ValueOrFunction<Renderable, Toast>;
+        loginError: ValueOrFunction<Renderable, Toast>;
+        apiError: ValueOrFunction<Renderable, Toast>;
+        error: ValueOrFunction<Renderable, Toast>;
+      };
+    }) => {
+      const { embedId, chartId, toastrConfig } = params;
+
+      setSavingChanges((prev: { staticImage: boolean; iframe: boolean }) => ({
+        ...prev,
+        iframe: true,
+      }));
+
+      const { id, success, apiError, loginError, error } = toastrConfig;
+      try {
+        if (!isAuthenticated) {
+          throw new Error('User not logged in.');
+        } else if (!chartId) {
+          throw new Error(
+            'Chart not saved. Please save chart once or load any saved chart.'
+          );
+        }
+
+        const formData = new FormData();
+        formData.append('type', EMBEDDABLES.DYNAMIC_IFRAME);
+        formData.append('chartId', chartId);
+
+        if (!embedId) {
+          formData.append('createdDate', new Date().toISOString());
+        } else {
+          formData.append('id', embedId);
+          formData.append('updatedDate', new Date().toISOString());
+        }
+
+        const response = await api.instance.put(
+          `${API_ENDPOINTS.USER_CHARTS_EMBED}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setAllEmbedChartData((prev: any) => {
+          return {
+            ...prev,
+            [`${chartId}`]: {
+              ...prev[chartId],
+              [`${EMBEDDABLES.DYNAMIC_IFRAME}`]:
+                response['data'][EMBEDDABLES.DYNAMIC_IFRAME],
+            },
+          };
+        });
+        toast.success(success, {
+          id: id,
+        });
+      } catch (err: any) {
+        console.error('Error in embedAsIframe:', err);
+        switch (err.status) {
+          case 429:
+            toast.error('Usage limit reached.', {
+              id: id,
+            });
+            break;
+          case 409:
+            toast.error(error, {
+              id: id,
+            });
+            break;
+
+          default:
+            if (err === loginError) {
+              toast.error(loginError, {
+                id: id,
+              });
+              return;
+            }
+            toast.error(apiError, {
+              id: id,
+            });
+            break;
+        }
+      } finally {
+        setSavingChanges((prev: { staticImage: boolean; iframe: boolean }) => ({
+          ...prev,
+          iframe: false,
+        }));
+      }
+    },
+    [isAuthenticated, setAllEmbedChartData]
+  );
+
   const getAllEmbeddedDataByUserId = useCallback(async () => {
     try {
       if (!isAuthenticated) {
@@ -140,7 +239,7 @@ function useEmbedCharts() {
   const deleteEmbeddedLink = useCallback(
     async (
       linkType: EMBEDDABLES,
-      url: string,
+      id: string,
       chart_id: string,
       toastrConfig: {
         loading: Renderable;
@@ -150,7 +249,6 @@ function useEmbedCharts() {
     ) => {
       toast.promise(async () => {
         try {
-          const id = `${url}`.split('/')[`${url}`.split('/').length - 1];
           await api.instance.delete(`/api/embed/${id}`);
           switch (linkType) {
             case EMBEDDABLES.STATIC_IMAGE:
@@ -159,7 +257,18 @@ function useEmbedCharts() {
                   ...prev,
                   [`${chart_id}`]: {
                     ...prev[chart_id],
-                    'static-image': '',
+                    [`${EMBEDDABLES.STATIC_IMAGE}`]: '',
+                  },
+                };
+              });
+              break;
+            case EMBEDDABLES.DYNAMIC_IFRAME:
+              setAllEmbedChartData((prev: any) => {
+                return {
+                  ...prev,
+                  [`${chart_id}`]: {
+                    ...prev[chart_id],
+                    [`${EMBEDDABLES.DYNAMIC_IFRAME}`]: '',
                   },
                 };
               });
@@ -182,6 +291,7 @@ function useEmbedCharts() {
     uploadEmbeddableStaticImage,
     getAllEmbeddedDataByUserId,
     deleteEmbeddedLink,
+    embedAsIframe,
   };
 }
 

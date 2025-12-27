@@ -16,6 +16,11 @@ import { sql } from 'drizzle-orm';
 
 import { relations } from 'drizzle-orm/relations';
 
+enum EMBEDDABLES {
+  STATIC_IMAGE = 'static-image',
+  DYNAMIC_IFRAME = 'dynamic-iframe',
+}
+
 export const chartwrightDev = pgSchema('chartwright_dev');
 
 export const chartTypesEnum = chartwrightDev.enum('chart_types', [
@@ -36,7 +41,7 @@ export const userPrivilegesEnum = chartwrightDev.enum('user_privileges', [
 ]);
 export const embeddedChartTypeEnum = chartwrightDev.enum(
   'embedded_chart_type',
-  ['static-image', 'dynamic-iframe']
+  [EMBEDDABLES.STATIC_IMAGE, EMBEDDABLES.DYNAMIC_IFRAME]
 );
 export const userPlansEnum = chartwrightDev.enum('user_plans', [
   'FREE',

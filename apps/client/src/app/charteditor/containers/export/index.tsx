@@ -7,7 +7,6 @@ import {
   Copy,
   Download,
 } from 'lucide-react';
-import { useAuth } from 'react-oidc-context';
 import { EMBEDDABLES } from '../../utils/lib';
 import toast from 'react-hot-toast';
 import { allEmbedChartDetails } from '../../../../store/charts';
@@ -16,43 +15,47 @@ import { CWTabs } from '@chartwright/ui-components';
 import { useParams } from 'react-router-dom';
 import EmbedChartCard, { IEmbedChartCard } from './EmbedChartCard';
 import useEmbedCharts from '../../hooks/useEmbedCharts';
+import { useAuth } from 'react-oidc-context';
 
 function ExportChart() {
   const { chart_id } = useParams();
-  const { isAuthenticated, signinRedirect } = useAuth();
   const [allEmbedChartData] = useAtom(allEmbedChartDetails);
+  const { isAuthenticated } = useAuth();
+
   const [embedLinks, setEmbedLinks] = useState({
     image: {
-      url: '',
+      embedId: '',
       loading: true,
       disabled: false,
     },
     iframe: {
-      url: '',
+      embedId: '',
       loading: true,
       disabled: false,
     },
   });
   const toastrIdRef = useRef('');
-  const { savingChanges, uploadEmbeddableStaticImage } = useEmbedCharts();
+  const { savingChanges, uploadEmbeddableStaticImage, embedAsIframe } =
+    useEmbedCharts();
 
   useEffect(() => {
     if (chart_id && allEmbedChartData[chart_id]) {
-      const imageUrl = allEmbedChartData[chart_id][EMBEDDABLES.STATIC_IMAGE];
-      const iFrameUrl = allEmbedChartData[chart_id][EMBEDDABLES.DYNAMIC_IFRAME];
+      const embedImgId = allEmbedChartData[chart_id][EMBEDDABLES.STATIC_IMAGE];
+      const embedIIframeId =
+        allEmbedChartData[chart_id][EMBEDDABLES.DYNAMIC_IFRAME];
 
       setEmbedLinks((prev) => {
         return {
           ...prev,
           image: {
             ...prev.image,
-            url: imageUrl,
-            loading: !imageUrl?.length,
+            embedId: embedImgId,
+            loading: !embedImgId?.length,
           },
           iframe: {
             ...prev.iframe,
-            url: iFrameUrl,
-            loading: !iFrameUrl?.length,
+            embedId: embedIIframeId,
+            loading: !embedIIframeId?.length,
           },
         };
       });
@@ -63,12 +66,12 @@ function ExportChart() {
         return {
           ...prev,
           image: {
-            url: '',
+            embedId: '',
             loading: false,
             disabled: false,
           },
           iframe: {
-            url: '',
+            embedId: '',
             loading: false,
             disabled: false,
           },
@@ -122,10 +125,6 @@ function ExportChart() {
     };
   }, [uploadStaticImage, chart_id]);
 
-  const redirectToLoginPage = useCallback(() => {
-    signinRedirect();
-  }, [signinRedirect]);
-
   const downloadItems: Array<IEmbedChartCard> = useMemo(() => {
     return [
       {
@@ -137,8 +136,6 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.COPY_TO_CLIPBAORD);
         },
-        isAuthenticated,
-        redirectToLoginPage,
       },
       {
         label: 'Download PNG',
@@ -147,8 +144,6 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_PNG);
         },
-        isAuthenticated,
-        redirectToLoginPage,
       },
       {
         label: 'Download JPG',
@@ -157,8 +152,6 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_JPG);
         },
-        isAuthenticated,
-        redirectToLoginPage,
       },
       {
         label: 'Download PDF',
@@ -167,88 +160,100 @@ function ExportChart() {
         onClick: () => {
           emitter.emit(EVENTS.EXPORT_TO_PDF);
         },
-        isAuthenticated,
-        redirectToLoginPage,
       },
     ];
-  }, [isAuthenticated, redirectToLoginPage]);
+  }, []);
 
-  const generateEmbedableCharts = useCallback(
+  const generateEmbedableLink = useCallback(
     (type: EMBEDDABLES) => {
-      if (type === EMBEDDABLES.STATIC_IMAGE) {
-        if (!isAuthenticated) {
-          toast.error(<b>User not logged in.</b>);
-          return;
-        } else if (!chart_id) {
-          toast.error(
-            <b>
-              Chart not saved. Please save chart once or load any saved chart.
-            </b>
-          );
-          return;
-        }
-        toastrIdRef.current = toast.loading('Generating embedable link...');
-        emitter.emit(EVENTS.EMBED_STATIC_IMAGE);
-
+      if (!isAuthenticated) {
+        toast.error(<b>User not logged in.</b>);
+        return;
+      } else if (!chart_id) {
+        toast.error(
+          <b>
+            Chart not saved. Please save chart once or load any saved chart.
+          </b>
+        );
         return;
       }
+      toastrIdRef.current = toast.loading('Generating embedable link...');
+      switch (type) {
+        case EMBEDDABLES.STATIC_IMAGE:
+          emitter.emit(EVENTS.EMBED_STATIC_IMAGE);
+          break;
+        case EMBEDDABLES.DYNAMIC_IFRAME:
+          embedAsIframe({
+            chartId: chart_id as string,
+            toastrConfig: {
+              id: toastrIdRef.current,
+              success: <b>Link Generated!</b>,
+              apiError: <b>Oops, try again later.</b>,
+              loginError: <b>User not logged in!</b>,
+              error: <b>Link already generated!</b>,
+            },
+          });
+          break;
+
+        default:
+          toast.error('Opps! Error occured.', {
+            id: toastrIdRef.current,
+          });
+          break;
+      }
     },
-    [chart_id, isAuthenticated]
+    [chart_id, isAuthenticated, embedAsIframe]
   );
 
   const embedItems: Array<IEmbedChartCard> = useMemo(() => {
     return [
       {
-        label: 'Generate Static Embedable Image',
+        label: 'Generate Static Image URL',
+        generatedLabel: 'Static Image URL',
         icon: <CloudCog className="size-6" aria-hidden={true} />,
-        image: <img src="/url.png" alt="Generate Link" className="h-6" />,
+        image: <img src="/url.png" alt="Static URL" className="h-6" />,
         onClick: () => {
-          generateEmbedableCharts(EMBEDDABLES.STATIC_IMAGE);
+          generateEmbedableLink(EMBEDDABLES.STATIC_IMAGE);
         },
-        userLoginCheck: true,
-        url: embedLinks.image.url,
-        loading: embedLinks.image.loading, //!chart_id || imageURL?.length > 0 ? false : true,
+        isUserLogged: true,
+        embedId: embedLinks.image.embedId,
+        loading: embedLinks.image.loading,
         disabled: embedLinks.image.disabled,
-        isAuthenticated,
-        redirectToLoginPage,
-        chart_id,
+        chartId: chart_id,
         linkType: EMBEDDABLES.STATIC_IMAGE,
         toastrIdRef,
       },
       {
-        label: 'Generate Interactive Frame',
+        label: 'Generate Interactive IFrame',
+        generatedLabel: 'Interactive IFrame',
         icon: <CloudCog className="size-6" aria-hidden={true} />,
         image: (
           <img
             src="/interaction.png"
-            alt="Generate Interactive Frame"
+            alt="Interactive IFrame"
             className="h-6"
           />
         ),
         onClick: () => {
-          generateEmbedableCharts(EMBEDDABLES.DYNAMIC_IFRAME);
+          generateEmbedableLink(EMBEDDABLES.DYNAMIC_IFRAME);
         },
-        userLoginCheck: true,
-        url: embedLinks.iframe.url,
-        loading: embedLinks.iframe.loading, //!chart_id || iframeURL?.length > 0 ? false : true,
+        isUserLogged: true,
+        embedId: embedLinks.iframe.embedId,
+        loading: embedLinks.iframe.loading,
         disabled: embedLinks.image.disabled,
-        isAuthenticated,
-        redirectToLoginPage,
-        chart_id,
+        chartId: chart_id,
         linkType: EMBEDDABLES.DYNAMIC_IFRAME,
         toastrIdRef,
       },
     ];
   }, [
-    embedLinks.image.url,
+    embedLinks.image.embedId,
     embedLinks.image.loading,
     embedLinks.image.disabled,
-    embedLinks.iframe.url,
+    embedLinks.iframe.embedId,
     embedLinks.iframe.loading,
-    isAuthenticated,
-    redirectToLoginPage,
     chart_id,
-    generateEmbedableCharts,
+    generateEmbedableLink,
   ]);
 
   const tabList = useMemo(() => {

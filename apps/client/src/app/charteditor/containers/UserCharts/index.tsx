@@ -87,8 +87,8 @@ function UserCharts(props: IUserCharts) {
           return {
             ...prev,
             [`${chart_id}`]: {
-              'dynamic-iframe': '',
-              'static-image': '',
+              [`${EMBEDDABLES.DYNAMIC_IFRAME}`]: '',
+              [`${EMBEDDABLES.STATIC_IMAGE}`]: '',
             },
           };
         });

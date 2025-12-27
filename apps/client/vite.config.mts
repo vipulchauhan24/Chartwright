@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import tailwindcss from '@tailwindcss/vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -61,6 +62,12 @@ export default defineConfig(({ mode }) => {
       reportCompressedSize: true,
       commonjsOptions: {
         transformMixedEsModules: true,
+      },
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'), // Main app
+          iframe: path.resolve(__dirname, 'embed.html'), // Isolated page
+        },
       },
     },
     define: {

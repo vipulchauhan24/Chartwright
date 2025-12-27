@@ -1,25 +1,33 @@
-import { CWGhostLink, CWIconButton } from '@chartwright/ui-components';
-import { Asterisk, Copy, LogIn, RefreshCw, Trash } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import { CWIconButton } from '@chartwright/ui-components';
+import {
+  Asterisk,
+  Copy,
+  ExternalLink,
+  LogIn,
+  RefreshCw,
+  Trash,
+} from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { copyToMemory, EMBEDDABLES } from '../../../utils/lib';
 import useEmbedCharts from '../../../hooks/useEmbedCharts';
 import { EVENTS } from '../../../utils/events';
 import emitter from '../../../../../service/eventBus';
+import { useAuth } from 'react-oidc-context';
 
-const { VITE_API_BASE_URL } = import.meta.env;
+const { VITE_API_BASE_URL, VITE_APP_BASE_URL } = import.meta.env;
+
 export interface IEmbedChartCard {
   onClick: () => void;
   label: string;
   icon: React.ReactNode;
   image: React.ReactNode;
-  isAuthenticated: boolean;
-  redirectToLoginPage: () => void;
-  userLoginCheck?: boolean;
-  url?: string;
+  generatedLabel?: string;
+  isUserLogged?: boolean;
+  embedId?: string;
   loading?: boolean;
   linkType?: EMBEDDABLES;
-  chart_id?: string;
+  chartId?: string;
   disabled?: boolean;
   toastrIdRef?: React.RefObject<string>;
 }
@@ -29,22 +37,22 @@ const EXPORT_ERROR_MSG = 'Oops, try again later.';
 function EmbedChartCard(props: IEmbedChartCard) {
   const {
     loading,
-    userLoginCheck,
+    isUserLogged,
     image,
     label,
-    url,
+    embedId,
     icon,
     onClick,
-    isAuthenticated,
-    redirectToLoginPage,
     linkType,
-    chart_id,
+    chartId,
     disabled,
     toastrIdRef,
+    generatedLabel,
   } = props;
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { deleteEmbeddedLink } = useEmbedCharts();
+  const { isAuthenticated, signinRedirect } = useAuth();
 
   useEffect(() => {
     setTimeout(() => {
@@ -57,6 +65,10 @@ function EmbedChartCard(props: IEmbedChartCard) {
       setIsLoading(false);
     }
   }, [loading]);
+
+  const redirectToLoginPage = useCallback(() => {
+    signinRedirect();
+  }, [signinRedirect]);
 
   const LoginRequiredComp = useCallback(() => {
     return (
@@ -73,11 +85,22 @@ function EmbedChartCard(props: IEmbedChartCard) {
     );
   }, [redirectToLoginPage]);
 
-  const copyLink = useCallback(async () => {
+  const embedURL = useMemo(() => {
+    switch (linkType) {
+      case EMBEDDABLES.STATIC_IMAGE:
+        return `${VITE_API_BASE_URL}/api/embed/static-image/${embedId}`;
+      case EMBEDDABLES.DYNAMIC_IFRAME:
+        return `${VITE_APP_BASE_URL}/embed.html?id=${embedId}`;
+      default:
+        return '';
+    }
+  }, [linkType, embedId]);
+
+  const onCopyEmbedRequested = useCallback(async () => {
     toast.promise(
       async () => {
         try {
-          const blob = new Blob([`${VITE_API_BASE_URL}/api/embed/${url}`], {
+          const blob = new Blob([embedURL], {
             type: 'text/plain',
           });
           await copyToMemory({ 'text/plain': blob });
@@ -92,28 +115,28 @@ function EmbedChartCard(props: IEmbedChartCard) {
         error: <b>{EXPORT_ERROR_MSG}</b>,
       }
     );
-  }, [url]);
+  }, [embedURL]);
 
-  const deleteLink = useCallback(() => {
+  const onDeleteEmbedRequested = useCallback(() => {
     deleteEmbeddedLink(
       linkType as EMBEDDABLES,
-      url as string,
-      chart_id as string,
+      embedId as string,
+      chartId as string,
       {
         loading: 'Deleting Link...',
         success: <b>Deleted Successfully!</b>,
         error: <b>{EXPORT_ERROR_MSG}</b>,
       }
     );
-  }, [chart_id, deleteEmbeddedLink, linkType, url]);
+  }, [chartId, deleteEmbeddedLink, linkType, embedId]);
 
-  const regenerateLink = useCallback(() => {
+  const onRegenerateEmbedRequested = useCallback(() => {
     switch (linkType) {
       case EMBEDDABLES.STATIC_IMAGE:
         if (!isAuthenticated) {
           toast.error(<b>User not logged in.</b>);
           return;
-        } else if (!chart_id) {
+        } else if (!chartId) {
           toast.error(
             <b>
               Chart not saved. Please save chart once or load any saved chart.
@@ -126,8 +149,7 @@ function EmbedChartCard(props: IEmbedChartCard) {
           toastrIdRef.current = toast.loading('Generating embedable link...');
         }
 
-        if (url?.length) {
-          const embedId = url.split('/')[url.split('/').length - 1];
+        if (embedId) {
           emitter.emit(EVENTS.EMBED_STATIC_IMAGE, { embedId });
         } else {
           toast.error(<b>Opps, Please try later!</b>);
@@ -138,57 +160,69 @@ function EmbedChartCard(props: IEmbedChartCard) {
       default:
         break;
     }
-  }, [chart_id, linkType, toastrIdRef, url, isAuthenticated]);
+  }, [linkType, isAuthenticated, chartId, toastrIdRef, embedId]);
+
+  const onViewEmbedRequested = useCallback(() => {
+    window.open(embedURL, '_blank');
+  }, [embedURL]);
 
   return (
     <div className="bg-app py-3 px-4 rounded-md mb-4 border border-default relative">
-      {!isAuthenticated && userLoginCheck && <LoginRequiredComp />}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {image}
-          <p className="font-semibold">{label}</p>
+      {!isAuthenticated && isUserLogged && <LoginRequiredComp />}
+      {!embedId?.length && !isLoading && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {image}
+            <p className="font-semibold">{label}</p>
+          </div>
+          <CWIconButton
+            icon={icon}
+            onClick={onClick}
+            disabled={!!embedId || isLoading || disabled}
+            aria-label={label}
+          />
         </div>
-        <CWIconButton
-          icon={icon}
-          onClick={onClick}
-          disabled={!!url || isLoading || disabled}
-          aria-label={label}
-        />
-      </div>
+      )}
       {isLoading && (
         <>
           <div className="h-4 w-2/3 animate-pulse bg-black/20 rounded-xl mt-4"></div>
           <div className="h-3 w-1/3 animate-pulse bg-black/20 rounded-xl mt-1"></div>
         </>
       )}
-      {!!url?.length && !isLoading && (
-        <div className="flex items-center gap-4 mt-4 w-full">
-          <span className="flex items-center gap-1 flex-1">
-            <strong>Link: </strong>
-            <CWGhostLink
-              href={`${VITE_API_BASE_URL}/api/embed/${url}`}
-              newTab={true}
-              label={<span className="truncate w-56">{url}</span>}
+      {!!embedId?.length && !isLoading && (
+        <div className="flex items-center justify-between mt-2 w-full">
+          <div className="flex items-center gap-4">
+            {image}
+            <p className="font-semibold">{generatedLabel}</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <CWIconButton
+              tooltip="View"
+              icon={<ExternalLink className="size-4" aria-hidden={true} />}
+              disabled={disabled}
+              onClick={onViewEmbedRequested}
             />
-          </span>
-          <CWIconButton
-            tooltip="Copy link"
-            icon={<Copy className="size-4" aria-hidden={true} />}
-            disabled={disabled}
-            onClick={copyLink}
-          />
-          <CWIconButton
-            tooltip="Delete link"
-            icon={<Trash className="size-4" aria-hidden={true} />}
-            disabled={disabled}
-            onClick={deleteLink}
-          />
-          <CWIconButton
-            tooltip="Re-generate Link"
-            icon={<RefreshCw className="size-4" aria-hidden={true} />}
-            disabled={disabled}
-            onClick={regenerateLink}
-          />
+            <CWIconButton
+              tooltip="Copy"
+              icon={<Copy className="size-4" aria-hidden={true} />}
+              disabled={disabled}
+              onClick={onCopyEmbedRequested}
+            />
+            <CWIconButton
+              tooltip="Delete"
+              icon={<Trash className="size-4" aria-hidden={true} />}
+              disabled={disabled}
+              onClick={onDeleteEmbedRequested}
+            />
+            {linkType == EMBEDDABLES.STATIC_IMAGE && (
+              <CWIconButton
+                tooltip="Re-generate"
+                icon={<RefreshCw className="size-4" aria-hidden={true} />}
+                disabled={disabled}
+                onClick={onRegenerateEmbedRequested}
+              />
+            )}
+          </div>
         </div>
       )}
     </div>

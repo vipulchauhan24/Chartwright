@@ -205,15 +205,15 @@ export class ChartsController {
   @UseInterceptors(FileInterceptor('file'))
   async generateEmbedableChart(
     @Req() req: Request,
+    @Body() reqBody: EmbedChartDTO,
+    @Res({ passthrough: true }) res: Response,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: 'image/png' })],
-        fileIsRequired: true,
+        fileIsRequired: false,
       })
     )
-    file: Express.Multer.File,
-    @Body() reqBody: EmbedChartDTO,
-    @Res({ passthrough: true }) res: Response
+    file?: Express.Multer.File
   ) {
     const userId = (req as any).user.userDbId;
     if (!userId) {
@@ -252,10 +252,15 @@ export class ChartsController {
     const url = await this.chartService.getEmbeddedStaticImage(id);
 
     if (!url || !url.length) {
-      throw new NotFoundException('Embedable data not found!');
+      throw new NotFoundException('Embeddable data not found!');
     }
 
     res.redirect(url);
+  }
+
+  @Get(`embed/${EMBEDDABLES.DYNAMIC_IFRAME}/:id`)
+  async getEmbeddedIframe(@Param('id') id: string) {
+    return this.chartService.getEmbeddedIframe(id);
   }
 
   @Delete('embed/:id')

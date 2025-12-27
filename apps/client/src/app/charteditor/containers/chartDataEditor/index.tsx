@@ -12,17 +12,15 @@ import {
 } from '@chartwright/ui-components';
 import InputRenderer from '../inputRenderer';
 import {
+  Axis3d,
   ChartArea,
+  Grid3x3,
   Highlighter,
   LetterText,
   PaintBucket,
   PenLine,
   SquareDashedMousePointer,
 } from 'lucide-react';
-
-import GridIcon from '../../../../assets/grid.svg?react';
-import XAxisEdgeIcon from '../../../../assets/x-axis-edge.svg?react';
-import YAxisEdgeIcon from '../../../../assets/y-axis-edge.svg?react';
 
 function ChartDataEditor() {
   const [chartEditableFeatures] = useAtom(activeChartFeatures);
@@ -91,11 +89,11 @@ function ChartDataEditor() {
           <SquareDashedMousePointer className="size-4" aria-hidden={true} />
         );
       case 'x-axis-edge':
-        return <XAxisEdgeIcon className="size-4" aria-hidden={true} />;
+        return <Axis3d className="size-4" aria-hidden={true} />;
       case 'y-axis-edge':
-        return <YAxisEdgeIcon className="size-4" aria-hidden={true} />;
+        return <Axis3d className="size-4" aria-hidden={true} />;
       case 'grid':
-        return <GridIcon className="size-4" aria-hidden={true} />;
+        return <Grid3x3 className="size-4" aria-hidden={true} />;
       default:
         return null;
     }
@@ -151,7 +149,7 @@ function ChartDataEditor() {
       options.push(
         ...chartEditableFeatures.chartEditSeries.map((option) => {
           return {
-            title: item.name || `${option.title} ${indx + 1}`,
+            title: `Series ${indx + 1}`,
             panelComponent: [
               ...getInputRenderedComp(option, indx),
               ...getChildren(option, indx),
