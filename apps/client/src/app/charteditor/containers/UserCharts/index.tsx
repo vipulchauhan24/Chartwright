@@ -86,7 +86,7 @@ function UserCharts(props: IUserCharts) {
         setAllEmbedChartData((prev: any) => {
           return {
             ...prev,
-            [`${chart_id}`]: {
+            [`${chartId}`]: {
               [`${EMBEDDABLES.DYNAMIC_IFRAME}`]: '',
               [`${EMBEDDABLES.STATIC_IMAGE}`]: '',
             },
