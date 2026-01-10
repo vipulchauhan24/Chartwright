@@ -49,6 +49,14 @@ export function App() {
             </AuthGaurd>
           }
         />
+        <Route
+          path="/chart/new"
+          element={
+            <AuthGaurd>
+              <ChartEditor />
+            </AuthGaurd>
+          }
+        />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     );

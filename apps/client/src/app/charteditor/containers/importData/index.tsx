@@ -21,14 +21,29 @@ import Papa from 'papaparse';
 import { read, utils } from 'xlsx';
 import useChartConfig from '../../hooks/useChartConfig';
 import { capitalizeFirstLetter, CHART_TYPES } from '../../utils/lib';
-import { chartTitle } from '../../../../store/charts';
+import {
+  activeChartConfig,
+  activeChartFeatures,
+  allChartFeatures,
+  chartTitle,
+  chartType,
+} from '../../../../store/charts';
 import { useAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 interface IImportData {
   toggleImportDataModal: (open: boolean) => void;
 }
 
 function ImportData({ toggleImportDataModal }: IImportData) {
+  const navigate = useNavigate();
+
+  const [, setActiveChartConfig] = useAtom(activeChartConfig);
+  const [, setChartTitle] = useAtom(chartTitle);
+  const [, setActiveChartFeatures] = useAtom(activeChartFeatures);
+  const [chartTypeLocal, setChartType] = useAtom(chartType);
+  const [chartFeaturesData] = useAtom(allChartFeatures);
+
   const dropzoneRef = useRef<HTMLDivElement>(null);
   const dropzoneInstRef = useRef<Dropzone>(null);
   const stepperRef = useRef<ICWStepper>(null);
@@ -63,15 +78,15 @@ function ImportData({ toggleImportDataModal }: IImportData) {
 
   const [uploadedFileData, setUploadedFileData] = useState<Array<never>>([]);
   const [isFileProcessing, setIsFileProcessing] = useState<boolean>(false);
+  const [fileType, setFileType] = useState<string>('');
   const [fileProcessingFinished, setFileProcessingFinished] =
     useState<boolean>(false);
   const [columnNames, setColumnNames] = useState<
     Array<{ id: string; value: string; label: string }>
   >([]);
   const [xColumnName, setXColumnName] = useState<string>();
-  const [chartType, setChartType] = useState<CHART_TYPES>(CHART_TYPES.BAR);
+
   const { isProcessing, buildChartConfig } = useChartConfig();
-  const [, setChrtTitle] = useAtom(chartTitle);
 
   const processHeaders = useCallback(
     (headers: Array<string>, file: { size: number }) => {
@@ -144,6 +159,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
       try {
         setIsFileProcessing(true);
         if (file.name.endsWith('.csv')) {
+          setFileType('CSV');
           Papa.parse(file, {
             header: true,
             dynamicTyping: true, //Prevent numbers to be converted to string.
@@ -160,6 +176,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
             },
           });
         } else if (file.name.endsWith('.xlsx')) {
+          setFileType('XLSX');
           const reader = new FileReader();
           reader.onload = (e) => {
             processXlsxFile(e, file);
@@ -228,17 +245,30 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     const chartConfig = await buildChartConfig(
       uploadedFileData,
       `${xColumnName}`,
-      chartType
+      chartTypeLocal as CHART_TYPES
     );
-    setChrtTitle(chartConfig.title.text || 'Chart');
+    setActiveChartConfig(chartConfig);
+    setChartTitle(chartConfig.title.text || 'Chart');
+    for (const features of chartFeaturesData) {
+      if (features['type'] === chartTypeLocal) {
+        setActiveChartFeatures(features['config']);
+        break;
+      }
+    }
+    navigate(`/chart/new?import=${fileType}`, { replace: true });
     toggleImportDataModal(false);
   }, [
     buildChartConfig,
-    chartType,
-    toggleImportDataModal,
     uploadedFileData,
     xColumnName,
-    setChrtTitle,
+    chartTypeLocal,
+    setActiveChartConfig,
+    setChartTitle,
+    navigate,
+    fileType,
+    toggleImportDataModal,
+    chartFeaturesData,
+    setActiveChartFeatures,
   ]);
 
   const steps = useMemo(() => {
@@ -294,7 +324,7 @@ function ImportData({ toggleImportDataModal }: IImportData) {
                 <CWSelect
                   id="import-data-select-chart-type"
                   placeholder="Select chart type"
-                  defaultValue={chartType}
+                  defaultValue={chartTypeLocal}
                   items={chartTypes.current}
                   onChange={(value: string) => {
                     setChartType(value as CHART_TYPES);
@@ -331,14 +361,13 @@ function ImportData({ toggleImportDataModal }: IImportData) {
     defaultSelectedColumn,
     columnNames,
     isProcessing,
-    chartType,
+    chartTypeLocal,
     generateChartConfig,
+    setChartType,
     toggleImportDataModal,
   ]);
 
-  return (
-    <CWStepper steps={steps} onFinish={() => alert('Done!')} ref={stepperRef} />
-  );
+  return <CWStepper steps={steps} ref={stepperRef} />;
 }
 
 export default React.memo(ImportData);

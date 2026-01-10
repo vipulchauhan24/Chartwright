@@ -1,11 +1,10 @@
 import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
-import { activeChartConfig, allChartBaseConfig } from '../../../store/charts';
+import { allChartBaseConfig } from '../../../store/charts';
 import toast from 'react-hot-toast';
 import { CHART_TYPES, randomHexColor } from '../utils/lib';
 
 function useChartConfig() {
-  const [, setChartDataConfig] = useAtom(activeChartConfig);
   const [allChartBaseConfigData] = useAtom(allChartBaseConfig);
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -122,8 +121,7 @@ function useChartConfig() {
             seriesIndx++;
           }
         });
-        setChartDataConfig(JSON.parse(JSON.stringify(chartConfig)));
-        return chartConfig;
+        return JSON.parse(JSON.stringify(chartConfig));
       } catch (error) {
         console.error("Error in 'building chart config': ", error);
         toast.error('Oops! Something went wrong. Please try again later.');
@@ -135,7 +133,6 @@ function useChartConfig() {
       allChartBaseConfigData,
       getSeriesData,
       getXAxisArray,
-      setChartDataConfig,
       setRandomColorToSeries,
     ]
   );

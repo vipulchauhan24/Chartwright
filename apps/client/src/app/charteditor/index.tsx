@@ -57,7 +57,7 @@ function ChartEditor() {
   const [chartTemplatesData] = useAtom(chartTemplates);
   const [chartFeaturesData] = useAtom(allChartFeatures);
   const [, setActiveChartFeatures] = useAtom(activeChartFeatures);
-  const [, setActiveChartConfig] = useAtom(activeChartConfig);
+  const [activeChartConf, setActiveChartConfig] = useAtom(activeChartConfig);
   const [, setChartTitle] = useAtom(chartTitle);
   const [, setChartType] = useAtom(chartType);
   const [, setChartId] = useAtom(chartId);
@@ -103,6 +103,12 @@ function ChartEditor() {
 
   useEffect(() => {
     if (!isLoading && !chart_id) {
+      if (window.location.pathname.includes('new')) {
+        if (!activeChartConf) {
+          navigate('/chart');
+        }
+        return;
+      }
       if (!chartTemplatesData?.length) {
         return;
       }
@@ -120,6 +126,8 @@ function ChartEditor() {
     } else if (!isLoading && chart_id) {
       fetchActiveChartConfig(chart_id);
     }
+    // DO NOT ADD activeChartConf in dependencies.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     chartTemplatesData,
     chartFeaturesData,
